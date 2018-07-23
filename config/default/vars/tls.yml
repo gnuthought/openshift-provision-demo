@@ -1,0 +1,5 @@
+---
+openshift_master_named_certificates:
+- certfile: "{{ openshift_master_cluster_public_certfile }}"
+  keyfile: "{{ openshift_master_cluster_public_keyfile }}"
+  cafile: "{{ openshift_master_cluster_public_cafile }}"

@@ -1,0 +1,6 @@
+---
+- name: Create terraform plugins directory
+  file:
+    path: "{{ terraform_dir }}/.terraform-plugins"
+    state: directory
+  changed_when: false

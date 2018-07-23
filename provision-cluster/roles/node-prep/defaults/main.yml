@@ -1,0 +1,2 @@
+---
+terraform_dir: "{{ playbook_dir }}"

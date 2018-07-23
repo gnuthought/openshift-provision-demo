@@ -1,0 +1,12 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+  - name: Load cluster config
+    import_tasks: load-config.yml
+
+  - name: Dump config YAML to {{ cluster_name }}-vars.yaml
+    copy:
+      content: "{{ lookup('vars', 'vars') | to_nice_yaml(indent=2) }}"
+      dest: "{{ playbook_dir }}/{{ cluster_name }}-vars.yaml"

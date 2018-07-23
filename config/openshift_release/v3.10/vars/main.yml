@@ -1,0 +1,3 @@
+---
+openshift_provision_release_prerequisite_packages:
+- centos-release-openshift-origin39

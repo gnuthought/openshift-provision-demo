@@ -1,0 +1,10 @@
+.*
+*.env
+*.json
+*.pyc
+*.retry
+*.token
+env/
+terraform/
+tls/
+openshift-connection.yml

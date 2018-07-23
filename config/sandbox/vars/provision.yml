@@ -1,0 +1,2 @@
+openshift_provision_sandbox_cluster_resources:
+- ClusterRole/sandbox-cluster-admin.yml

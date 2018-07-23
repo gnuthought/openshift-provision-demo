@@ -1,0 +1,14 @@
+---
+- name: Run terraform destroy
+  hosts: localhost
+  connection: local
+  vars:
+    openshift_provision_action: destroy
+    terraform_dir: "{{ playbook_dir }}/terraform"
+  tasks:
+  - name: Load cluster config
+    import_tasks: ../load-config.yml
+
+  - name: Include terraform role for destruction
+    include_role:
+      name: "{{ cloud_provider }}-terraform"

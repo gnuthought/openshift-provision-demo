@@ -1,0 +1,55 @@
+---
+- when: >-
+    'image' in group_names
+  block:
+  - name: Stop {{ openshift_node_service }} service
+    service:
+      name: "{{ openshift_node_service }}"
+      state: stopped
+
+  - name: Reset node bootstrap
+    file:
+      state: absent
+      path: "{{ item }}"
+    with_items:
+    - /etc/origin/node/certificates
+    - /etc/origin/node/node.kubeconfig
+
+  - name: Create {{ deployment_type }}-node-bootstrap-conf service
+    copy:
+      dest: /etc/systemd/system/{{ deployment_type }}-node-bootstrap-conf.service
+      content: |
+        [Unit]
+        Description=OpenShift Node Bootstrap Configuration
+        Before={{ openshift_node_service }}
+        Wants=dnsmasq.service
+        After=dnsmasq.service
+
+        [Service]
+        ExecStart=/usr/local/bin/{{ openshift_node_service }}-bootstrap-conf
+        Type=oneshot
+
+        [Install]
+        WantedBy=multi-user.target
+
+  - name: Add boostrap conf systemd requires to {{ openshift_node_service }} service
+    lineinfile:
+      path: /etc/systemd/system/{{ openshift_node_service }}.service
+      line: Requires={{ openshift_node_service }}-bootstrap-conf.service
+      insertafter: '^\[Unit\]'
+
+  - name: Create /usr/local/bin/{{ openshift_node_service }}-bootstrap-conf
+    copy:
+      src: "{{ cloud_provider }}-node-bootstrap-conf.py"
+      dest: /usr/local/bin/{{ openshift_node_service }}-bootstrap-conf
+      mode: u=rwx,go=rx
+
+  - name: Enable {{ openshift_node_service }}-bootstrap-conf service
+    systemd:
+      daemon_reload: true
+      enabled: true
+      name: "{{ openshift_node_service }}-bootstrap-conf"
+
+- name: Create cluster disk image
+  delegate_to: localhost
+  command: ./hosts.py --create-node-image

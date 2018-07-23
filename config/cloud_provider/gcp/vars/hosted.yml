@@ -1,0 +1,5 @@
+---
+openshift_hosted_registry_storage_provider: gcs
+openshift_hosted_registry_storage_gcs_bucket: "{{ cluster_name }}/docker-registry"
+#openshift_hosted_registry_storage_gcs_keyfile: docker-registry-key.json
+openshift_hosted_registry_storage_gcs_rootdirectory: /registry

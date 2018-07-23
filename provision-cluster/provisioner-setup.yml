@@ -1,0 +1,41 @@
+- name: Setup provisioner
+  hosts: masters[0]
+  tasks:
+  - name: Create provisioner service account
+    command: >-
+      oc create serviceaccount -n default provisioner
+    register: create_provisioner_serviceaccount
+    changed_when: >-
+      create_provisioner_serviceaccount.rc == 0
+    failed_when: >-
+      create_provisioner_serviceaccount.rc != 0 and
+      'already exists' not in create_provisioner_serviceaccount.stderr
+
+  - name: Check cluster-admin provisioner ClusterRoleBinding
+    command: >-
+      oc get ClusterRoleBinding cluster-admin-provisioner -o json
+    changed_when: false
+    failed_when: false
+    register: get_provisioner_cluster_admin
+
+  - name: Grant cluster-admin to provisioner
+    command: >-
+      oc adm policy add-cluster-role-to-user
+      --rolebinding-name=cluster-admin-provisioner
+      cluster-admin system:serviceaccount:default:provisioner
+    when: get_provisioner_cluster_admin.rc != 0
+
+  - name: Get provisioner token
+    command: >-
+      oc serviceaccounts get-token -n default provisioner
+    changed_when: false
+    register: get_provisioner_token
+
+  - name: Save provisioner token with ansible-vault
+    command: >-
+      ansible-vault encrypt --vault-password-file={{ vault_password_file }}
+      --output={{ openshift_config_location }}/cluster/{{ cluster_name }}/openshift-connection.yml
+    args:
+      stdin: "openshift_connection_token: {{ get_provisioner_token.stdout | to_json }}"
+    delegate_to: localhost
+    register: encrypt_provisioner_token

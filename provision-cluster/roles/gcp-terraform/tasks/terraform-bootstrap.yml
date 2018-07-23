@@ -1,0 +1,12 @@
+---
+- name: Run terraform apply
+  command: terraform apply -auto-approve
+  args:
+    chdir: terraform/{{ item }}
+  register: terraform_apply
+  changed_when: >-
+    "Resources: 0 added, 0 changed, 0 destroyed." not in terraform_apply.stdout
+  with_items:
+  - cluster-core
+  - masters
+  - image-node

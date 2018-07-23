@@ -1,0 +1,7 @@
+resource "google_storage_bucket" "{{ openshift_gcp_prefix }}terraform-state" {
+  name = "{{ openshift_gcp_prefix }}terraform-state"
+  project = "{{ openshift_gcp_project }}"
+  location = "{{ openshift_gcp_region }}"
+  storage_class = "REGIONAL"
+  force_destroy = true
+}

@@ -1,0 +1,19 @@
+---
+# htpasswd auth
+openshift_master_identity_providers:
+- name: htpasswd_auth
+  login: true
+  challenge: true
+  kind: HTPasswdPasswordIdentityProvider
+
+# Define htpasswd users
+openshift_master_htpasswd_users:
+  # admin:admin
+  admin: "$apr1$htwLsew9$RHCnuLTq9KxKi5ahrvsMw1"
+  # alice:password
+  alice: "$apr1$qgCoSsC5$v5fSYIiuAUEFaZbJbYgaW0"
+
+openshift_provision_sandbox_cluster_role_bindings:
+  sandbox-cluster-admin:
+    users:
+    - admin

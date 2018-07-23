@@ -1,0 +1,23 @@
+apiVersion: authorization.openshift.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    openshift.io/description: Super-user for sandbox environments. Created as a
+      separate cluster-role so as to not conflict with other binding management
+      for cluster-admin.
+  name: sandbox-cluster-admin
+rules:
+- apiGroups:
+  - '*'
+  attributeRestrictions: null
+  resources:
+  - '*'
+  verbs:
+  - '*'
+- apiGroups: null
+  attributeRestrictions: null
+  nonResourceURLs:
+  - '*'
+  resources: []
+  verbs:
+  - '*'

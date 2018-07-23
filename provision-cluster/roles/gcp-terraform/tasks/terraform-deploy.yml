@@ -1,0 +1,15 @@
+---
+- name: Run terraform apply
+  command: terraform apply -auto-approve
+  args:
+    chdir: terraform/node-group-{{ item.key }}
+  changed_when: >-
+    "Resources: 0 added, 0 changed, 0 destroyed." not in terraform_apply.stdout
+  # Terraform template management sometimes fails because it attempts template
+  # delete before the instance group updates have completed, so retry
+  register: terraform_apply
+  until: terraform_apply.rc == 0
+  retries: 2
+  delay: 5
+  with_dict: "{{ openshift_provision_node_groups }}"
+  when: item.key != 'master'

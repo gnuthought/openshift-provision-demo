@@ -1,0 +1,81 @@
+{% set router_node_group = openshift_provision_node_groups.router %}
+{% set router_gcp_zones = router_node_group.gcp_zones | default(openshift_gcp_zones) %}
+{% set router_maximum_instance_count = router_node_group.maximum_instance_count | default(router_node_group.instance_count) %}
+{% set router_managed_instance_group_count = router_maximum_instance_count if router_maximum_instance_count < router_gcp_zones|length else router_gcp_zones|length %}
+
+terraform {
+  backend "gcs" {
+    bucket  = "{{ openshift_gcp_prefix }}terraform-state"
+    prefix  = "image-node"
+  }
+}
+
+provider "google" {
+  project = "{{ openshift_gcp_project }}"
+  region = "{{ openshift_gcp_region }}"
+}
+
+data "google_compute_network" "{{ openshift_gcp_network_name }}" {
+  name = "{{ openshift_gcp_network_name }}"
+}
+
+data "google_compute_subnetwork" "{{ openshift_gcp_subnetwork_name }}" {
+  name = "{{ openshift_gcp_subnetwork_name }}"
+}
+
+{% for i in range(router_managed_instance_group_count) %}
+{%   set gcp_zone = router_gcp_zones[i] %}
+{%   set instance_group_name = openshift_gcp_prefix ~ 'router' ~ gcp_zone[-2:] %}
+data "google_compute_instance_group" "{{ instance_group_name }}" {
+  name = "{{ instance_group_name }}" {
+  zone = "{{ gcp_zone }}"
+}
+{% endfor %}
+
+resource "google_compute_health_check" "{{ openshift_gcp_prefix }}router" {
+  name = "{{ openshift_gcp_prefix }}router"
+  timeout_sec = 10
+  check_interval_sec = 10
+
+  http_health_check {
+    port = "1936"
+    request_path = "/healthz"
+  }
+}
+
+resource "google_compute_firewall" "{{ openshift_gcp_prefix }}router-http" {
+  name = "{{ openshift_gcp_prefix }}router-http"
+  network = "${google_compute_network.{{ openshift_gcp_network_name }}.name}"
+  allow {
+    protocol = "tcp"
+    ports = ["80", "443"]
+  }
+  source_ranges = ["0.0.0.0/0"]
+  target_tags = ["{{ openshift_gcp_prefix }}node-router"]
+}
+
+resource "google_compute_firewall" "{{ openshift_gcp_prefix }}router-stats" {
+  name = "{{ openshift_gcp_prefix }}router-stats"
+  network = "${data.google_compute_network.{{ openshift_gcp_network_name }}.name}"
+  allow {
+    protocol = "tcp"
+    ports = ["1936"]
+  }
+  source_ranges = ["35.191.0.0/16", "130.211.0.0/22", "209.85.152.0/22", "209.85.204.0/22"]
+  target_tags = ["{{ openshift_gcp_prefix }}node-router"]
+}
+
+resource "google_compute_region_backend_service" "{{ openshift_gcp_prefix }}router" {
+  name = "{{ openshift_gcp_prefix }}router"
+  protocol = "TCP"
+
+{% for i in range(router_managed_instance_group_count) %}
+{%   set gcp_zone = router_gcp_zones[i] %}
+{%   set instance_group_name = openshift_gcp_prefix ~ 'router' ~ gcp_zone[-2:] %}
+  backend {
+    group = "${data.google_compute_instance_group.{{ instance_group_name }}.self_link}"
+  }
+{% endfor %}
+
+  health_checks = [ "${google_compute_health_check.{{ openshift_gcp_prefix }}router}" ]
+}

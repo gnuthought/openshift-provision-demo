@@ -1,0 +1,39 @@
+---
+- name: Wait for Image Node
+  hosts: image
+  gather_facts: false
+  tasks:
+  - name: Wait for connection to image node
+    wait_for_connection:
+      connect_timeout: 20
+      sleep: 5
+      delay: 5
+      timeout: 300
+
+- name: Load Cluster Config
+  hosts: OSEv3
+  tasks:
+  - name: Load cluster config
+    import_tasks: ../load-config.yml
+
+- name: Run node-prep on image node
+  hosts: image
+  vars:
+    terraform_dir: "{{ playbook_dir }}/terraform"
+  roles:
+  - role: node-prep
+
+- import_playbook: >-
+    {{ openshift_ansible_location }}/playbooks/prerequisites.yml
+# OCP 3.10
+- import_playbook: >-
+    {{ openshift_ansible_location }}/playbooks/openshift-checks/pre-install.yml
+# OCP 3.10
+- import_playbook: >-
+    {{ openshift_ansible_location }}/playbooks/openshift-node/bootstrap.yml
+# OCP 3.10
+- import_playbook: >-
+    {{ openshift_ansible_location }}/playbooks/openshift-node/join.yml
+# OCP 3.9
+#- import_playbook: >-
+#    {{ openshift_ansible_location }}/playbooks/openshift-node/config.yml

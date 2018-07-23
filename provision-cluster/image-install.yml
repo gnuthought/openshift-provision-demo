@@ -1,0 +1,14 @@
+---
+- name: Load cluster config
+  hosts: OSEv3
+  vars:
+    terraform_dir: "{{ playbook_dir }}/terraform"
+  tasks:
+  - import_tasks: ../load-config.yml
+
+- import_playbook: "{{ openshift_ansible_location }}/playbooks/openshift-etcd/config.yml"
+#- import_playbook: "{{ openshift_ansible_location }}/playbooks/openshift-nfs/config.yml"
+#- import_playbook: "{{ openshift_ansible_location }}/playbooks/openshift-loadbalancer/config.yml"
+- import_playbook: "{{ openshift_ansible_location }}/playbooks/openshift-master/config.yml"
+- import_playbook: "{{ openshift_ansible_location }}/playbooks/openshift-master/additional_config.yml"
+- import_playbook: "{{ openshift_ansible_location }}/playbooks/openshift-node/config.yml"

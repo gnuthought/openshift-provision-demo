@@ -1,0 +1,35 @@
+= Configuration Repository
+
+== Main Variables
+
+* cluster_name
+* is_sandbox
+* environment_level
+* cloud_region
+* cloud_provider
+* openshift_release
+* deployment_type
+* cluster_name
+
+== Other Variables I Need To Document
+
+* management_source_ip
+* openshift_gcp_master_boot_disk_image
+* openshift_gcp_master_boot_disk_size_gb
+* openshift_gcp_master_docker_vg_disk_size_gb
+* openshift_gcp_master_docker_vg_disk_type
+* openshift_gcp_master_machine_type
+* openshift_gcp_master_service_account
+* openshift_gcp_network_name
+* openshift_gcp_node_boot_disk_image
+* openshift_gcp_node_boot_disk_size_gb
+* openshift_gcp_node_image_family
+* openshift_gcp_node_machine_type
+* openshift_gcp_node_service_account
+* openshift_gcp_prefix
+* openshift_gcp_project
+* openshift_gcp_region
+* openshift_gcp_subnetwork_name
+* openshift_master_cluster_hostname
+* openshift_master_cluster_public_hostname
+* openshift_provision_cluster_domain

@@ -1,0 +1,10 @@
+---
+openshift_gcp_master_boot_disk_size_gb: 50
+openshift_gcp_master_docker_vg_disk_size_gb: 50
+openshift_gcp_master_service_account: "{{ openshift_gcp_prefix }}master"
+openshift_gcp_network_name: "{{ cluster_name }}"
+openshift_gcp_node_boot_disk_size_gb: 50
+openshift_gcp_node_boot_disk_type: pd-standard
+openshift_gcp_node_service_account: "{{ openshift_gcp_prefix }}node"
+openshift_gcp_subnetwork_name: "{{ cluster_name }}"
+openshift_provision_master_count: 1

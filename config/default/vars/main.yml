@@ -1,0 +1,6 @@
+---
+# Debug level for all OpenShift components (Defaults to 2)
+debug_level: 2
+
+# Default sandbox setting to false
+is_sandbox: false

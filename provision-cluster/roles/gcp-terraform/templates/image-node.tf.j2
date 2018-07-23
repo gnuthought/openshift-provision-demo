@@ -1,0 +1,59 @@
+{% set t_gcp_zone = openshift_gcp_zones[0] %}
+
+terraform {
+  backend "gcs" {
+    bucket  = "{{ openshift_gcp_prefix }}terraform-state"
+    prefix  = "image-node"
+  }
+}
+
+provider "google" {
+  project = "{{ openshift_gcp_project }}"
+  region = "{{ openshift_gcp_region }}"
+}
+
+data "google_service_account" "{{ openshift_gcp_node_service_account }}" {
+  account_id = "{{ openshift_gcp_node_service_account }}"
+}
+
+data "google_compute_subnetwork" "{{ openshift_gcp_subnetwork_name }}" {
+  name = "{{ openshift_gcp_subnetwork_name }}"
+}
+
+resource "google_compute_instance" "{{ openshift_gcp_prefix }}image" {
+  name = "{{ openshift_gcp_prefix }}image"
+  machine_type = "{{ openshift_gcp_node_machine_type }}"
+  zone = "{{ t_gcp_zone }}"
+
+  tags = ["{{ openshift_gcp_prefix }}node"]
+
+  boot_disk {
+    initialize_params {
+      image = "{{ openshift_gcp_node_boot_disk_image | default('centos-7') }}"
+      size = "{{ openshift_gcp_node_boot_disk_size_gb }}"
+    }
+  }
+
+  network_interface {
+    subnetwork = "${data.google_compute_subnetwork.{{ openshift_gcp_subnetwork_name }}.self_link}"
+    access_config {
+      // Ephemeral IP
+    }
+  }
+
+  labels = {
+    openshift-cluster = "{{ cluster_name }}"
+    openshift-node-group-name = "image"
+  }
+
+  metadata {
+    ansible-host-group-nodes = "true"
+    ansible-host-group-image = "true"
+    ansible-var-openshift_schedulable = "false"
+  }
+
+  service_account {
+    email = "${data.google_service_account.{{ openshift_gcp_node_service_account }}.email}"
+    scopes = ["cloud-platform"]
+  }
+}

@@ -1,0 +1,142 @@
+terraform {
+  backend "gcs" {
+    bucket  = "{{ openshift_gcp_prefix }}terraform-state"
+    prefix  = "cluster-core"
+  }
+}
+
+provider "google" {
+  project = "{{ openshift_gcp_project }}"
+  region = "{{ openshift_gcp_region }}"
+}
+
+resource "google_service_account" "{{ openshift_gcp_master_service_account }}" {
+  account_id = "{{ openshift_gcp_master_service_account }}"
+  display_name = "{{ cluster_name }} master"
+}
+
+resource "google_service_account" "{{ openshift_gcp_node_service_account }}" {
+  account_id = "{{ openshift_gcp_node_service_account }}"
+  display_name = "{{ cluster_name }} node"
+}
+
+resource "google_project_iam_member" "{{ openshift_gcp_master_service_account }}-compute-admin" {
+  role = "roles/compute.admin"
+  member = "serviceAccount:${google_service_account.{{ openshift_gcp_master_service_account }}.email}"
+}
+
+resource "google_project_iam_member" "{{ openshift_gcp_node_service_account }}-compute-viewer" {
+  role = "roles/compute.viewer"
+  member = "serviceAccount:${google_service_account.{{ openshift_gcp_node_service_account }}.email}"
+}
+
+resource "google_compute_network" "{{ openshift_gcp_network_name }}" {
+  name = "{{ openshift_gcp_network_name }}"
+  auto_create_subnetworks = false
+}
+
+resource "google_compute_subnetwork" "{{ openshift_gcp_subnetwork_name }}" {
+  name = "{{ openshift_gcp_subnetwork_name }}"
+  ip_cidr_range = "{{ openshift_gcp_subnetwork_ip_cidr_range | default('10.0.0.0/24') }}"
+  network = "${google_compute_network.{{ openshift_gcp_network_name }}.self_link}"
+}
+
+#resource "google_compute_firewall" "{{ openshift_gcp_prefix }}master-controllers" {
+#  name = "{{ openshift_gcp_prefix }}master-controllers"
+#  network = "${google_compute_network.{{ openshift_gcp_network_name }}.name}"
+#  allow {
+#    protocol = "tcp"
+#    ports = ["8444"]
+#  }
+#  source_???
+#  target_tags = ["{{ openshift_gcp_prefix }}node-master"]
+#}
+
+# FIXME - etcd may not be located on the master...
+resource "google_compute_firewall" "{{ openshift_gcp_prefix }}master-etcd" {
+  name = "{{ openshift_gcp_prefix }}master-etcd"
+  network = "${google_compute_network.{{ openshift_gcp_network_name }}.name}"
+  allow {
+    protocol = "tcp"
+    ports = ["2379", "2380"]
+  }
+  source_tags = ["{{ openshift_gcp_prefix }}node-master"]
+  target_tags = ["{{ openshift_gcp_prefix }}node-master"]
+}
+
+resource "google_compute_firewall" "{{ openshift_gcp_prefix }}master-https" {
+  name = "{{ openshift_gcp_prefix }}master-https"
+  network = "${google_compute_network.{{ openshift_gcp_network_name }}.name}"
+  allow {
+    protocol = "tcp"
+    ports = ["443"]
+  }
+  source_ranges = ["0.0.0.0/0"]
+  target_tags = ["{{ openshift_gcp_prefix }}node-master"]
+}
+
+resource "google_compute_firewall" "{{ openshift_gcp_prefix }}master-skydns" {
+  name = "{{ openshift_gcp_prefix }}master-skydns"
+  network = "${google_compute_network.{{ openshift_gcp_network_name }}.name}"
+  allow {
+    protocol = "tcp"
+    ports = ["8053"]
+  }
+  source_tags = ["{{ openshift_gcp_prefix }}node"]
+  target_tags = ["{{ openshift_gcp_prefix }}node-master"]
+}
+
+resource "google_compute_firewall" "{{ openshift_gcp_prefix }}node-kublet" {
+  name = "{{ openshift_gcp_prefix }}node-kublet"
+  network = "${google_compute_network.{{ openshift_gcp_network_name }}.name}"
+  allow {
+    protocol = "tcp"
+    ports = ["10250"]
+  }
+  source_tags = ["{{ openshift_gcp_prefix }}node-master"]
+  target_tags = ["{{ openshift_gcp_prefix }}node"]
+}
+
+resource "google_compute_firewall" "{{ openshift_gcp_prefix }}node-kubeproxy" {
+  name = "{{ openshift_gcp_prefix }}node-kubeproxy"
+  network = "${google_compute_network.{{ openshift_gcp_network_name }}.name}"
+  allow {
+    protocol = "tcp"
+    ports = ["10256"]
+  }
+  source_ranges = ["35.191.0.0/16", "130.211.0.0/22", "209.85.152.0/22", "209.85.204.0/22"]
+  target_tags = ["{{ openshift_gcp_prefix }}node"]
+}
+
+resource "google_compute_firewall" "{{ openshift_gcp_prefix }}node-sdn" {
+  name = "{{ openshift_gcp_prefix }}node-sdn"
+  network = "${google_compute_network.{{ openshift_gcp_network_name }}.name}"
+  allow {
+    protocol = "tcp"
+    ports = ["4789"]
+  }
+  source_tags = ["{{ openshift_gcp_prefix }}node"]
+  target_tags = ["{{ openshift_gcp_prefix }}node"]
+}
+
+resource "google_compute_firewall" "{{ openshift_gcp_prefix }}node-ssh" {
+  name = "{{ openshift_gcp_prefix }}node-ssh"
+  network = "${google_compute_network.{{ openshift_gcp_network_name }}.name}"
+
+  allow {
+    protocol = "tcp"
+    ports = ["22"]
+  }
+  source_ranges = ["{{ management_source_ip }}/32"]
+  target_tags = ["{{ openshift_gcp_prefix }}node"]
+}
+
+resource "google_dns_managed_zone" "{{ cluster_name }}" {
+  name        = "{{ cluster_name }}"
+  dns_name    = "{{ openshift_provision_cluster_domain }}."
+  description = "{{ cluster_name }} managed by terraform"
+}
+
+output "cloud_dns_servers" {
+  value = "${google_dns_managed_zone.{{ cluster_name }}.name_servers}"
+}

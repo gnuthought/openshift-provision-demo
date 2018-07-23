@@ -1,0 +1,35 @@
+= OpenShift Provision Demo
+
+This repository provides examples of how to use the openshift-provision
+ansible role using a configuration repository that also drives the OpenShift
+installation as well as low level infrastructure provisioning with terraform.
+
+All code in this repository is GPLv3.
+
+== Using this Demo
+
+FIXME ...
+
+=== GCP 
+
+FIXME ...
+
+== Design Patterns Shown Here
+
+FIXME ...
+
+=== Config Repository
+
+FIXME ...
+
+=== Dynamic Inventory
+
+FIXME ...
+
+=== Resource Hierarchy
+
+FIXME ...
+
+=== Terraform with Jinja Templates
+
+FIXME ...

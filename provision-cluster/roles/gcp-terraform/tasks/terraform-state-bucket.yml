@@ -1,0 +1,33 @@
+---
+- name: Create terraform state bucket directory
+  file:
+    path: "{{ terraform_dir }}/state-bucket"
+    state: directory
+  changed_when: false
+
+- name: Process terraform state bucket template
+  template:
+    src: terraform-state-bucket.tf.j2
+    dest: "{{ terraform_dir }}/state-bucket/main.tf"
+  changed_when: false
+
+- name: Run terraform init for state bucket
+  command: terraform init
+  args:
+    chdir: "{{ terraform_dir }}/state-bucket"
+  changed_when: false
+
+- name: Run terraform import for state bucket
+  command: terraform import google_storage_bucket.{{ openshift_gcp_prefix }}terraform-state {{ openshift_gcp_prefix }}terraform-state
+  args:
+    chdir: "{{ terraform_dir }}/state-bucket"
+  changed_when: false
+  failed_when: false
+
+- name: Create terraform state bucket
+  command: terraform apply -auto-approve
+  args:
+    chdir: "{{ terraform_dir }}/state-bucket"
+  register: terraform_apply
+  changed_when: >-
+    '0 added, 0 changed, 0 destroyed' not in terraform_apply.stdout

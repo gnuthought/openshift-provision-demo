@@ -1,0 +1,7 @@
+---
+openshift_master_bootstrap_auto_approve: true
+
+openshift_node_groups: >-
+  {{ openshift_provision_node_groups | provision_to_openshift_node_groups
+   | union([{'name': 'node-config-image', 'labels': ['node-role.kubernetes.io/image=true'], 'edits': []}])
+  }}

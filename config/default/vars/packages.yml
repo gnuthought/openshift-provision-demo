@@ -1,0 +1,9 @@
+---
+openshift_provision_default_prerequisite_packages:
+- bind-utils
+- dnsmasq
+
+openshift_provision_prerequisite_packages: >-
+  {{ openshift_provision_default_prerequisite_packages
+   | union(openshift_provision_release_prerequisite_packages | default([]))
+  }}

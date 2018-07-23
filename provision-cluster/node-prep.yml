@@ -1,0 +1,21 @@
+---
+- name: Prepare Nodes for openshift-ansible
+  hosts: nodes
+  vars:
+    terraform_dir: "{{ playbook_dir }}/terraform"
+
+  pre_tasks:
+  - name: Load cluster config
+    import_tasks: ../load-config.yml
+
+  - name: Wait for connection to instances
+    wait_for_connection:
+      connect_timeout: 20
+      sleep: 5
+      delay: 5
+      timeout: 300
+
+  roles:
+  - role: node-prep
+
+- import_playbook: "{{ openshift_ansible_location }}/playbooks/prerequisites.yml"

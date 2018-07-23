@@ -1,0 +1,56 @@
+---
+- name: Get cloud dns servers
+  command: terraform output -json cloud_dns_servers
+  args:
+    chdir: "{{ terraform_dir }}/cluster-core"
+  changed_when: false
+  delegate_to: localhost
+  run_once: true
+  register: get_cloud_dns_servers
+
+- name: Configure dnsmasq for cluster domain
+  blockinfile:
+    path: /etc/dnsmasq.d/cluster-domain.conf
+    create: true
+    block: |-
+      {% for dnssrv in cloud_dns_servers.value %}
+      server=/{{ openshift_provision_cluster_domain }}/{{ lookup('dig', dnssrv) }}
+      {% endfor %}
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - cloud-dns-gcp"
+  vars:
+    cloud_dns_servers: >-
+      {{ get_cloud_dns_servers.stdout | from_json }}
+  notify:
+  - restart dnsmasq
+
+- name: Bootstrap dnsmasq dispatcher.d script
+  copy:
+    content: |
+      #!/bin/bash
+      [[ "$2" == 'up' ]] || exit 0
+      cat <<EOF >/etc/resolv.conf
+      # Bootstrap dnsmasq configuration, should be replaced during OpenShift installation
+      search c.{{ openshift_gcp_project }}.internal google.internal
+      nameserver 127.0.0.1
+      EOF
+    dest: /etc/NetworkManager/dispatcher.d/99-origin-dns.sh
+    owner: root
+    group: root
+    mode: u=rwx,go=rx
+    force: false
+  notify:
+  - run 99-origin-dns.sh
+
+- name: Set google internal DNS as upstream
+  copy:
+    content: |
+      server=169.254.169.254
+    dest: /etc/dnsmasq.d/origin-upstream-dns.conf
+    owner: root
+    group: root
+    mode: u=rw,go=
+  notify:
+  - restart dnsmasq
+
+- name: Flush handlers
+  meta: flush_handlers
