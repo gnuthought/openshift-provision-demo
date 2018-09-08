@@ -20,6 +20,10 @@ FIXME ...
 
 === Config Repository
 
+The link:config[] directory includes an example of how to lay out a
+configuration repositories with an inheritance structure to make it easy to
+manage multiple clusters.
+
 FIXME ...
 
 === Dynamic Inventory
