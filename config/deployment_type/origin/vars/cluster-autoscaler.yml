@@ -1,0 +1,2 @@
+---
+kube_cluster_autoscaler_image: docker.io/openshift/origin-cluster-autoscaler:{{ openshift_release }}

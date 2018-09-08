@@ -1,10 +1,16 @@
 ---
 openshift_provision_default_cluster_resources:
+- ClusterRole/kube-cluster-autoscaler.yml
 - Route/docker-registry.yml.j2
 
-openshift_provision_default_cluster_role_bindings: {}
+openshift_provision_default_cluster_role_bindings:
+  kube-cluster-autoscaler:
+    users:
+    - system:serviceaccount:kube-cluster-autoscaler:default
+    remove_unlisted: true
 
-openshift_provision_default_projects: {}
+openshift_provision_default_projects:
+  kube-cluster-autoscaler: "{{ openshift_provision_project_kube_cluster_autoscaler }}"
 
 #
 # Assemble cluster resources list using inheritance hierarchy

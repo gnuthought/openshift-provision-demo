@@ -1,0 +1,25 @@
+---
+apiVersion: v1
+kind: ClusterRole
+metadata:
+  annotations:
+    authorization.openshift.io/system-only: "true"
+    openshift.io/description: Kubernetes cluster autoscaler role
+  name: kube-cluster-autoscaler
+rules:
+# FIXME - This cluster role can be restricted... right now it is equivalent to
+# cluster-admin
+- apiGroups:
+  - '*'
+  attributeRestrictions: null
+  resources:
+  - '*'
+  verbs:
+  - '*'
+- apiGroups: null
+  attributeRestrictions: null
+  nonResourceURLs:
+  - '*'
+  resources: []
+  verbs:
+  - '*'

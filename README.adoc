@@ -4,9 +4,29 @@ This repository provides examples of how to use the openshift-provision
 ansible role using a configuration repository that also drives the OpenShift
 installation as well as low level infrastructure provisioning with terraform.
 
-All code in this repository is GPLv3.
+While you may choose to use this repository directly to provision OpenShift
+clusters, it is meant more as a collection of examples and design patterns to
+borrow from to build out your own tooling. All code in this repository is GPLv3.
+This means you are free to take code and do what you will with it, but if you
+_distribute_ new tools that use code from this repository then those tools must
+also be available under the GPLv3. Of course, if your tools you build from this
+are for internal ted then simply do as you will because the GPLv3 provisions
+only regard distribution. The ideas and inspiration you may take from this are
+all completely free.
+
+This demo includes cluster configuration, infrastructure provisioning with
+terraform, cluster installation with ansible, and post installation cluster
+configuration all in a single repository. You may wish to break these functions
+into multiple repositories for your own implementation. Separating your code and
+configuration repositories is a good practice.
 
 == Using this Demo
+
+To take this demo for a spin you may want to setup a cluster under the config
+directory. The config directory includes configuration for a "demo" cluster that
+uses the DNS domain "openshift-provision-demo.gnuthought.com". If you use this
+unchanged then you will need to setup local DNS overrides from your test system
+hosts file for names such as "master.openshift-provision-demo.gnuthought.com".
 
 FIXME ...
 
@@ -19,6 +39,10 @@ FIXME ...
 FIXME ...
 
 === Config Repository
+
+The link:config[] directory includes an example of how to lay out a
+configuration repositories with an inheritance structure to make it easy to
+manage multiple clusters.
 
 FIXME ...
 
@@ -33,3 +57,7 @@ FIXME ...
 === Terraform with Jinja Templates
 
 FIXME ...
+
+== License
+
+GPLv3
