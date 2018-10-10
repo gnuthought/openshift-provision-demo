@@ -1,0 +1,32 @@
+---
+# Cluster autoscaler dynamic reconfiguration by config map, is described here:
+# https://github.com/kubernetes/contrib/pull/2226
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kube-cluster-autoscaler
+data:
+  settings: >-
+    {
+       "nodeGroups": [
+{% for node_group_name, node_group in openshift_provision_node_groups.items() if 'minimum_instance_count' in node_group and 'maximum_instance_count' in node_group %}
+{%   if cloud_provider == 'gcp' %}
+{%     set gcp_zones = node_group.gcp_zones | default(openshift_gcp_zones) %}
+{%     set managed_instance_group_count = node_group.minimum_instance_count if node_group.minimum_instance_count < gcp_zones|length else gcp_zones|length %}
+{%     set outer_loop_last = loop.last %}
+{%     for i in range(managed_instance_group_count) %}
+{%       set gcp_zone = gcp_zones[i] %}
+{%       set instance_group_name = openshift_gcp_prefix ~ node_group_name ~ gcp_zone[-2:] %}
+{%       set zone_max = ((node_group.maximum_instance_count + managed_instance_group_count - i - 1) / managed_instance_group_count) | int %}
+{%       set zone_min = ((node_group.minimum_instance_count + managed_instance_group_count - i - 1) / managed_instance_group_count) | int %}
+         {
+           "maxSize": {{ zone_max if zone_max > 0 else 1 }},
+           "minSize": {{ zone_min if zone_min > 0 else 1 }},
+           "name": "https://www.googleapis.com/compute/v1/projects/{{ openshift_gcp_project }}/zones/{{ gcp_zone }}/instanceGroups/{{ instance_group_name }}"
+         }{% if not loop.last and not outer_loop_last %},{% endif %}
+{%     endfor %}
+{%   endif %}
+{% endfor %}
+
+       ]
+    }
