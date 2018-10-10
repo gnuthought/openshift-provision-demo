@@ -8,19 +8,22 @@ openshift_provision_node_groups:
       logging-infra-fluentd: "true"
       node-role.kubernetes.io/master: "true"
   infra-app:
-    instance_count: 1
+    minimum_instance_count: 1
+    maximum_instance_count: 3
     labels:
       logging-infra-fluentd: "true"
       node-role.kubernetes.io/infra: "true"
       node-role.kubernetes.io/infra-app: "true"
   router:
-    instance_count: 1
+    minimum_instance_count: 1
+    maximum_instance_count: 3
     labels:
       logging-infra-fluentd: "true"
       node-role.kubernetes.io/infra: "true"
       node-role.kubernetes.io/router: "true"
   compute:
-    instance_count: 1
+    minimum_instance_count: 1
+    maximum_instance_count: 3
     labels:
       logging-infra-fluentd: "true"
       node-role.kubernetes.io/compute: "true"

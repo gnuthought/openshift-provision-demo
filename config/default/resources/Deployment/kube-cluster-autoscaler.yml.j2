@@ -1,0 +1,42 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: kube-cluster-autoscaler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: kube-cluster-autoscaler
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        name: kube-cluster-autoscaler
+    spec:
+      containers:
+      - command:
+        - /usr/bin/cluster-autoscaler
+        - --balance-similar-node-groups
+        - --configmap=kube-cluster-autoscaler
+        - --logtostderr
+        - --namespace=kube-cluster-autoscaler
+        - --write-status-configmap=true
+        env:
+        - name: LOG_OUTPUT
+          value: /dev/stdout
+        image: {{ kube_cluster_autoscaler_image }}
+        imagePullPolicy: {{ kube_cluster_autoscaler_image_pull_policy }}
+        name: kube-cluster-autoscaler
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30

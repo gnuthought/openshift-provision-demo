@@ -1,0 +1,11 @@
+---
+openshift_provision_project_kube_cluster_autoscaler:
+  admin_create: true
+  annotations:
+    # Run autoscaler pods on masters
+    openshift.io/node-selector: "node-role.kubernetes.io/master=true"
+  resources:
+  - ConfigMap/kube-cluster-autoscaler.yml.j2
+  - Deployment/kube-cluster-autoscaler.yml.j2
+
+kube_cluster_autoscaler_image_pull_policy: Always
