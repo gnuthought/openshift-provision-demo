@@ -1,0 +1,3 @@
+---
+openshift_provision_cloud_provider_cluster_resources:
+- StorageClass/gce-pd.yml.j2
