@@ -23,10 +23,10 @@ data:
            "maxSize": {{ zone_max if zone_max > 0 else 1 }},
            "minSize": {{ zone_min if zone_min > 0 else 1 }},
            "name": "https://www.googleapis.com/compute/v1/projects/{{ openshift_gcp_project }}/zones/{{ gcp_zone }}/instanceGroups/{{ instance_group_name }}"
-         }{% if not loop.last and not outer_loop_last %},{% endif %}
+         }{% if not loop.last or not outer_loop_last %},{% endif %}
+
 {%     endfor %}
 {%   endif %}
 {% endfor %}
-
        ]
     }
