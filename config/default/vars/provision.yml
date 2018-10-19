@@ -1,7 +1,6 @@
 ---
 openshift_provision_default_cluster_resources:
 - ClusterRole/kube-cluster-autoscaler.yml
-- Route/docker-registry.yml.j2
 
 openshift_provision_default_cluster_role_bindings:
   kube-cluster-autoscaler:
@@ -10,6 +9,7 @@ openshift_provision_default_cluster_role_bindings:
     remove_unlisted: true
 
 openshift_provision_default_projects:
+  default: "{{ openshift_provision_project_default }}"
   kube-cluster-autoscaler: "{{ openshift_provision_project_kube_cluster_autoscaler }}"
 
 #

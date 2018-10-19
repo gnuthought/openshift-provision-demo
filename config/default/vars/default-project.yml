@@ -1,0 +1,7 @@
+---
+openshift_provision_project_default:
+  annotations:
+    # Allow resources in default project to run on any node
+    openshift.io/node-selector: ""
+  resources:
+  - Route/docker-registry.yml.j2

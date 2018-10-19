@@ -4,15 +4,9 @@ kind: Route
 metadata:
   annotations:
     haproxy.router.openshift.io/balance: source
+    openshift-provision/action: patch
   name: docker-registry
 spec:
   host: {{ openshift_hosted_registry_routehost }}
-  port:
-    targetPort: 5000-tcp
   tls:
     termination: reencrypt
-  to:
-    kind: Service
-    name: docker-registry
-    weight: 100
-  wildcardPolicy: None
