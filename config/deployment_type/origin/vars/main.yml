@@ -1,2 +1,5 @@
 ---
 openshift_node_service: origin-node
+openshift_service_type: origin
+openshift_provision_release_prerequisite_packages:
+- centos-release-openshift-origin{{ openshift_release | regex_replace('[^0-9]+','') }}

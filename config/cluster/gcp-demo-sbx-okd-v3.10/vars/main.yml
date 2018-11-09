@@ -1,5 +1,5 @@
 ---
-cluster_name: demo
+cluster_name: okd-gcp
 is_sandbox: true
 environment_level: nonprod
 cloud_region: gcp-us-central1

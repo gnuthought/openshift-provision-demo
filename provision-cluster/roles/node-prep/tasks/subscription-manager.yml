@@ -1,0 +1,23 @@
+---
+- name: Install subscription-manager package
+  yum:
+    name: subscription-manager
+    state: present
+
+- name: Register nodes with subscription-manager
+  redhat_subscription:
+    username: "{{ redhat_subscription_username }}"
+    password: "{{ redhat_subscription_password }}"
+    pool_ids: "{{ redhat_subscription_pools }}"
+  register: redhat_subscribe_system
+
+- name: Set yum repositories
+  command: >-
+    subscription-manager repos
+    --disable='*'
+    --enable=rhel-7-server-ansible-2.4-rpms
+    --enable=rhel-7-server-extras-rpms
+    --enable=rhel-7-server-ose-{{ openshift_release[1:] }}-rpms
+    --enable=rhel-7-server-rpms
+    --enable=rhel-7-server-optional-rpms
+  when: redhat_subscribe_system.changed

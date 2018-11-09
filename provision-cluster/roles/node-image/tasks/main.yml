@@ -15,9 +15,9 @@
     - /etc/origin/node/certificates
     - /etc/origin/node/node.kubeconfig
 
-  - name: Create {{ deployment_type }}-node-bootstrap-conf service
+  - name: Create {{ openshift_node_service }}-bootstrap-conf service
     copy:
-      dest: /etc/systemd/system/{{ deployment_type }}-node-bootstrap-conf.service
+      dest: /etc/systemd/system/{{  openshift_node_service }}-bootstrap-conf.service
       content: |
         [Unit]
         Description=OpenShift Node Bootstrap Configuration

@@ -29,7 +29,7 @@ resource "google_compute_instance" "{{ openshift_gcp_prefix }}image" {
 
   boot_disk {
     initialize_params {
-      image = "{{ openshift_gcp_node_boot_disk_image | default('centos-7') }}"
+      image = "{{ openshift_gcp_node_boot_disk_image }}"
       size = "{{ openshift_gcp_node_boot_disk_size_gb }}"
     }
   }

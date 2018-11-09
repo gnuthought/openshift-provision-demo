@@ -31,14 +31,14 @@ data "google_dns_managed_zone" "{{ cluster_name }}" {
 resource "google_compute_disk" "{{ t_master_name }}-docker-vg" {
   name = "{{ t_master_name }}-docker-vg"
   project = "{{ openshift_gcp_project }}"
-  type = "{{ openshift_gcp_master_docker_vg_disk_type | default('pd-standard') }}"
-  size = "{{ openshift_gcp_master_docker_vg_disk_size_gb | default(50) }}"
+  type = "{{ openshift_gcp_master_docker_vg_disk_type }}"
+  size = "{{ openshift_gcp_master_docker_vg_disk_size_gb }}"
   zone = "{{ t_master_zone }}"
 }
 
 resource "google_compute_instance" "{{ t_master_name }}" {
   name = "{{ t_master_name }}"
-  machine_type = "{{ openshift_gcp_master_machine_type | default('n1-standard-2') }}"
+  machine_type = "{{ openshift_gcp_master_machine_type }}"
   project = "{{ openshift_gcp_project }}"
   zone = "{{ t_master_zone }}"
 
@@ -46,8 +46,8 @@ resource "google_compute_instance" "{{ t_master_name }}" {
 
   boot_disk {
     initialize_params {
-      image = "{{ openshift_gcp_master_boot_disk_image | default('centos-7') }}"
-      size = "{{ openshift_gcp_master_boot_disk_size_gb | default(100) }}"
+      image = "{{ openshift_gcp_master_boot_disk_image }}"
+      size = "{{ openshift_gcp_master_boot_disk_size_gb }}"
     }
   }
 
