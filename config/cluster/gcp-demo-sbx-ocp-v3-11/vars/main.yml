@@ -1,0 +1,8 @@
+---
+cluster_name: gcp-demo-sbx-ocp-v3-11
+is_sandbox: true
+environment_level: nonprod
+cloud_region: gcp-us-east4
+cloud_provider: gcp
+openshift_release: v3.11
+deployment_type: openshift-enterprise

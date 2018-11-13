@@ -1,0 +1,15 @@
+---
+#
+# Secret values in this file may be managed as environment variables or directly
+# stored in this file. If credetials are store directly then this file should be
+# encrypted with ansible vault.
+#
+
+# Values used to subscribe system to Red Hat for software installation and updates
+redhat_subscription_username: "{{ lookup('env', 'REDHAT_SUBSCRIPTION_USERNAME') }}"
+redhat_subscription_password: "{{ lookup('env', 'REDHAT_SUBSCRIPTION_PASSWORD') }}"
+redhat_subscription_pools: "{{ lookup('env', 'REDHAT_SUBSCRIPTION_POOLS') }}"
+
+# Values for accessing images from registry.redhat.io
+oreg_auth_user: "{{ lookup('env', 'OREG_AUTH_USER') }}"
+oreg_auth_password: "{{ lookup('env', 'OREG_AUTH_PASSWORD') }}"
