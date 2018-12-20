@@ -1,0 +1,7 @@
+---
+openshift_provision_dns_cluster_domain: "{{ openshift_provision_dns_subdomain }}.{{ openshift_provision_dns_parent_domain }}"
+openshift_provision_dns_parent_domain: openshift.gnuthought.com
+openshift_provision_dns_subdomain: "{{ cluster_name }}"
+openshift_master_cluster_hostname: master-internal.{{ openshift_provision_dns_cluster_domain }}
+openshift_master_cluster_public_hostname: master.{{ openshift_provision_dns_cluster_domain }}
+openshift_master_default_subdomain: app.{{ openshift_provision_dns_cluster_domain }}

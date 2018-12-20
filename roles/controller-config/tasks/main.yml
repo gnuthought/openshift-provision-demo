@@ -1,0 +1,14 @@
+---
+- include_tasks: disable-yum-cron.yml
+
+- include_tasks: subscription-manager.yml
+  when: deployment_type == 'openshift-enterprise'
+
+- include_tasks: packages.yml
+
+- include_tasks: cluster-domain-dns.yml
+  when: openshift_provision_cluster_domain_dns_servers is defined
+
+- include_tasks: openshift-provision-demo-init.yml
+
+- include_tasks: ssh-keygen.yml

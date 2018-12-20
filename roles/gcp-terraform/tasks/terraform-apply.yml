@@ -1,0 +1,34 @@
+---
+- name: Run terraform apply for components
+  command: terraform apply -auto-approve
+  args:
+    chdir: "{{ terraform_dir }}/{{ component_name }}"
+  register: terraform_apply
+  changed_when: >-
+    "Resources: 0 added, 0 changed, 0 destroyed." not in terraform_apply.stdout
+  with_items:
+  - base
+  - controller
+  - masters
+  - image-node
+  loop_control:
+    loop_var: component_name
+  when: >-
+    component_name in terraform_components
+
+- name: Run terraformapply for node-group components
+  command: terraform apply -auto-approve
+  args:
+    chdir: "{{ terraform_template_dir }}"
+  with_dict: "{{ openshift_provision_node_groups }}"
+  loop_control:
+    loop_var: node_group_item
+  vars:
+    node_group: "{{ node_group_item.value }}"
+    node_group_name: "{{ node_group_item.key }}"
+    terraform_template_dir: "{{ terraform_dir }}/node-group-{{ node_group_name }}"
+  when:
+  - node_group_name != 'master'
+  - >-
+    'node-group-' ~ node_group_name in terraform_components or
+    'node-groups' in terraform_components

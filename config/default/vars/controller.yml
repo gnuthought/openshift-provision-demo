@@ -1,0 +1,8 @@
+---
+# ansible_user is used both for access and for provisioning access to instances
+# with terraform.
+ansible_user: ansible
+ansible_user_ssh_pubkey: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+
+openshift_provision_use_controller: true
+openshift_provision_controller_ssh_tcp443: true

@@ -1,0 +1,10 @@
+---
+- name: Stop yum-cron processes
+  shell: |-
+    for PID in $(ps aux | sed -rn 's|^root +([0-9]+).*[/]python.*/yum-cron .*|\1|p')
+    do
+      echo "Killing yum-cron $PID"
+      kill $PID
+    done
+  register: kill_yum_cron
+  changed_when: kill_yum_cron.stdout != ''

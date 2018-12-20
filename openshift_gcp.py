@@ -18,6 +18,7 @@ class OpenShiftGCP:
     def __init__(self, ocpinv):
         self.ocpinv = weakref.ref(ocpinv)
         self.computeAPI = googleapiclient.discovery.build('compute', 'v1')
+        self.dnsAPI = googleapiclient.discovery.build('dns', 'v1')
 
     def instance_fqdn(self, instance):
         return '%s.c.%s.internal' % (
@@ -58,7 +59,8 @@ class OpenShiftGCP:
 
     def get_cluster_instances_in_zone(self, zone):
         for instance in self.get_instances_in_zone(zone):
-            if self.instance_belongs_to_cluster(instance):
+            if( self.instance_belongs_to_cluster(instance)
+            and self.ansible_group_filter(instance) ):
                 yield instance
 
     def get_instances_in_zone(self, zone):
@@ -112,7 +114,7 @@ class OpenShiftGCP:
 
     def instance_ansible_host_ip(self, instance):
         primary_network_interface = instance['networkInterfaces'][0]
-        if os.envirnon.get('GCP_ANSIBLE_INVENTORY_USE_NAT_IP', 'false') == 'true':
+        if os.environ.get('GCP_ANSIBLE_INVENTORY_USE_NAT_IP', 'false') == 'true':
             return primary_network_interface['accessConfigs'][0]['natIP']
         else:
             return primary_network_interface['networkIP']
@@ -141,13 +143,26 @@ class OpenShiftGCP:
 
     def instance_host_vars(self, instance):
         hostvars = {
-            'ansible_host': self.instance_ansible_host_ip(instance),
-            'openshift_node_group_name': 'node-config-' + self.instance_openshift_node_group_name(instance),
-            'openshift_node_labels': self.instance_openshift_node_labels(instance)
+            'ansible_host': self.instance_ansible_host_ip(instance)
         }
-        self.instance_add_host_storage_devices(instance, hostvars)
+        self.instance_add_ansible_vars(instance, hostvars)
+
+        if instance.get('labels',{}).get('openshift-cluster-controller', 'false') != 'true':
+            hostvars['openshift_node_group_name'] = 'node-config-' + self.instance_openshift_node_group_name(instance)
+            hostvars['openshift_node_labels'] = self.instance_openshift_node_labels(instance)
+            self.instance_add_host_storage_devices(instance, hostvars)
+
         self.instance_add_ansible_vars(instance, hostvars)
         return hostvars
+
+    def ansible_group_filter(self, instance):
+        if 'ANSIBLE_GROUP_FILTER' not in os.environ:
+            return True
+        for item in instance['metadata']['items']:
+            if( item['key'] == 'ansible-host-group-' + os.environ['ANSIBLE_GROUP_FILTER']
+            and item['value'] == 'true' ):
+                return True
+        return False
 
     def openshift_role_filter(self, hostvars):
         if 'OPENSHIFT_ROLE_FILTER' not in os.environ:
@@ -166,7 +181,7 @@ class OpenShiftGCP:
         else:
             return self.instance_host_vars(instance)
 
-    def populate_hosts(self, hosts):
+    def populate_hosts_with_instances(self, hosts):
         for instance in self.get_cluster_instances():
             # Skip instances that are not running
             if instance['status'] != 'RUNNING':
@@ -186,6 +201,18 @@ class OpenShiftGCP:
                     hosts[group] = {
                         'hosts': [fqdn]
                     }
+
+    def populate_all_group_vars(self, hosts):
+        cluster_zone = self.dnsAPI.managedZones().get(
+            managedZone = self.ocpinv().cluster_var('openshift_gcp_dns_zone_name'),
+            project = self.ocpinv().cluster_var('openshift_gcp_project')
+        ).execute()
+        hosts['all']['vars']['openshift_provision_cluster_domain_dns_servers'] = \
+            cluster_zone['nameServers']
+
+    def populate_hosts(self, hosts):
+        self.populate_all_group_vars(hosts)
+        self.populate_hosts_with_instances(hosts)
 
     def wait_for_hosts_running(self, timeout):
         start_time = time.time()

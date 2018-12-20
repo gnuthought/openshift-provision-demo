@@ -1,0 +1,30 @@
+---
+- name: Run terraform apply
+  command: terraform apply -auto-approve
+  args:
+    chdir: terraform/cluster-core
+  register: terraform_apply
+  changed_when: >-
+    "Resources: 0 added, 0 changed, 0 destroyed." not in terraform_apply.stdout
+
+- name: Controller instance
+  include_tasks: controller-setup.yml
+  when: openshift_provision_deploy_controller
+
+- name: Run terraform apply
+  command: >-
+    terraform apply -auto-approve
+    {% if openshift_provision_controller_ssh_pubkey is defined %}
+    -var openshift_provision_controller_ssh_pubkey={{ openshift_provision_controller_ssh_pubkey | quote }}
+    {% endif %}
+  args:
+    chdir: terraform/{{ item }}
+  register: terraform_apply
+  changed_when: >-
+    "Resources: 0 added, 0 changed, 0 destroyed." not in terraform_apply.stdout
+  with_items:
+  - masters
+  - image-node
+
+- name: Get terraform output
+  include_tasks: get-terraform-output.yml

@@ -1,0 +1,102 @@
+{% set instance_template_name = openshift_gcp_prefix ~ node_group_name ~ '-' ~ ansible_date_time.iso8601 | regex_replace('[^0-9]', '') %}
+
+{% if openshift_provision_deploy_controller | bool %}
+variable "openshift_provision_controller_ssh_pubkey" {
+  description = "SSH public key for access to nodes"
+}
+{% endif %}
+
+terraform {
+  backend "gcs" {
+    bucket  = "{{ openshift_gcp_prefix }}terraform-state"
+    prefix  = "node-{{ node_group_name }}"
+  }
+}
+
+provider "google" {
+  project = "{{ openshift_gcp_project }}"
+  region = "{{ openshift_gcp_region }}"
+}
+
+data "google_service_account" "{{ openshift_gcp_node_service_account }}" {
+  account_id = "{{ openshift_gcp_node_service_account }}"
+}
+
+data "google_compute_subnetwork" "{{ openshift_gcp_subnetwork_name }}" {
+  name = "{{ openshift_gcp_subnetwork_name }}"
+  project = "{{ openshift_gcp_network_project }}"
+}
+
+data "google_compute_image" "node_image" {
+  family = "{{ openshift_gcp_node_image_family }}"
+}
+
+resource "google_compute_instance_template" "{{ instance_template_name }}" {
+  name = "{{ instance_template_name }}"
+  description = "OpenShift {{ cluster_name }} {{ node_group_name }}"
+  labels = {
+    openshift-cluster = "{{ cluster_name }}"
+    openshift-node-group-name = "{{ node_group_name }}"
+  }
+  machine_type = "{{ node_group.gcp_machine_type | default(openshift_gcp_node_machine_type) }}"
+  tags = ["{{ openshift_gcp_prefix }}node", "{{ openshift_gcp_prefix }}node-{{ node_group_name }}"]
+
+  disk {
+    boot = true
+    disk_size_gb = {{ node_group.disk_size_gb | default(openshift_gcp_node_boot_disk_size_gb) | int }}
+    disk_type = "{{ node_group.disk_type | default(openshift_gcp_node_boot_disk_type) }}"
+    source_image = "${data.google_compute_image.node_image.self_link}"
+  }
+
+  metadata {
+    ansible-host-group-nodes = "true"
+    ansible-host-group-{{ node_group_name }}-node = "true"
+    openshift-node-group = "{{ node_group_name }}"
+    # Labels included in metadata for node bootstrap labeling
+{% for k, v in node_group.labels.items() %}
+    openshift-node-label-{{ loop.index }} = "{{ k }}={{ v }}"
+{% endfor %}
+{% if ansible_user_ssh_pubkey | bool %}
+    sshKeys = "{{ansible_user}}:{{ansible_user_ssh_pubkey}} {{ansible_user}}"
+{% endif %}
+  }
+
+  network_interface {
+    subnetwork = "${data.google_compute_subnetwork.{{ openshift_gcp_subnetwork_name }}.self_link}"
+    access_config {
+      // Ephemeral IP
+    }
+  }
+
+  scheduling {
+{% if node_group.gcp_preemptible | default(false) | bool %}
+    automatic_restart = false
+    on_host_maintenance = "TERMINATE"
+    preemptible = true
+{% else %}
+    automatic_restart = true
+    on_host_maintenance = "MIGRATE"
+    preemptible = false
+{% endif %}
+  }
+
+  service_account {
+    email = "${data.google_service_account.{{ openshift_gcp_node_service_account }}.email}"
+    scopes = ["cloud-platform"]
+  }
+}
+
+{% set gcp_zones = node_group.gcp_zones | default(openshift_gcp_zones) %}
+{% set maximum_instance_count = node_group.maximum_instance_count | default(node_group.instance_count) %}
+{% set managed_instance_group_count = maximum_instance_count if maximum_instance_count < gcp_zones|length else gcp_zones|length %}
+{% for i in range(managed_instance_group_count) %}
+{%   set gcp_zone = gcp_zones[i] %}
+{%   set instance_group_name = openshift_gcp_prefix ~ node_group_name ~ gcp_zone[-2:] %}
+resource "google_compute_instance_group_manager" "{{ instance_group_name }}" {
+  name = "{{ instance_group_name }}"
+  base_instance_name = "{{ instance_group_name }}"
+  instance_template = "${google_compute_instance_template.{{ instance_template_name }}.self_link}"
+  update_strategy = "NONE"
+  zone = "{{ gcp_zone }}"
+}
+{% endfor %}

@@ -1,0 +1,34 @@
+---
+#
+# Process terraform templates for all components to setup for terraform
+# processing
+#
+
+- include_tasks: terraform-setup-template.yml
+  with_items:
+  - base
+  - controller
+  - masters
+  - image-node
+  loop_control:
+    loop_var: component_name
+  vars:
+    terraform_template: "{{ component_name }}"
+    terraform_template_dir: "{{ terraform_dir }}/{{ component_name }}"
+  when: >-
+    component_name in terraform_components
+
+- include_tasks: terraform-setup-template.yml
+  with_dict: "{{ openshift_provision_node_groups }}"
+  loop_control:
+    loop_var: node_group_item
+  vars:
+    node_group: "{{ node_group_item.value }}"
+    node_group_name: "{{ node_group_item.key }}"
+    terraform_template: node-group
+    terraform_template_dir: "{{ terraform_dir }}/node-group-{{ node_group_name }}"
+  when:
+  - node_group_name != 'master'
+  - >-
+    'node-group-' ~ node_group_name in terraform_components or
+    'node-groups' in terraform_components

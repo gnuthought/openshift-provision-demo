@@ -1,0 +1,108 @@
+---
+- name: Run terraform apply
+  command: terraform apply -auto-approve
+  args:
+    chdir: terraform/controller
+  register: terraform_apply
+  changed_when: >-
+    "Resources: 0 added, 0 changed, 0 destroyed." not in terraform_apply.stdout
+
+- name: Get controller IP
+  command: terraform output -json controller_ip
+  args:
+    chdir: "{{ terraform_dir }}/controller"
+  changed_when: false
+  check_mode: false
+  register: get_controller_ip
+
+- name: Add host for ansible controller
+  add_host:
+    name: controller
+    ansible_host: >-
+      {{ get_controller_ip.stdout | from_json | json_query('value') }}
+    ansible_user: "{{ ansible_user }}"
+  changed_when: false
+
+- name: Wait for connection to controller
+  delegate_to: controller
+  wait_for_connection:
+    connect_timeout: 20
+    sleep: 5
+    delay: 5
+    timeout: 300
+
+- when: deployment_type == 'openshift-enterprise'
+  block:
+  - name: Install subscription-manager package
+    delegate_to: controller
+    become: true
+    yum:
+      name: subscription-manager
+      state: present
+
+  - name: Register nodes with subscription-manager
+    delegate_to: controller
+    become: true
+    redhat_subscription:
+      username: "{{ redhat_subscription_username }}"
+      password: "{{ redhat_subscription_password }}"
+      pool_ids: "{{ redhat_subscription_pools }}"
+    register: redhat_subscribe_system
+
+  - name: Set yum repositories
+    delegate_to: controller
+    become: true
+    command: >-
+      subscription-manager repos
+      --disable='*'
+      --enable=rhel-7-server-ansible-2.4-rpms
+      --enable=rhel-7-server-extras-rpms
+      --enable=rhel-7-server-ose-{{ openshift_release[1:] }}-rpms
+      --enable=rhel-7-server-rpms
+      --enable=rhel-7-server-optional-rpms
+    when: redhat_subscribe_system.changed
+    register: set_yum_repositories
+
+- when: set_yum_repositories.changed
+  block:
+  - name: Yum clean
+    delegate_to: controller
+    become: true
+    command: yum clean all
+
+  - name: Remove yum cache
+    delegate_to: controller
+    become: true
+    file:
+      path: /var/cache/yum
+      state: absent
+
+- name: Check stat for controller ssh key exists
+  delegate_to: controller
+  stat:
+    path: ~/.ssh/id_rsa
+  register: controller_ssh_stat
+
+- name: Generate controller ssh key
+  when: controller_ssh_stat.stat.exists == False
+  command: ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
+  delegate_to: controller
+
+- name: Get controller ssh public key
+  delegate_to: controller
+  command: ssh-keygen -y -f ~/.ssh/id_rsa
+  changed_when: false
+  check_mode: false
+  register: get_controller_ssh_pubkey
+
+- name: Set fact for controller ssh public key
+  set_fact:
+    openshift_provision_controller_ssh_pubkey: >-
+      {{ get_controller_ssh_pubkey.stdout }}
+
+- name: Copy openshift-provision-demo to controller
+  delegate_to: controller
+  copy:
+    dest: ~/
+    src: "{{ openshift_provision_demo_location }}"
+    local_follow: false

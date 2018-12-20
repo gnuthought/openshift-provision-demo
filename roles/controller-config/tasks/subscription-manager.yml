@@ -1,0 +1,59 @@
+---
+- name: Install subscription-manager package
+  yum:
+    name: subscription-manager
+    state: present
+
+- name: Register nodes with subscription-manager
+  redhat_subscription:
+    username: "{{ redhat_subscription_username }}"
+    password: "{{ redhat_subscription_password }}"
+    pool_ids: "{{ redhat_subscription_pools }}"
+  register: redhat_subscribe_system
+
+- name: Set yum repositories
+  command: >-
+    subscription-manager repos
+    --disable='*'
+    --enable=rhel-7-server-ansible-2.6-rpms
+    --enable=rhel-7-server-extras-rpms
+    --enable=rhel-7-server-ose-{{ openshift_release[1:] }}-rpms
+    --enable=rhel-7-server-optional-rpms
+    --enable=rhel-7-server-rpms
+  when: redhat_subscribe_system.changed
+  register: set_yum_repositories
+
+- name: Remove cloud repos
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+  - /etc/yum.repos.d/google-cloud.repo
+  - /etc/yum.repos.d/rh-cloud.repo
+  register: remove_cloud_repos
+
+- name: Check if epel yum repository is configured
+  stat:
+    path: /etc/yum.repos.d/epel.repo
+  register: epel_repo_stat
+
+- name: Disable epel repository
+  replace:
+    path: /etc/yum.repos.d/epel.repo
+    regexp: ^enabled=1
+    replace: enabled=0
+  when: epel_repo_stat.stat.exists
+
+- when: >-
+    set_yum_repositories.changed or
+    remove_cloud_repos.changed
+  block:
+  - name: Yum clean
+    command: yum clean all
+    args:
+      warn: false
+
+  - name: Remove yum cache
+    file:
+      path: /var/cache/yum
+      state: absent

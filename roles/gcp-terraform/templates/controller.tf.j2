@@ -1,0 +1,113 @@
+{% set t_gcp_zone = openshift_gcp_zones[0] %}
+
+terraform {
+  backend "gcs" {
+    bucket  = "{{ openshift_gcp_prefix }}terraform-state"
+    prefix  = "controller"
+  }
+}
+
+provider "google" {
+  project = "{{ openshift_gcp_project }}"
+  region = "{{ openshift_gcp_region }}"
+}
+
+data "google_compute_network" "{{ openshift_gcp_network_name }}" {
+  name = "{{ openshift_gcp_subnetwork_name }}"
+  project = "{{ openshift_gcp_network_project }}"
+}
+
+data "google_compute_subnetwork" "{{ openshift_gcp_subnetwork_name }}" {
+  name = "{{ openshift_gcp_subnetwork_name }}"
+  project = "{{ openshift_gcp_network_project }}"
+}
+
+resource "google_service_account" "{{ openshift_gcp_controller_service_account }}" {
+  account_id = "{{ openshift_gcp_controller_service_account }}"
+  display_name = "{{ cluster_name }} controller"
+}
+
+resource "google_project_iam_member" "{{ openshift_gcp_controller_service_account }}-compute-admin" {
+  role = "roles/compute.admin"
+  member = "serviceAccount:${google_service_account.{{ openshift_gcp_controller_service_account }}.email}"
+}
+
+resource "google_project_iam_member" "{{ openshift_gcp_controller_service_account }}-dns-admin" {
+  role = "roles/dns.admin"
+  member = "serviceAccount:${google_service_account.{{ openshift_gcp_controller_service_account }}.email}"
+}
+
+resource "google_compute_firewall" "{{ openshift_gcp_prefix }}controller-to-node-ssh" {
+  name = "{{ openshift_gcp_prefix }}controller-to-node-ssh"
+  network = "${data.google_compute_network.{{ openshift_gcp_network_name }}.name}"
+
+  allow {
+    protocol = "tcp"
+    ports = ["22"]
+  }
+  source_tags = ["{{ openshift_gcp_prefix }}controller"]
+  target_tags = ["{{ openshift_gcp_prefix }}node"]
+}
+
+{% if openshift_provision_management_source_ip_range %}
+resource "google_compute_firewall" "{{ openshift_gcp_prefix }}mangement-to-controller-ssh" {
+  name = "{{ openshift_gcp_prefix }}mangement-to-controller-ssh"
+  network = "${data.google_compute_network.{{ openshift_gcp_network_name }}.name}"
+
+  allow {
+    protocol = "tcp"
+    ports = [
+{%   if openshift_provision_controller_ssh_tcp443 | bool %}
+      "443",
+{%   endif %}
+      "22"
+    ]
+  }
+  source_ranges = ["{{ openshift_provision_management_source_ip_range }}"]
+  target_tags = ["{{ openshift_gcp_prefix }}controller"]
+}
+{% endif %}
+
+resource "google_compute_instance" "{{ openshift_gcp_prefix }}controller" {
+  name = "{{ openshift_gcp_prefix }}controller"
+  machine_type = "{{ openshift_gcp_controller_machine_type }}"
+  zone = "{{ t_gcp_zone }}"
+
+  tags = ["{{ openshift_gcp_prefix }}controller"]
+
+  boot_disk {
+    initialize_params {
+      image = "{{ openshift_gcp_controller_boot_disk_image }}"
+      size = "{{ openshift_gcp_controller_boot_disk_size_gb }}"
+    }
+  }
+
+  network_interface {
+    subnetwork = "${data.google_compute_subnetwork.{{ openshift_gcp_subnetwork_name }}.self_link}"
+    access_config {
+      // Ephemeral IP
+    }
+  }
+
+  labels = {
+    openshift-cluster = "{{ cluster_name }}"
+    openshift-cluster-controller = "true"
+  }
+
+  metadata {
+    ansible-host-group-controller = "true"
+    sshKeys = "{{ansible_user}}:{{ansible_user_ssh_pubkey}} {{ansible_user}}"
+{% if openshift_provision_controller_ssh_tcp443 | default(False) | bool %}
+    startup-script = {{ lookup('file', 'ssh-tcp443-startup.sh') | to_json }}
+{% endif %}
+  }
+
+  service_account {
+    email = "${google_service_account.{{ openshift_gcp_controller_service_account }}.email}"
+    scopes = ["cloud-platform"]
+  }
+}
+
+output "controller_ip" {
+  value = "${google_compute_instance.{{ openshift_gcp_prefix }}controller.network_interface.0.access_config.0.nat_ip}"
+}

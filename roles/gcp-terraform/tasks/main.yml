@@ -1,0 +1,4 @@
+---
+- include_tasks: terraform-state-bucket.yml
+- include_tasks: terraform-setup.yml
+- include_tasks: terraform-{{ terraform_action }}.yml

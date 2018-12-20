@@ -12,13 +12,18 @@ errexit () {
 [[ -z "$PLAYBOOK" ]] && errexit "No PLAYBOOK provided."
 [[ -z "$OPENSHIFT_CLUSTER_NAME" ]] && errexit "No OPENSHIFT_CLUSTER_NAME provided."
 
-OPENSHIFT_ANSIBLE_LOCATION=${OPENSHIFT_ANSIBLE_LOCATION:-~/git/github.com/openshift/openshift-ansible}
+# Path to the cluster config
 OPENSHIFT_CONFIG_LOCATION=${OPENSHIFT_CONFIG_LOCATION:-$PWD/../config}
+
+# Directory within OPENSHIFT_CONFIG_LOCATION of the cluster config directoriy
 OPENSHIFT_CLUSTER_DIR=${OPENSHIFT_CONFIG_LOCATION}/cluster/${OPENSHIFT_CLUSTER_NAME}
+
+# Location of openshift-provision-demo to copy over to controller instance
+OPENSHFIT_PROVISION_DEMO_DIR=$(dirname $PWD)
+
+# Vault password file to protect any sensitive configuration
 VAULT_PASSWORD_FILE=${VAULT_PASSWORD_FILE:-$PWD/../.vaultpw}
 
-[[ -d "$OPENSHIFT_ANSIBLE_LOCATION" ]] || \
-  errexit "OPENSHIFT_ANSIBLE_LOCATION not found at $OPENSHIFT_ANSIBLE_LOCATION"
 [[ -d "$OPENSHIFT_CONFIG_LOCATION" ]] || \
   errexit "OPENSHIFT_CONFIG_LOCATION not found at $OPENSHIFT_CONFIG_LOCATION"
 [[ -d "$OPENSHIFT_CLUSTER_DIR" ]] || \
@@ -26,20 +31,17 @@ VAULT_PASSWORD_FILE=${VAULT_PASSWORD_FILE:-$PWD/../.vaultpw}
 [[ -f "$VAULT_PASSWORD_FILE" ]] || \
   errexit "VAULT_PASSWORD_FILE not found at $VAULT_PASSWORD_FILE"
 
+ANSIBLE_ROLES_PATH=$OPENSHFIT_PROVISION_DEMO_DIR/roles
+
 ANSIBLE_VARS="\
---inventory=hosts.py \
---vault-password-file=$VAULT_PASSWORD_FILE \
+--inventory=../hosts.py \
 -e cluster_name=$OPENSHIFT_CLUSTER_NAME \
--e openshift_provision_demo_location=$(dirname $PWD) \
--e openshift_ansible_location=$OPENSHIFT_ANSIBLE_LOCATION \
+-e openshift_provision_demo_location=$OPENSHFIT_PROVISION_DEMO_DIR \
 -e openshift_config_location=$OPENSHIFT_CONFIG_LOCATION \
--e vault_password_file=$VAULT_PASSWORD_FILE"
+-e vault_password_file=$VAULT_PASSWORD_FILE \
+--vault-password-file=$VAULT_PASSWORD_FILE"
 
-for EXT in cert key ca; do
-  if [[ -f "$OPENSHIFT_CLUSTER_DIR/tls/master.cert" ]]; then
-    ANSIBLE_VARS="$ANSIBLE_VARS -e openshift_master_cluster_public_${EXT}file=$OPENSHIFT_CLUSTER_DIR/tls/master.${EXT}"
-  fi
-done
-
-export OPENSHIFT_CONFIG_LOCATION OPENSHIFT_CLUSTER_NAME
+export ANSIBLE_ROLES_PATH \
+       OPENSHIFT_CONFIG_LOCATION \
+       OPENSHIFT_CLUSTER_NAME
 ansible-playbook -vvv $ANSIBLE_VARS $PLAYBOOK

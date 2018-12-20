@@ -1,0 +1,10 @@
+---
+- name: Uninstall Packages
+  yum:
+    name: "{{ openshift_provision_prerequisite_remove_packages }}"
+    state: absent
+
+- name: Install Packages
+  yum:
+    name: "{{ openshift_provision_prerequisite_packages }}"
+    state: present

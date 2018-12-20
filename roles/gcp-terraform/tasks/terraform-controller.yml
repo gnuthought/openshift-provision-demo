@@ -1,0 +1,16 @@
+---
+- name: Run terraform apply
+  command: >-
+    terraform apply -auto-approve
+  args:
+    chdir: "{{ terraform_dir }}/{{ item }}"
+  register: terraform_apply
+  changed_when: >-
+    "Resources: 0 added, 0 changed, 0 destroyed." not in terraform_apply.stdout
+  with_items:
+  - cluster-core
+  - controller
+
+#- name: Controller instance
+#  include_tasks: controller-setup.yml
+#  when: openshift_provision_deploy_controller

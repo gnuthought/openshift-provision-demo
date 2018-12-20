@@ -1,4 +1,4 @@
 ---
 openshift_gcp_project: openshift-provision
-openshift_gcp_prefix: demo-sbx-ocp-v3-11-
+openshift_gcp_prefix: demo-sbx-ocp-v3-10-
 openshift_gcp_dns_delegation_zone_name: openshift-gnuthought-com

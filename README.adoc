@@ -30,6 +30,10 @@ hosts file for names such as "master.openshift-provision-demo.gnuthought.com".
 
 FIXME ...
 
+=== Ansible Vault
+
+Create `.vaultpw` with a string.
+
 === GCP 
 
 FIXME ...

@@ -1,7 +1,0 @@
----
-openshift_provision_cluster_domain: openshift-provision-demo.gnuthought.com
-openshift_master_cluster_public_hostname: master.{{ openshift_provision_cluster_domain }}
-openshift_master_cluster_hostname: master-internal.{{ openshift_provision_cluster_domain }}
-openshift_master_default_subdomain: app.{{ openshift_provision_cluster_domain }}
-
-#openshift_master_named_certificates=[{"certfile": "/path/to/custom1.crt", "keyfile": "/path/to/custom1.key"}]

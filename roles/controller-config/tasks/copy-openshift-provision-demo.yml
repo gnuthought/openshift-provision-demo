@@ -1,0 +1,41 @@
+---
+- name: Create tempfile for openshift-provision-demo archive
+  delegate_to: localhost
+  tempfile:
+    state: file
+    suffix: .tar.gz
+  register: temptar
+
+- name: Create archive of openshift-provision-demo
+  delegate_to: localhost
+  command: tar czvf {{ temptar.path }} .
+  args:
+    chdir: "{{ openshift_provision_demo_location }}"
+
+- name: Create ~/openshift-provision-demo on controller
+  file:
+    path: ~/openshift-provision-demo
+    state: directory
+  vars:
+    ansible_become: false
+
+- name: Extract archive of openshift-provision-demo
+  unarchive:
+    src: "{{ temptar.path }}"
+    dest: ~/openshift-provision-demo
+  vars:
+    ansible_become: false
+
+- name: Remove archive of openshift-provision-demo
+  delegate_to: localhost
+  file:
+    path: "{{ temptar.path }}"
+    state: absent
+
+- name: Create var to indicate running from controller
+  copy:
+    dest: ~/openshift-provision-demo/config/default/vars/running-from-controller.yml
+    content: |
+      openshift_provision_is_running_from_controller: true
+  vars:
+    ansible_become: false

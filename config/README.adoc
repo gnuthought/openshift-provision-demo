@@ -13,23 +13,107 @@
 
 == Other Variables I Need To Document
 
-* management_source_ip
-* openshift_gcp_master_boot_disk_image
-* openshift_gcp_master_boot_disk_size_gb
-* openshift_gcp_master_docker_vg_disk_size_gb
-* openshift_gcp_master_docker_vg_disk_type
-* openshift_gcp_master_machine_type
-* openshift_gcp_master_service_account
-* openshift_gcp_network_name
-* openshift_gcp_node_boot_disk_image
-* openshift_gcp_node_boot_disk_size_gb
-* openshift_gcp_node_image_family
-* openshift_gcp_node_machine_type
-* openshift_gcp_node_service_account
-* openshift_gcp_prefix
-* openshift_gcp_project
-* openshift_gcp_region
-* openshift_gcp_subnetwork_name
-* openshift_master_cluster_hostname
-* openshift_master_cluster_public_hostname
-* openshift_provision_cluster_domain
+[cols="1,1,4",options="header"]
+|=======================
+| Variable | Default | Description
+
+| ansible_user | "ansible" |
+User for SSH access to cluster nodes from controller or management host if
+controller is not used. This variable is used for for host access and provision
+access with terraform.
+
+| ansible_user_ssh_pubkey | content of "\~/.ssh/id_rsa.pub" |
+SSH public key to configure for remote access into instances.
+
+| openshift_gcp_dns_delegation_zone_name | - none - |
+GCP name of cloud dns zone name for domain given by
+`openshift_provision_dns_parent_domain`. This is used to create delegation NS
+records for domain listed in `openshift_provision_dns_cluster_domain`.
+
+| openshift_gcp_dns_zone_name | "{{ cluster_name }}" |
+
+| openshift_gcp_master_boot_disk_image | ??? |
+
+| openshift_gcp_master_boot_disk_size_gb | ??? |
+
+| openshift_gcp_master_docker_vg_disk_size_gb | ??? |
+
+| openshift_gcp_master_docker_vg_disk_type | ??? |
+
+| openshift_gcp_master_machine_type | ??? |
+
+| openshift_gcp_master_service_account | ??? |
+
+| openshift_gcp_network_name | "{{ cluster_name }}" |
+
+| openshift_gcp_network_project | "{{ openshift_gcp_project }}" |
+
+| openshift_gcp_node_boot_disk_image | ??? |
+
+| openshift_gcp_node_boot_disk_size_gb | ??? |
+
+| openshift_gcp_node_image_family | ??? |
+
+| openshift_gcp_node_machine_type | ??? |
+
+| openshift_gcp_node_service_account | ??? |
+
+| openshift_gcp_prefix | "{{ cluster_name }}-" |
+Prefix used for GCP resource names.
+
+| openshift_gcp_project | - required for GCP - |
+GCP project in which to provision all resources.
+
+| openshift_gcp_region | - required for GCP - |
+
+| openshift_gcp_subnetwork_name | "{{ cluster_name }}" |
+
+| openshift_master_cluster_hostname | "master-internal.{{ openshift_provision_dns_cluster_domain }}" |
+
+| openshift_master_cluster_public_hostname | "master.{{ openshift_provision_dns_cluster_domain }}" |
+
+| openshift_master_default_subdomain | "app.{{ openshift_provision_dns_cluster_domain }}" |
+
+| openshift_provision_controller_cloud_packages | varies by cloud |
+
+| openshift_provision_controller_cloud_packages_enablerepo | varies by cloud |
+
+| openshift_provision_controller_cloud_python_packages | varies by cloud |
+
+| openshift_provision_controller_packages | list in roles/controller-config/default/main.yml |
+
+| openshift_provision_controller_packages_enablerepo | [] |
+
+| openshift_provision_controller_remove_packages | [] |
+
+| openshift_provision_controller_ssh_tcp443 | false |
+Configure controller instance for SSH access over port 443/tcp
+
+| openshift_provision_dns_cluster_domain | "{{ openshift_provision_dns_subdomain }}.{{ openshift_provision_dns_parent_domain }}" |
+
+| openshift_provision_dns_parent_domain | "openshift.gnuthought.com" |
+
+| openshift_provision_dns_subdomain | "{{ cluster_name }}" |
+
+| openshift_provision_management_source_ip_range | dynamic ip of host | 
+The IP range used to manage the cluster. If not set then the default
+configuration will attempt to dynamically determine the IP address of the
+host from which the ansible playbooks are run.
+
+| openshift_provision_use_controller | True |
+Indicates whether the cluster is managed with a controller instance. If this
+is set to false then the cluster is managed directly from wherever the ansible
+playbooks are run.
+
+| oreg_auth_user | value of environment variable "OREG_AUTH_USER" |
+
+| oreg_auth_password | value of environment variable "OREG_AUTH_PASSWORD" |
+
+| redhat_subscription_username | value of environment variable  "REDHAT_SUBSCRIPTION_USERNAME" |
+
+| redhat_subscription_password | value of environment variable "REDHAT_SUBSCRIPTION_PASSWORD" |
+
+| redhat_subscription_pools | value of environment variable "REDHAT_SUBSCRIPTION_POOLS" |
+
+|=======================
+

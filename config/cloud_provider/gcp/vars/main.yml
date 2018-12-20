@@ -1,5 +1,4 @@
 ---
-ansible_user: cloud-user
 openshift_cloudprovider_kind: gce
 openshift_gcp_multizone: true
 openshift_gcp_prefix: "{{ cluster_name }}-"
@@ -23,3 +22,6 @@ openshift_gcp_subnetwork_name: "{{ cluster_name }}"
 #openshift_gcp_subnetwork_ip_cidr_range: "10.0.0.0/24"
 #openshift_gcp_master_service_account: "{{ openshift_gcp_prefix }}master"
 #openshift_gcp_node_service_account: "{{ openshift_gcp_prefix }}node"
+
+openshift_gcp_dns_zone_name: "{{ cluster_name }}"
+openshift_gcp_network_project: "{{ openshift_gcp_project }}"
