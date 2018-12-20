@@ -20,7 +20,9 @@ openshift_provision_controller_packages:
 - psacct
 - python-dns
 - python2-pip
+- screen
 - sos
+- tmux
 - unzip
 - wget
 - yajl
