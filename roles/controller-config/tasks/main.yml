@@ -11,4 +11,6 @@
 
 - include_tasks: openshift-provision-demo-init.yml
 
+- include_tasks: install-terraform.yml
+
 - include_tasks: ssh-keygen.yml

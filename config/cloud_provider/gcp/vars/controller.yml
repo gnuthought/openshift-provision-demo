@@ -1,7 +1,6 @@
 ---
 openshift_provision_controller_cloud_packages:
 - python2-google-api-client
-- python2-pip
 
 openshift_provision_controller_cloud_packages_enablerepo:
 - epel

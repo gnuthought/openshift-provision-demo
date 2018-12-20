@@ -1,0 +1,28 @@
+---
+- name: Stat /usr/local/bin/terraform
+  stat:
+    path: /usr/local/bin/terraform
+  register: check_terraform
+
+- when: not check_terraform.stat.exists
+  block:
+  - name: Get terraform
+    get_url:
+      url: >-
+        https://releases.hashicorp.com/terraform/{{
+          openshift_provision_controller_terraform_release
+        }}/terraform_{{
+          openshift_provision_controller_terraform_release
+        }}_linux_amd64.zip
+      dest: >-
+        /usr/local/src/terraform_{{
+          openshift_provision_controller_terraform_release
+        }}_linux_amd64.zip
+
+  - name: Unpack terraform
+    command: >-
+      unzip /usr/local/src/terraform_{{
+        openshift_provision_controller_terraform_release
+      }}_linux_amd64.zip
+    args:
+      chdir: /usr/local/bin

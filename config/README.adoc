@@ -89,6 +89,8 @@ GCP project in which to provision all resources.
 | openshift_provision_controller_ssh_tcp443 | false |
 Configure controller instance for SSH access over port 443/tcp
 
+| openshift_provision_controller_terraform_release | "0.11.11" |
+
 | openshift_provision_dns_cluster_domain | "{{ openshift_provision_dns_subdomain }}.{{ openshift_provision_dns_parent_domain }}" |
 
 | openshift_provision_dns_parent_domain | "openshift.gnuthought.com" |
