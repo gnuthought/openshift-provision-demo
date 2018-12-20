@@ -27,20 +27,12 @@ resource "google_service_account" "{{ openshift_gcp_controller_service_account }
   display_name = "{{ cluster_name }} controller"
 }
 
-resource "google_project_iam_member" "{{ openshift_gcp_controller_service_account }}-compute-admin" {
-  role = "roles/compute.admin"
+{% for iam_role in openshift_provision_controller_gcp_iam_roles %}
+resource "google_project_iam_member" "{{ openshift_gcp_controller_service_account }}-{{ iam_role | replace('.', '-') }}" {
+  role = "roles/{{ iam_role }}"
   member = "serviceAccount:${google_service_account.{{ openshift_gcp_controller_service_account }}.email}"
 }
-
-resource "google_project_iam_member" "{{ openshift_gcp_controller_service_account }}-dns-admin" {
-  role = "roles/dns.admin"
-  member = "serviceAccount:${google_service_account.{{ openshift_gcp_controller_service_account }}.email}"
-}
-
-resource "google_project_iam_member" "{{ openshift_gcp_controller_service_account }}-storage-admin" {
-  role = "roles/storage.admin"
-  member = "serviceAccount:${google_service_account.{{ openshift_gcp_controller_service_account }}.email}"
-}
+{% endfor %}
 
 resource "google_compute_firewall" "{{ openshift_gcp_prefix }}controller-to-node-ssh" {
   name = "{{ openshift_gcp_prefix }}controller-to-node-ssh"

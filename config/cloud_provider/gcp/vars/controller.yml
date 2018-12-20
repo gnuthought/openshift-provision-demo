@@ -6,3 +6,6 @@ openshift_provision_controller_cloud_packages_enablerepo:
 - epel
 
 openshift_provision_controller_cloud_python_packages: []
+
+openshift_provision_controller_gcp_iam_roles:
+- editor

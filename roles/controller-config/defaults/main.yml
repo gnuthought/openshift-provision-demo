@@ -1,26 +1,5 @@
 ---
-openshift_provision_controller_packages:
-- ansible
-- bash-completion
-- bind-utils
-- dnsmasq
-- firewalld
-- git
-- kexec-tools
-- openshift-ansible
-- net-tools
-- psacct
-- python2-pip
-- sos
-- unzip
-- wget
-- yajl
-- yum-utils
-
 openshift_provision_controller_packages_enablerepo: []
-
-openshift_provision_controller_remove_packages:
-- yum-cron
 
 openshift_provision_controller_cloud_packages: []
 

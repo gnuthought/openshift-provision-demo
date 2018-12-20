@@ -7,4 +7,26 @@ ansible_user_ssh_pubkey: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
 openshift_provision_use_controller: true
 openshift_provision_controller_ssh_tcp443: true
 
+openshift_provision_controller_packages:
+- ansible
+- bash-completion
+- bind-utils
+- dnsmasq
+- firewalld
+- git
+- kexec-tools
+- openshift-ansible
+- net-tools
+- psacct
+- python-dns
+- python2-pip
+- sos
+- unzip
+- wget
+- yajl
+- yum-utils
+
+openshift_provision_controller_remove_packages:
+- yum-cron
+
 openshift_provision_controller_terraform_release: "0.11.11"
