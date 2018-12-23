@@ -1,25 +1,13 @@
 ---
-- name: Get cloud dns servers
-  command: terraform output -json cloud_dns_servers
-  args:
-    chdir: "{{ terraform_dir }}/cluster-core"
-  changed_when: false
-  delegate_to: localhost
-  run_once: true
-  register: get_cloud_dns_servers
-
 - name: Configure dnsmasq for cluster domain
   blockinfile:
     path: /etc/dnsmasq.d/cluster-domain.conf
     create: true
     block: |-
-      {% for dnssrv in cloud_dns_servers.value %}
+      {% for dnssrv in openshift_provision_cluster_domain_dns_servers %}
       server=/{{ openshift_provision_dns_cluster_domain }}/{{ lookup('dig', dnssrv) }}
       {% endfor %}
     marker: "# {mark} ANSIBLE MANAGED BLOCK - cloud-dns-gcp"
-  vars:
-    cloud_dns_servers: >-
-      {{ get_cloud_dns_servers.stdout | from_json }}
   notify:
   - restart dnsmasq
 

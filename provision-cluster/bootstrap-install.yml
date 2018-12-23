@@ -12,8 +12,6 @@
 
 - name: Prepare OSEv3 Hosts
   hosts: OSEv3
-  vars:
-    terraform_dir: "{{ playbook_dir }}/terraform"
   pre_tasks:
   - name: Load cluster config
     import_tasks: ../load-config.yml
@@ -22,25 +20,21 @@
 
 - import_playbook: >-
     {{ openshift_ansible_location }}/playbooks/prerequisites.yml
-# OCP 3.10
+
+# Import playbook list from openshift-ansible/playbooks/deploy_cluster.yml
 - import_playbook: >-
-    {{ openshift_ansible_location }}/playbooks/openshift-checks/pre-install.yml
-# OCP 3.10
+    {{ openshift_ansible_location }}/playbooks/init/main.yml
+  vars:
+    l_networkman_check_hosts: "oo_nodes_to_config"
+
 - import_playbook: >-
-    {{ openshift_ansible_location }}/playbooks/openshift-node/bootstrap.yml
+    {{ openshift_ansible_location }}/playbooks/openshift-checks/private/install.yml
+
 - import_playbook: >-
-    {{ openshift_ansible_location }}/playbooks/openshift-etcd/config.yml
-#- import_playbook: >-
-#    {{ openshift_ansible_location }}/playbooks/openshift-nfs/config.yml
-#- import_playbook: >-
-#    {{ openshift_ansible_location }}/playbooks/openshift-loadbalancer/config.yml
+    {{ openshift_ansible_location }}/playbooks/openshift-node/private/bootstrap.yml
+
 - import_playbook: >-
-    {{ openshift_ansible_location }}/playbooks/openshift-master/config.yml
+    {{ openshift_ansible_location }}/playbooks/common/private/control_plane.yml
+
 - import_playbook: >-
-    {{ openshift_ansible_location }}/playbooks/openshift-master/additional_config.yml
-# OCP 3.10
-- import_playbook: >-
-    {{ openshift_ansible_location }}/playbooks/openshift-node/join.yml
-# OCP 3.9
-#- import_playbook: >-
-#    {{ openshift_ansible_location }}/playbooks/openshift-node/config.yml
+    {{ openshift_ansible_location }}/playbooks/openshift-node/private/join.yml

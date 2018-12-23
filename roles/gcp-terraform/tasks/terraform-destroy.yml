@@ -1,4 +1,6 @@
 ---
+# FIXME - This needs fixed to be like terraform-apply
+#
 - name: Run terraform destroy for node groups
   command: >-
     terraform destroy -auto-approve
@@ -15,12 +17,6 @@
   delay: 5
   with_dict: "{{ openshift_provision_node_groups }}"
   when: item.key != 'master'
-
-- name: Run terraform destroy for controller
-  command: terraform destroy -auto-approve
-  args:
-    chdir: terraform/controller
-  when: openshift_provision_deploy_controller | bool
 
 - name: Run terraform destroy for core components
   command: >-

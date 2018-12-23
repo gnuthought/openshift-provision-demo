@@ -2,9 +2,6 @@
 - name: Run terrafom bootstrap
   hosts: localhost
   connection: local
-  vars:
-    openshift_provision_action: bootstrap
-    terraform_dir: "{{ playbook_dir }}/terraform"
   tasks:
   - name: Load cluster config
     import_tasks: ../load-config.yml
@@ -13,9 +10,16 @@
     include_role:
       name: "{{ cloud_provider }}-terraform"
       allow_duplicates: true
+    vars:
+      terraform_action: apply
+      terraform_components:
+      - base
+      - image-node
+      - masters
+      terraform_dir: "{{ playbook_dir }}/terraform"
 
   - name: Wait for all instances to be running
-    command: ./hosts.py --wait 300
+    command: ../hosts.py --wait 300
     changed_when: false
 
   - name: Refresh inventory

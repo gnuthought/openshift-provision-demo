@@ -1,6 +1,4 @@
 ---
-terraform_dir: "{{ playbook_dir }}"
-
 openshift_provision_prerequisite_packages:
 - bind-utils
 - docker

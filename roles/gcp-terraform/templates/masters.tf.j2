@@ -1,10 +1,4 @@
-{% set t_master_count = openshift_provision_node_groups.master.instance_count %}
-
-{% if openshift_provision_deploy_controller | bool %}
-variable "openshift_provision_controller_ssh_pubkey" {
-  description = "SSH public key for access to nodes"
-}
-{% endif %}
+{% set t_master_count = openshift_provision_node_groups.master.instance_count | default(1) %}
 
 terraform {
   backend "gcs" {
@@ -79,7 +73,7 @@ resource "google_compute_instance" "{{ t_master_name }}" {
   metadata {
     ansible-host-group-masters = "true"
     ansible-host-group-nodes = "true"
-{% if ansible_user_ssh_pubkey | bool %}
+{% if ansible_user_ssh_pubkey %}
     sshKeys = "{{ansible_user}}:{{ansible_user_ssh_pubkey}} {{ansible_user}}"
 {% endif %}
   }
