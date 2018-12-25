@@ -1,4 +1,8 @@
 ---
+# FIXME - Cleanup
+- fail:
+    msg: Don't think this is used
+
 - name: Run terraform apply
   command: >-
     terraform apply -auto-approve
@@ -10,7 +14,3 @@
   with_items:
   - cluster-core
   - controller
-
-#- name: Controller instance
-#  include_tasks: controller-setup.yml
-#  when: openshift_provision_deploy_controller

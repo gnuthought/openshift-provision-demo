@@ -1,4 +1,4 @@
-{% set t_master_count = openshift_provision_node_groups.master.instance_count %}
+{% set t_master_count = openshift_provision_node_groups.master.instance_count | default(1) %}
 
 terraform {
   backend "gcs" {

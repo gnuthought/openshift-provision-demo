@@ -35,11 +35,11 @@ ANSIBLE_ROLES_PATH=$OPENSHFIT_PROVISION_DEMO_DIR/roles
 
 ANSIBLE_VARS="\
 --inventory=../hosts.py \
+--vault-password-file=$VAULT_PASSWORD_FILE \
 -e cluster_name=$OPENSHIFT_CLUSTER_NAME \
 -e openshift_provision_demo_location=$OPENSHFIT_PROVISION_DEMO_DIR \
 -e openshift_config_location=$OPENSHIFT_CONFIG_LOCATION \
--e vault_password_file=$VAULT_PASSWORD_FILE \
---vault-password-file=$VAULT_PASSWORD_FILE"
+-e vault_password_file=$VAULT_PASSWORD_FILE"
 
 export ANSIBLE_ROLES_PATH \
        OPENSHIFT_CONFIG_LOCATION \

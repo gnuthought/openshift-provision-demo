@@ -93,7 +93,9 @@ resource "google_compute_instance" "{{ openshift_gcp_prefix }}controller" {
 
   metadata {
     ansible-host-group-controller = "true"
+{% if openshift_provision_controller_ansible_ssh_pubkey %}
     sshKeys = "{{openshift_provision_controller_ansible_user}}:{{openshift_provision_controller_ansible_ssh_pubkey}} {{openshift_provision_controller_ansible_user}}"
+{% endif %}
 {% if openshift_provision_controller_ssh_tcp443 | default(False) | bool %}
     startup-script = {{ lookup('file', 'ssh-tcp443-startup.sh') | to_json }}
 {% endif %}

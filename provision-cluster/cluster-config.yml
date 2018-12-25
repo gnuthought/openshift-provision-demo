@@ -8,36 +8,5 @@
   - name: Load cluster config
     import_tasks: ../load-config.yml
 
-#- import_playbook: >-
-#    {{ openshift_ansible_location }}/playbooks/openshift-glusterfs/config.yml
 - import_playbook: >-
-    {{ openshift_ansible_location }}/playbooks/openshift-hosted/config.yml
-# OCP 3.10
-# FIXME - Need to define openshift_cluster_monitoring_operator_node_selector
-#- import_playbook: >-
-#    {{ openshift_ansible_location }}/playbooks/openshift-monitoring/config.yml
-- import_playbook: >-
-    {{ openshift_ansible_location }}/playbooks/openshift-web-console/config.yml
-#- import_playbook: >-
-#    {{ openshift_ansible_location }}/playbooks/openshift-metrics/config.yml
-#- import_playbook: >-
-#    {{ openshift_ansible_location }}/playbooks/openshift-logging/config.yml
-#- import_playbook: >-
-#    {{ openshift_ansible_location }}/playbooks/openshift-prometheus/config.yml
-# OCP 3.10
-#- import_playbook
-#    {{ openshift_ansible_location }}/playbooks/openshift-monitor-availability/config.yml
-- import_playbook: >-
-    {{ openshift_ansible_location }}/playbooks/openshift-service-catalog/config.yml
-# FIXME - Error about openshift_management_storage_nfs_local_hostname... why is it using NFS?
-#- import_playbook: >-
-#    {{ openshift_ansible_location }}/playbooks/openshift-management/config.yml
-# OCP 3.10
-#- import_playbook: >-
-#    {{ openshift_ansible_location }}/playbooks/openshift-descheduler/config.yml
-# OCP 3.10
-#- import_playbook: >-
-#    {{ openshift_ansible_location }}/playbooks/openshift-node-problem-detector/config.yml    
-# OCP 3.10
-#- import_playbook: >-
-#    {{ openshift_ansible_location }}/playbooks/openshift-autoheal/config.yml
+   {{ openshift_ansible_location }}/common/private/components.yml

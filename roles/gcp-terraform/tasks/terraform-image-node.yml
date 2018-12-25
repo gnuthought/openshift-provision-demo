@@ -1,8 +1,8 @@
 ---
-- name: Controller instance
-  include_tasks: controller-setup.yml
-  when: openshift_provision_deploy_controller
+# FIXME - Cleanup
 
+- fail:
+    msg: Not used I think
 - name: Run terraform apply
   command: >-
     terraform apply -auto-approve

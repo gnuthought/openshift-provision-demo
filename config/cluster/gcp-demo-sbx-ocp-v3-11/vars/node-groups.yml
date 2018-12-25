@@ -3,7 +3,7 @@ openshift_disable_check: memory_availability,disk_availability
 
 openshift_provision_node_groups:
   master:
-    static_instance_count: 1
+    instance_count: 1
     labels:
       logging-infra-fluentd: "true"
       node-role.kubernetes.io/master: "true"
