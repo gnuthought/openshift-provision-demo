@@ -1,4 +1,8 @@
 ---
+# FIXME
+- fail:
+    msg: NOT USED
+
 - name: Run terraform apply
   command: terraform apply -auto-approve
   args:
