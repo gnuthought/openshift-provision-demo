@@ -60,6 +60,13 @@ class OpenShiftInventory:
             self.cluster_config.update(yaml.load(file(varpath,'r')) or {})
 
     def cluster_var(self, varname):
+        """
+        Return the value of a given variable.
+
+        This method provides simplistic variable evaluation by the inventory
+        to get a variable. This is needed to evaluated variables used to
+        retrieve the inventory such as getting cloud provider information.
+        """
         raw_value = self.cluster_config.get(varname, None)
         if isinstance(raw_value, str):
             return self.value_expand(raw_value)
@@ -85,22 +92,14 @@ class OpenShiftInventory:
     def print_host_list_json(self):
         hosts = {
             'all': {
-                'vars': {}
+                'vars': self.cluster_config
             },
             'controller': {
-                'hosts': [],
-                'vars': {
-                    'ansible_become': True,
-                    'ansible_user': self.cluster_var('ansible_user')
-                }
+                'hosts': []
             },
             'OSEv3': {
                 'children': ['etcd', 'nodes'],
-                'hosts': [],
-                'vars': {
-                    'ansible_become': True,
-                    'ansible_user': self.cluster_var('ansible_user')
-                }
+                'hosts': []
             },
             'nodes': {
                 'children': ['masters'],

@@ -1,11 +1,5 @@
 {% set t_gcp_zone = openshift_gcp_zones[0] %}
 
-{% if openshift_provision_deploy_controller | bool %}
-variable "openshift_provision_controller_ssh_pubkey" {
-  description = "SSH public key for access to nodes"
-}
-{% endif %}
-
 terraform {
   backend "gcs" {
     bucket  = "{{ openshift_gcp_prefix }}terraform-state"
@@ -57,8 +51,8 @@ resource "google_compute_instance" "{{ openshift_gcp_prefix }}image" {
     ansible-host-group-nodes = "true"
     ansible-host-group-image = "true"
     ansible-var-openshift_schedulable = "false"
-{% if ansible_user_ssh_pubkey | bool %}
-    sshKeys = "{{ansible_user}}:{{ansible_user_ssh_pubkey}} {{ansible_user}}"
+{% if openshift_provision_ansible_ssh_pubkey | bool %}
+    sshKeys = "{{openshift_provision_ansible_user}}:{{openshift_provision_ansible_ssh_pubkey}} {{openshift_provision_ansible_user}}"
 {% endif %}
   }
 

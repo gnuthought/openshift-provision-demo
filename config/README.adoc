@@ -17,19 +17,6 @@
 |=======================
 | Variable | Default | Description
 
-| ansible_user | "ansible" |
-User for SSH access to cluster nodes from controller or management host if
-controller is not used. This variable is used for for host access and provision
-access with terraform.
-
-| ansible_user_ssh_pubkey | content of "\~/.ssh/id_rsa.pub" |
-SSH public key to configure for remote access into instances.
-
-| openshift_provision_controller_gcp_iam_roles | ["editor"] |
-The editor role is required to use the full functionality included in this demo.
-If more restrictive roles are desired then specific functionality such as IAM
-user and role binding would need to be handled in another manner.
-
 | openshift_gcp_dns_delegation_zone_name | - none - |
 GCP name of cloud dns zone name for domain given by
 `openshift_provision_dns_parent_domain`. This is used to create delegation NS
@@ -79,11 +66,31 @@ GCP project in which to provision all resources.
 
 | openshift_master_default_subdomain | "app.{{ openshift_provision_dns_cluster_domain }}" |
 
+| openshift_provision_ansible_user | "ansible" |
+User for SSH access to cluster nodes from controller or management host if
+controller is not used. This variable is used for for host access and provision
+access with terraform.
+
+| openshift_provision_ansible_ssh_pubkey | content of "\~/.ssh/id_rsa.pub" |
+SSH public key to configure for remote access into instances.
+
+| openshift_provision_controller_ansible_user | "ansible" |
+User for SSH access to controller from management host.  This variable is
+used for for host access and provision access with terraform.
+
+| openshift_provision_controller_ansible_ssh_pubkey | content of "\~/.ssh/id_rsa.pub" |
+SSH public key to configure for remote access to controller.
+
 | openshift_provision_controller_cloud_packages | varies by cloud |
 
 | openshift_provision_controller_cloud_packages_enablerepo | varies by cloud |
 
 | openshift_provision_controller_cloud_python_packages | varies by cloud |
+
+| openshift_provision_controller_gcp_iam_roles | ["editor"] |
+The editor role is required to use the full functionality included in this demo.
+If more restrictive roles are desired then specific functionality such as IAM
+user and role binding would need to be handled in another manner.
 
 | openshift_provision_controller_packages | list in roles/controller-config/default/main.yml |
 

@@ -1,0 +1,3 @@
+---
+# Default value in config/default/vars/controller.yml
+ansible_user: "{{ openshift_provision_controller_ansible_user }}"

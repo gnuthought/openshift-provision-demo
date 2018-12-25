@@ -1,11 +1,5 @@
 {% set instance_template_name = openshift_gcp_prefix ~ node_group_name ~ '-' ~ ansible_date_time.iso8601 | regex_replace('[^0-9]', '') %}
 
-{% if openshift_provision_deploy_controller | bool %}
-variable "openshift_provision_controller_ssh_pubkey" {
-  description = "SSH public key for access to nodes"
-}
-{% endif %}
-
 terraform {
   backend "gcs" {
     bucket  = "{{ openshift_gcp_prefix }}terraform-state"
@@ -56,8 +50,8 @@ resource "google_compute_instance_template" "{{ instance_template_name }}" {
 {% for k, v in node_group.labels.items() %}
     openshift-node-label-{{ loop.index }} = "{{ k }}={{ v }}"
 {% endfor %}
-{% if ansible_user_ssh_pubkey | bool %}
-    sshKeys = "{{ansible_user}}:{{ansible_user_ssh_pubkey}} {{ansible_user}}"
+{% if openshift_provision_ansible_ssh_pubkey | bool %}
+    sshKeys = "{{openshift_provision_ansible_user}}:{{openshift_provision_ansible_ssh_pubkey}} {{openshift_provision_ansible_user}}"
 {% endif %}
   }
 
