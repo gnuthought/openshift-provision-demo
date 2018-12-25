@@ -74,6 +74,9 @@ access with terraform.
 | openshift_provision_ansible_ssh_pubkey | content of "\~/.ssh/id_rsa.pub" |
 SSH public key to configure for remote access into instances.
 
+| openshift_provision_controller_ansible_port | 443 |
+SSH port for reaching the controller.
+
 | openshift_provision_controller_ansible_user | "ansible" |
 User for SSH access to controller from management host.  This variable is
 used for for host access and provision access with terraform.
@@ -97,9 +100,6 @@ user and role binding would need to be handled in another manner.
 | openshift_provision_controller_packages_enablerepo | [] |
 
 | openshift_provision_controller_remove_packages | [] |
-
-| openshift_provision_controller_ssh_tcp443 | false |
-Configure controller instance for SSH access over port 443/tcp
 
 | openshift_provision_controller_terraform_release | "0.11.11" |
 

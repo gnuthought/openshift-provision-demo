@@ -16,15 +16,11 @@
   file:
     path: ~/openshift-provision-demo
     state: directory
-  vars:
-    ansible_become: false
 
 - name: Extract archive of openshift-provision-demo
   unarchive:
     src: "{{ temptar.path }}"
     dest: ~/openshift-provision-demo
-  vars:
-    ansible_become: false
 
 - name: Remove archive of openshift-provision-demo
   delegate_to: localhost
@@ -37,5 +33,3 @@
     dest: ~/openshift-provision-demo/config/default/vars/running-from-controller.yml
     content: |
       openshift_provision_is_running_from_controller: true
-  vars:
-    ansible_become: false

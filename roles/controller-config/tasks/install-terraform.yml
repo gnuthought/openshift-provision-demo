@@ -1,5 +1,6 @@
 ---
 - name: Stat /usr/local/bin/terraform
+  become: true
   stat:
     path: /usr/local/bin/terraform
   register: check_terraform
@@ -7,6 +8,7 @@
 - when: not check_terraform.stat.exists
   block:
   - name: Get terraform
+    become: true
     get_url:
       url: >-
         https://releases.hashicorp.com/terraform/{{
@@ -20,6 +22,7 @@
         }}_linux_amd64.zip
 
   - name: Unpack terraform
+    become: true
     command: >-
       unzip /usr/local/src/terraform_{{
         openshift_provision_controller_terraform_release

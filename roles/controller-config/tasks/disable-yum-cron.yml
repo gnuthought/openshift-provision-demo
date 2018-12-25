@@ -1,5 +1,6 @@
 ---
 - name: Stop yum-cron processes
+  become: true
   shell: |-
     for PID in $(ps aux | sed -rn 's|^root +([0-9]+).*[/]python.*/yum-cron .*|\1|p')
     do

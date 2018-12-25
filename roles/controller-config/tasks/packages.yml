@@ -1,11 +1,13 @@
 ---
 - name: Uninstall Packages
+  become: true
   yum:
     name: "{{ openshift_provision_controller_remove_packages }}"
     state: absent
 
 # The yum module should be preferable, but was found to frequently hang
 - name: Install Packages
+  become: true
   command: >-
     yum install -y
     {% if openshift_provision_controller_packages_enablerepo %}
@@ -21,6 +23,7 @@
     yum_install.stdout_lines[-1] != 'Nothing to do'
 
 - name: Install Cloud Packages
+  become: true
   command: >-
     yum install -y
     {% if openshift_provision_controller_cloud_packages_enablerepo %}
@@ -36,6 +39,7 @@
     yum_install.stdout_lines[-1] != 'Nothing to do'
 
 - name: Pip install cloud python packages
+  become: true
   command: >-
     pip install --upgrade {{ item }}
   with_items: "{{ openshift_provision_controller_cloud_python_packages }}"

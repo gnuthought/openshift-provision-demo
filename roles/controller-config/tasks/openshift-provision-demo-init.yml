@@ -2,8 +2,6 @@
 - name: Check if openshift-provision-demo exists on controller
   stat: 
     path: ~/openshift-provision-demo
-  vars:
-    ansible_become: false
   register: openshift_provision_demo_stat
 
 - include_tasks: copy-openshift-provision-demo.yml

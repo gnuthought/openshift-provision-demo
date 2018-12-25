@@ -1,10 +1,12 @@
 ---
 - name: Install subscription-manager package
+  become: true
   yum:
     name: subscription-manager
     state: present
 
-- name: Register nodes with subscription-manager
+- name: Register controller with subscription-manager
+  become: true
   redhat_subscription:
     username: "{{ redhat_subscription_username }}"
     password: "{{ redhat_subscription_password }}"
@@ -12,6 +14,7 @@
   register: redhat_subscribe_system
 
 - name: Set yum repositories
+  become: true
   command: >-
     subscription-manager repos
     --disable='*'
@@ -24,6 +27,7 @@
   register: set_yum_repositories
 
 - name: Remove cloud repos
+  become: true
   file:
     path: "{{ item }}"
     state: absent
@@ -33,11 +37,13 @@
   register: remove_cloud_repos
 
 - name: Check if epel yum repository is configured
+  become: true
   stat:
     path: /etc/yum.repos.d/epel.repo
   register: epel_repo_stat
 
 - name: Disable epel repository
+  become: true
   replace:
     path: /etc/yum.repos.d/epel.repo
     regexp: ^enabled=1
@@ -49,11 +55,13 @@
     remove_cloud_repos.changed
   block:
   - name: Yum clean
+    become: true
     command: yum clean all
     args:
       warn: false
 
   - name: Remove yum cache
+    become: true
     file:
       path: /var/cache/yum
       state: absent

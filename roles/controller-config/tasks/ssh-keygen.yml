@@ -3,5 +3,3 @@
   command: ssh-keygen -t rsa -N '' -f ~/.ssh/id_rsa
   args:
     creates: ~/.ssh/id_rsa
-  vars:
-    ansible_become: false

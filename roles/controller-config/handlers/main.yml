@@ -1,9 +1,11 @@
 ---
 - name: restart dnsmasq
+  become: true
   service:
     name: dnsmasq
     enabled: true
     state: restarted
 
 - name: run 99-origin-dns.sh
+  become: true
   command: /etc/NetworkManager/dispatcher.d/99-origin-dns.sh dummy up

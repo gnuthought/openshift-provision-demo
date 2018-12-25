@@ -1,5 +1,6 @@
 ---
 - name: Configure dnsmasq for cluster domain
+  become: true
   blockinfile:
     path: /etc/dnsmasq.d/cluster-domain.conf
     create: true
@@ -12,6 +13,7 @@
   - restart dnsmasq
 
 - name: Bootstrap dnsmasq dispatcher.d script
+  become: true
   copy:
     content: |
       #!/bin/bash
@@ -30,6 +32,7 @@
   - run 99-origin-dns.sh
 
 - name: Set google internal DNS as upstream
+  become: true
   copy:
     content: |
       server=169.254.169.254

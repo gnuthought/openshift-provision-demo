@@ -113,9 +113,6 @@ class OpenShiftInventory:
             }
         }
  
-        if self.cluster_var('openshift_provision_controller_ssh_tcp443'):
-            hosts['controller']['vars']['ansible_port'] = 443
-
         self.cloud_provider.populate_hosts(hosts)
 
         # Put etcd on masters if separate etcd nodes were not indicated
