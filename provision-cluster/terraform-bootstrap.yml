@@ -3,8 +3,8 @@
   hosts: localhost
   connection: local
   tasks:
-  - name: Load cluster config
-    import_tasks: ../load-config.yml
+  - name: Load dynamic config
+    import_tasks: ../load-dynamic-config.yml
 
   - name: Include terraform role for bootstrap
     include_role:
@@ -24,3 +24,14 @@
 
   - name: Refresh inventory
     meta: refresh_inventory
+
+- name: Wait for bootstrap instances
+  hosts: OSEv3
+  gather_facts: false
+  tasks:
+  - name: Wait for connection to instances
+    wait_for_connection:
+      connect_timeout: 20
+      sleep: 5
+      delay: 5
+      timeout: 300

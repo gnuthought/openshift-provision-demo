@@ -1,5 +1,7 @@
 ---
-openshift_router_selector: 'node-role.kubernetes.io/router=true'
-
+openshift_hosted_infra_selector: 'node-role.kubernetes.io/infra-app=true'
 openshift_hosted_registry_routehost: docker-registry.{{ openshift_master_default_subdomain }}
+
 openshift_registry_selector: 'node-role.kubernetes.io/infra=true'
+
+openshift_router_selector: 'node-role.kubernetes.io/router=true'

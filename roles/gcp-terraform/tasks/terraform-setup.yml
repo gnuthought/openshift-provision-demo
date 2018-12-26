@@ -28,7 +28,7 @@
     terraform_template: node-group
     terraform_template_dir: "{{ terraform_dir }}/node-group-{{ node_group_name }}"
   when:
-  - node_group_name != 'master'
+  - not node_group.static_node_group|default(false)|bool
   - >-
     'node-group-' ~ node_group_name in terraform_components or
     'node-groups' in terraform_components

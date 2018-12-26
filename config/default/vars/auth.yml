@@ -1,3 +1,0 @@
----
-# htpasswd auth
-openshift_master_identity_providers: []

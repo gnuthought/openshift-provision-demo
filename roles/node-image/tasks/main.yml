@@ -52,4 +52,4 @@
 
 - name: Create cluster disk image
   delegate_to: localhost
-  command: ./hosts.py --create-node-image
+  command: ../hosts.py --create-node-image

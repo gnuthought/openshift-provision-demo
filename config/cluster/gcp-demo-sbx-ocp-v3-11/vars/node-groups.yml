@@ -7,9 +7,11 @@ openshift_provision_node_groups:
     labels:
       logging-infra-fluentd: "true"
       node-role.kubernetes.io/master: "true"
+    static_node_group: true
   image:
     labels:
       node-role.kubernetes.io/image: "true"
+    static_node_group: true
   infra-app:
     minimum_instance_count: 1
     maximum_instance_count: 3

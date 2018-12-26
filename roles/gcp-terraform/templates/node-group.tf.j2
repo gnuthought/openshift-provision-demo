@@ -50,7 +50,7 @@ resource "google_compute_instance_template" "{{ instance_template_name }}" {
 {% for k, v in node_group.labels.items() %}
     openshift-node-label-{{ loop.index }} = "{{ k }}={{ v }}"
 {% endfor %}
-{% if openshift_provision_ansible_ssh_pubkey | bool %}
+{% if openshift_provision_ansible_ssh_pubkey %}
     sshKeys = "{{openshift_provision_ansible_user}}:{{openshift_provision_ansible_ssh_pubkey}} {{openshift_provision_ansible_user}}"
 {% endif %}
   }

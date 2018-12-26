@@ -1,20 +1,9 @@
 ---
-- name: Wait for Instances
-  hosts: OSEv3
-  gather_facts: false
-  tasks:
-  - name: Wait for connection to instances
-    wait_for_connection:
-      connect_timeout: 20
-      sleep: 5
-      delay: 5
-      timeout: 300
-
 - name: Prepare OSEv3 Hosts
   hosts: OSEv3
   pre_tasks:
-  - name: Load cluster config
-    import_tasks: ../load-config.yml
+  - name: Load dynamic config
+    import_tasks: ../load-dynamic-config.yml
   roles:
   - role: node-prep
 

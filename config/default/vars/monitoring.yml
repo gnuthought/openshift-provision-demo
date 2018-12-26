@@ -1,0 +1,3 @@
+---
+openshift_cluster_monitoring_operator_node_selector:
+  node-role.kubernetes.io/infra-app: "true"

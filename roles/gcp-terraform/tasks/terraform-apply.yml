@@ -16,7 +16,7 @@
   when: >-
     component_name in terraform_components
 
-- name: Run terraformapply for node-group components
+- name: Run terraform apply for node-group components
   command: terraform apply -auto-approve
   args:
     chdir: "{{ terraform_template_dir }}"
@@ -28,7 +28,13 @@
     node_group_name: "{{ node_group_item.key }}"
     terraform_template_dir: "{{ terraform_dir }}/node-group-{{ node_group_name }}"
   when:
-  - node_group_name != 'master'
+  - not node_group.static_node_group|default(false)|bool
   - >-
     'node-group-' ~ node_group_name in terraform_components or
     'node-groups' in terraform_components
+  # Terraform template management sometimes fails because it attempts template
+  # delete before the instance group updates have completed, so retry
+  register: terraform_apply
+  until: terraform_apply.rc == 0
+  retries: 2
+  delay: 5

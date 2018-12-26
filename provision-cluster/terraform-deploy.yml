@@ -2,30 +2,31 @@
 - name: Run terrafom deploy
   hosts: localhost
   connection: local
-  vars:
-    openshift_provision_action: deploy
-    terraform_dir: "{{ playbook_dir }}/terraform"
-
   tasks:
-  - name: Load cluster config
-    import_tasks: ../load-config.yml
+  - name: Load dynamic config
+    import_tasks: ../load-dynamic-config.yml
 
   - name: Include terraform role for deploy
     include_role:
       name: "{{ cloud_provider }}-terraform"
       allow_duplicates: true
+    vars:
+      terraform_action: apply
+      terraform_components:
+      - node-groups
+      terraform_dir: "{{ playbook_dir }}/terraform"
 
   - name: Scale-up cluster
-    command: ./hosts.py --scaleup
+    command: ../hosts.py --scaleup
 
   - name: Wait for all instances to be running
-    command: ./hosts.py --wait 300
+    command: ../hosts.py --wait 300
     changed_when: false
 
   - name: Refresh inventory
     meta: refresh_inventory
  
-- name: Wait for new instances
+- name: Wait for connection to scaled instances
   hosts: OSEv3
   gather_facts: false
   tasks:

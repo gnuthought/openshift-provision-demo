@@ -2,8 +2,8 @@
 - name: Create cluster node image
   hosts: image
   pre_tasks:
-  - name: Load cluster config
-    import_tasks: ../load-config.yml
+  - name: Load dynamic cluster
+    import_tasks: ../load-dynamic-config.yml
 
   roles:
   - role: node-image
