@@ -14,6 +14,6 @@
   hosts: controller
   pre_tasks:
   - name: Load cluster config
-    import_tasks: ../load-config.yml
+    import_tasks: ../load-dynamic-config.yml
   roles:
   - role: controller-config

@@ -1,0 +1,9 @@
+---
+- name: Load dynamic configuration
+  include_tasks: "{{ dynamic_vars_file.src }}"
+  with_filetree:
+  - "{{ openshift_config_location }}/dynamic"
+  loop_control:
+    loop_var: dynamic_vars_file
+  when:
+    dynamic_vars_file.path is match('.*\.(ya?ml|json)$')
