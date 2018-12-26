@@ -1,32 +1,40 @@
 ---
-# FIXME - This needs fixed to be like terraform-apply
-#
-- name: Run terraform destroy for node groups
-  command: >-
-    terraform destroy -auto-approve
-    {% if openshift_provision_controller_ssh_pubkey is defined %}
-    -var openshift_provision_controller_ssh_pubkey=''
-    {% endif %}
+- name: Run terraform apply for node-group components
+  command: terraform destroy -auto-approve
   args:
-    chdir: terraform/node-group-{{ item.key }}
+    chdir: "{{ terraform_template_dir }}"
+  with_dict: "{{ openshift_provision_node_groups }}"
+  loop_control:
+    loop_var: node_group_item
+  vars:
+    node_group: "{{ node_group_item.value }}"
+    node_group_name: "{{ node_group_item.key }}"
+    terraform_template_dir: "{{ terraform_dir }}/node-group-{{ node_group_name }}"
+  when:
+  - not node_group.static_node_group|default(false)|bool
+  - >-
+    'node-group-' ~ node_group_name in terraform_components or
+    'node-groups' in terraform_components
   # Terraform template management sometimes fails because it attempts template
   # delete before the instance group updates have completed, so retry
   register: terraform_destroy
   until: terraform_destroy.rc == 0
   retries: 2
   delay: 5
-  with_dict: "{{ openshift_provision_node_groups }}"
-  when: item.key != 'master'
 
-- name: Run terraform destroy for core components
-  command: >-
-    terraform destroy -auto-approve
-    {% if openshift_provision_controller_ssh_pubkey is defined %}
-    -var openshift_provision_controller_ssh_pubkey=''
-    {% endif %}
+- name: Run terraform destroy for components
+  command: terraform destroy -auto-approve
   args:
-    chdir: terraform/{{ item }}
+    chdir: "{{ terraform_dir }}/{{ component_name }}"
+  register: terraform_apply
+  changed_when: >-
+    "Resources: 0 added, 0 changed, 0 destroyed." not in terraform_apply.stdout
   with_items:
-  - image-node
+  - base
+  - controller
   - masters
-  - cluster-core
+  - image-node
+  loop_control:
+    loop_var: component_name
+  when: >-
+    component_name in terraform_components
