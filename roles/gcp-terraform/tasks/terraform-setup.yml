@@ -25,6 +25,19 @@
   vars:
     node_group: "{{ node_group_item.value }}"
     node_group_name: "{{ node_group_item.key }}"
+    node_group_gcp: "{{ node_group.gcp | default({})"
+    boot_disk_size_gb: >-
+      {{ node_group_gcp.boot_disk_size_gb
+       | default(image_node_boot_disk_size_gb)
+      }}
+    boot_disk_type: >-
+      {{ node_group_gcp.boot_disk_type
+       | default(image_node_boot_disk_type)
+      }}
+    machine_type: >-
+      {{ node_group_gcp.machine_type
+       | default(image_node_machine_type)
+      }}
     terraform_template: node-group
     terraform_template_dir: "{{ terraform_dir }}/node-group-{{ node_group_name }}"
   when:

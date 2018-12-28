@@ -112,7 +112,7 @@ class OpenShiftInventory:
                 'hostvars': {}
             }
         }
- 
+
         self.cloud_provider.populate_hosts(hosts)
 
         # Put etcd on masters if separate etcd nodes were not indicated

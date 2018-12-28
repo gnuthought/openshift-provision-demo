@@ -1,0 +1,96 @@
+---
+cluster_ansible_ssh_pubkey: >-
+  {{ openshift_provision_ansible_ssh_pubkey }}
+cluster_ansible_user: >-
+  {{ openshift_provision_ansible_user }}
+cluster_subnetwork_name: >-
+  {{ openshift_provision_gcp_subnetwork_name }}
+cluster_subnetwork_ip_cidr_range: >-
+  {{ openshift_provision_gcp_subnetwork_ip_cidr_range }}
+
+cluster_dns_domain: >-
+  {{ openshift_provision_dns_cluster_domain }}
+cluster_dns_zone_name: >-
+  {{ openshift_provision_gcp_dns_zone_name }}
+
+use_controller: >-
+  {{ openshift_provision_use_controller }}
+controller_ansible_port: >-
+  {{ openshift_provision_controller_ansible_port }}
+controller_ansible_ssh_pubkey: >-
+  {{ openshift_provision_controller_ansible_ssh_pubkey }}
+controller_ansible_user: >-
+  {{ openshift_provision_controller_ansible_user }}
+controller_boot_disk_image: >-
+  {{ openshift_provision_gcp_controller_boot_disk_image }}
+controller_boot_disk_size_gb: >-
+  {{ openshift_provision_gcp_controller_boot_disk_size_gb }}
+controller_hostname: >-
+  {{ openshift_provision_controller_hostname }}
+controller_iam_roles: >-
+  {{ openshift_provision_gcp_controller_iam_roles }}
+controller_machine_type: >-
+  {{ openshift_provision_gcp_controller_machine_type }}
+controller_service_account: >-
+  {{ openshift_provision_gcp_controller_service_account }}
+
+delegation_dns_zone_name: >-
+  {{ openshift_provision_gcp_dns_delegation_zone_name }}
+
+gcp_zones: >-
+  {{ openshift_provision_gcp_zones }}
+
+image_node_group: >-
+  {{ openshift_provision_node_groups.image }}
+image_node_group_gcp: >-
+  {{ image_node_group.gcp | default({}) }}
+image_node_boot_disk_image: >-
+  {{ openshift_gcp_image }}
+image_node_boot_disk_size_gb: >-
+  {{ image_node_group_gcp.boot_disk_size_gb
+   | default(openshift_provision_gcp_node_boot_disk_size_gb)
+  }}
+image_node_boot_disk_type: >-
+  {{ image_node_group_gcp.boot_disk_type
+   | default(openshift_provision_gcp_node_boot_disk_type)
+  }}
+image_node_machine_type: >-
+  {{ image_node_group_gcp.machine_type
+   | default(openshift_provision_gcp_node_machine_type)
+
+management_source_ip_range: >-
+  {{ openshift_provision_management_source_ip_range | default('') }}
+
+master_node_group: >-
+  {{ openshift_provision_node_groups.master }}
+master_node_group_gcp: >-
+  {{ master_node_group.gcp | default({}) }}
+master_boot_disk_image: >-
+  {{ openshift_provision_gcp_master_boot_disk_image }}
+master_boot_disk_size_gb: >-
+  {{ master_node_group_gcp.boot_disk_size_gb
+   | default(openshift_provision_gcp_master_boot_disk_size_gb)
+  }}
+master_boot_disk_type: >-
+  {{ master_node_group_gcp.boot_disk_type
+   | default(openshift_provision_gcp_master_boot_disk_type)
+  }}
+master_docker_vg_disk_size_gb: >-
+  {{ master_node_group_gcp.docker_vg_disk_size_gb
+   | default(openshift_provision_gcp_master_docker_vg_disk_size_gb)
+  }}
+master_docker_vg_disk_type: >-
+  {{ master_node_group_gcp.docker_vg_disk_type
+   | default(openshift_provision_gcp_master_docker_vg_disk_type)
+  }}
+master_machine_type: >-
+  {{ master_node_group_gcp.machine_type
+   | default(openshift_provision_gcp_master_machine_type)
+  }}
+master_service_account: >-
+  {{ openshift_provision_gcp_master_service_account }}
+
+node_image_family: >-
+  {{ openshift_provision_gcp_node_image_family }}
+node_service_account: >-
+  {{ openshift_provision_gcp_node_service_account }}

@@ -2,8 +2,8 @@
 
 if systemctl is-active -q firewalld
 then
-  firewall-cmd --add-forward-port=port={{ openshift_provision_controller_ansible_port }}:proto=tcp:toport=22
-  firewall-cmd --permanent --add-forward-port=port={{ openshift_provision_controller_ansible_port }}:proto=tcp:toport=22
+  firewall-cmd --add-forward-port=port={{ controller_ansible_port }}:proto=tcp:toport=22
+  firewall-cmd --permanent --add-forward-port=port={{ controller_ansible_port }}:proto=tcp:toport=22
 else
-  iptables -t nat -I PREROUTING -p tcp --dport {{ openshift_provision_controller_ansible_port }} -j REDIRECT --to-ports=22
+  iptables -t nat -I PREROUTING -p tcp --dport {{ controller_ansible_port }} -j REDIRECT --to-ports=22
 fi

@@ -1,4 +1,4 @@
-{% set t_master_count = openshift_provision_node_groups.master.instance_count | default(1) %}
+{% set t_master_count = master_node_group.instance_count | default(1) %}
 
 terraform {
   backend "gcs" {
@@ -12,34 +12,35 @@ provider "google" {
   region = "{{ openshift_gcp_region }}"
 }
 
-data "google_compute_subnetwork" "{{ openshift_gcp_subnetwork_name }}" {
-  name   = "{{ openshift_gcp_subnetwork_name }}"
+data "google_compute_subnetwork" "{{ cluster_subnetwork_name }}" {
+  name   = "{{ cluster_subnetwork_name }}"
   project = "{{ openshift_gcp_network_project }}"
 }
 
-data "google_service_account" "{{ openshift_gcp_master_service_account }}" {
-  account_id = "{{ openshift_gcp_master_service_account }}"
+data "google_service_account" "{{ master_service_account }}" {
+  account_id = "{{ master_service_account }}"
 }
 
-data "google_dns_managed_zone" "{{ cluster_name }}" {
-  name = "{{ cluster_name }}"
+data "google_dns_managed_zone" "{{ cluster_dns_zone_name }}" {
+  name = "{{ cluster_dns_zone_name }}"
 }
 
+{# Spread masters between available zones #}
 {% for n in range(t_master_count|int) %}
 {%   set t_master_name = openshift_gcp_prefix ~ 'master-' ~ n %}
-{%   set t_master_zone = openshift_gcp_zones[ n % openshift_gcp_zones|length ] %}
+{%   set t_master_zone = gcp_zones[ n % gcp_zones|length ] %}
 
 resource "google_compute_disk" "{{ t_master_name }}-docker-vg" {
   name = "{{ t_master_name }}-docker-vg"
   project = "{{ openshift_gcp_project }}"
-  type = "{{ openshift_gcp_master_docker_vg_disk_type }}"
-  size = "{{ openshift_gcp_master_docker_vg_disk_size_gb }}"
+  type = "{{ master_docker_vg_disk_type }}"
+  size = "{{ master_docker_vg_disk_size_gb }}"
   zone = "{{ t_master_zone }}"
 }
 
 resource "google_compute_instance" "{{ t_master_name }}" {
   name = "{{ t_master_name }}"
-  machine_type = "{{ openshift_gcp_master_machine_type }}"
+  machine_type = "{{ master_machine_type }}"
   project = "{{ openshift_gcp_project }}"
   zone = "{{ t_master_zone }}"
 
@@ -47,8 +48,9 @@ resource "google_compute_instance" "{{ t_master_name }}" {
 
   boot_disk {
     initialize_params {
-      image = "{{ openshift_gcp_master_boot_disk_image }}"
-      size = "{{ openshift_gcp_master_boot_disk_size_gb }}"
+      image = "{{ master_boot_disk_image }}"
+      size = "{{ master_boot_disk_size_gb }}"
+      type = "{{ master_boot_disk_type }}"
     }
   }
 
@@ -58,7 +60,7 @@ resource "google_compute_instance" "{{ t_master_name }}" {
   }
 
   network_interface {
-    subnetwork = "${data.google_compute_subnetwork.{{ openshift_gcp_subnetwork_name }}.self_link}"
+    subnetwork = "${data.google_compute_subnetwork.{{ cluster_subnetwork_name }}.self_link}"
     subnetwork_project = "{{ openshift_gcp_project }}"
     access_config {
       // Ephemeral IP
@@ -73,13 +75,13 @@ resource "google_compute_instance" "{{ t_master_name }}" {
   metadata {
     ansible-host-group-masters = "true"
     ansible-host-group-nodes = "true"
-{% if openshift_provision_ansible_ssh_pubkey %}
-    sshKeys = "{{openshift_provision_ansible_user}}:{{openshift_provision_ansible_ssh_pubkey}} {{openshift_provision_ansible_user}}"
+{% if cluster_ansible_ssh_pubkey %}
+    sshKeys = "{{ cluster_ansible_user }}:{{ cluster_ansible_ssh_pubkey }} {{ cluster_ansible_user }}"
 {% endif %}
   }
 
   service_account {
-    email = "${data.google_service_account.{{ openshift_gcp_master_service_account }}.email}"
+    email = "${data.google_service_account.{{ master_service_account }}.email}"
     scopes = ["cloud-platform"]
   }
 }
@@ -96,16 +98,18 @@ resource "google_compute_health_check" "{{ openshift_gcp_prefix }}master" {
   }
 }
 
-{% for n in range(openshift_gcp_zones|length if openshift_gcp_zones|length < t_master_count|int else t_master_count|int) %}
-{%   if n < openshift_gcp_zones|length %}
-{%     set t_master_zone = openshift_gcp_zones[n] %}
+# A master instance group for each zone which has master instances.
+# Instance groups are named with the same suffix as zone name ("-a", "-b", etc)
+{% for n in range(t_master_count|int) %}
+{%   if n < gcp_zones|length %}
+{%     set t_master_zone = gcp_zones[n] %}
 {%     set t_master_instance_group = openshift_gcp_prefix ~ 'master' ~ t_master_zone[-2:] %}
 resource "google_compute_instance_group" "{{ t_master_instance_group }}" {
   name = "{{ t_master_instance_group }}"
   zone = "{{ t_master_zone }}"
   instances = [
 {%     for i in range(t_master_count|int) %}
-{%       if n == i % openshift_gcp_zones|length %}
+{%       if n == i % gcp_zones|length %}
     "${google_compute_instance.{{ openshift_gcp_prefix }}master-{{ i }}.self_link}",
 {%       endif %}
 {%     endfor %}
@@ -126,8 +130,8 @@ resource "google_compute_region_backend_service" "{{ openshift_gcp_prefix }}mast
   timeout_sec = 30
 
 {% for n in range(t_master_count|int) %}
-{%   if n < openshift_gcp_zones|length %}
-{%     set t_master_zone = openshift_gcp_zones[n] %}
+{%   if n < gcp_zones|length %}
+{%     set t_master_zone = gcp_zones[n] %}
 {%     set t_master_instance_group = openshift_gcp_prefix ~ 'master' ~ t_master_zone[-2:] %}
   backend {
     group = "${google_compute_instance_group.{{ t_master_instance_group }}.self_link}"
@@ -148,8 +152,8 @@ resource "google_compute_backend_service" "{{ openshift_gcp_prefix }}master-http
   timeout_sec = 30
 
 {% for n in range(t_master_count|int) %}
-{%   if n < openshift_gcp_zones|length %}
-{%     set t_master_zone = openshift_gcp_zones[n] %}
+{%   if n < gcp_zones|length %}
+{%     set t_master_zone = gcp_zones[n] %}
 {%     set t_master_instance_group = openshift_gcp_prefix ~ 'master' ~ t_master_zone[-2:] %}
   backend {
     group = "${google_compute_instance_group.{{ t_master_instance_group }}.self_link}"
@@ -172,7 +176,7 @@ resource "google_compute_forwarding_rule" "{{ openshift_gcp_prefix }}master" {
   }
   load_balancing_scheme = "INTERNAL"
   ports = [443]
-  subnetwork = "${data.google_compute_subnetwork.{{ openshift_gcp_subnetwork_name }}.self_link}"
+  subnetwork = "${data.google_compute_subnetwork.{{ cluster_subnetwork_name }}.self_link}"
 }
 
 resource "google_compute_url_map" "{{ openshift_gcp_prefix }}master" {
@@ -181,6 +185,7 @@ resource "google_compute_url_map" "{{ openshift_gcp_prefix }}master" {
   default_service = "${google_compute_backend_service.{{ openshift_gcp_prefix }}master-https.self_link}"
 }
 
+# FIXME? - Support passthrough https to masters?
 resource "google_compute_ssl_certificate" "{{ openshift_gcp_prefix }}master" {
   name = "{{ openshift_gcp_prefix }}master"
   certificate = "${file("{{ openshift_master_named_certificates[0].certfile }}")}"
@@ -211,7 +216,7 @@ resource "google_dns_record_set" "{{ openshift_gcp_prefix }}master" {
   name = "{{ openshift_master_cluster_public_hostname }}."
   type = "A"
   ttl  = 300
-  managed_zone = "${data.google_dns_managed_zone.{{ cluster_name }}.name}"
+  managed_zone = "${data.google_dns_managed_zone.{{ cluster_dns_zone_name }}.name}"
   rrdatas = ["${google_compute_global_forwarding_rule.{{ openshift_gcp_prefix }}master.ip_address}"]
 }
 
@@ -219,7 +224,7 @@ resource "google_dns_record_set" "{{ openshift_gcp_prefix }}master-internal" {
   name = "{{ openshift_master_cluster_hostname }}."
   type = "A"
   ttl  = 300
-  managed_zone = "${data.google_dns_managed_zone.{{ cluster_name }}.name}"
+  managed_zone = "${data.google_dns_managed_zone.{{ cluster_dns_zone_name }}.name}"
   rrdatas = ["${google_compute_forwarding_rule.{{ openshift_gcp_prefix }}master.ip_address}"]
 }
 

@@ -7,5 +7,11 @@ openshift_provision_controller_cloud_packages_enablerepo:
 
 openshift_provision_controller_cloud_python_packages: []
 
-openshift_provision_controller_gcp_iam_roles:
+openshift_provision_gcp_controller_iam_roles:
 - editor
+
+#openshift_provision_gcp_controller_boot_disk_image: >-
+#  {{ 'centos-7' if deployment_type == 'origin' else 'rhel-7' }}
+#openshift_provision_gcp_controller_boot_disk_size_gb: 50
+#openshift_provision_gcp_controller_machine_type: n1-standard-1
+#openshift_provision_gcp_controller_service_account: "{{ openshift_gcp_prefix }}controller"

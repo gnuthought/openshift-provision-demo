@@ -1,6 +1,6 @@
 ---
 - name: Check if openshift-provision-demo exists on controller
-  stat: 
+  stat:
     path: ~/openshift-provision-demo
   register: openshift_provision_demo_stat
 

@@ -25,7 +25,7 @@
 
   - name: Refresh inventory
     meta: refresh_inventory
- 
+
 - name: Wait for connection to scaled instances
   hosts: OSEv3
   gather_facts: false

@@ -1,27 +1,11 @@
 ---
 openshift_cloudprovider_kind: gce
-openshift_gcp_multizone: true
 openshift_gcp_prefix: "{{ cluster_name }}-"
+openshift_gcp_multizone: true
 
-openshift_gcp_master_boot_disk_image: >-
-  {{ 'centos-7' if deployment_type == 'origin' else 'rhel-7' }}
-openshift_gcp_master_boot_disk_size_gb: 100
-openshift_gcp_master_docker_vg_disk_type: pd-standard
-openshift_gcp_master_docker_vg_disk_size_gb: 50
-openshift_gcp_master_machine_type: n1-standard-2
-
-openshift_gcp_node_boot_disk_image: >-
-  {{ 'centos-7' if deployment_type == 'origin' else 'rhel-7' }}
-openshift_gcp_node_boot_disk_size_gb: 100
-openshift_gcp_node_boot_disk_type: pd-standard
-openshift_gcp_node_image_family: "{{ openshift_gcp_prefix }}node"
-openshift_gcp_node_machine_type: n1-standard-2
-
-openshift_gcp_network_name: "{{ cluster_name }}"
-openshift_gcp_subnetwork_name: "{{ cluster_name }}"
-#openshift_gcp_subnetwork_ip_cidr_range: "10.0.0.0/24"
-#openshift_gcp_master_service_account: "{{ openshift_gcp_prefix }}master"
-#openshift_gcp_node_service_account: "{{ openshift_gcp_prefix }}node"
-
-openshift_gcp_dns_zone_name: "{{ cluster_name }}"
-openshift_gcp_network_project: "{{ openshift_gcp_project }}"
+# FIXME - Support these settings
+#openshift_gcp_create_registry_bucket: true
+#openshift_gcp_clusterid: default
+#openshift_gcp_master_lb_timeout: 2m
+#openshift_gcp_registry_bucket_keyfile: ''
+#openshift_gcp_registry_bucket_name: "{{ openshift_gcp_prefix }}-docker-registry"

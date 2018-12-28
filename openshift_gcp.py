@@ -31,6 +31,31 @@ class OpenShiftGCP:
             self.ocpinv().cluster_name == instance.get('labels',{}).get('openshift-cluster','')
         )
 
+    def get_cluster_zones(self):
+        """
+        Return list of zones configured for the cluster or list of all zones
+        for the region.
+        """
+
+        config_zones = self.ocpinv().cluster_var('openshift_provision_gcp_zones')
+        if config_zones:
+            return config_zones
+
+        if not self.ocpinv().cluster_var('openshift_gcp_multizone'):
+            gcp_zone = self.ocpinv().cluster_var('openshift_gcp_zone')
+            self.ocpinv().cluster_config['openshift_provision_gcp_zones'] = [gcp_zone]
+            return [gcp_zone]
+
+        region = self.computeAPI.regions().get(
+            project = self.ocpinv().cluster_var('openshift_gcp_project'),
+            region = self.ocpinv().cluster_var('openshift_gcp_region')
+        ).execute()
+        gcp_zones = [
+            zone_uri.rsplit('/',1)[-1] for zone_uri in region['zones']
+        ]
+        self.ocpinv().cluster_config['openshift_provision_gcp_zones'] = gcp_zones
+        return gcp_zones
+
     def get_instance_in_zone(self, hostname, zone):
         try:
             instance = self.computeAPI.instances().get(
@@ -46,14 +71,14 @@ class OpenShiftGCP:
         return False
 
     def get_instance(self, hostname):
-        for zone in self.ocpinv().cluster_var('openshift_gcp_zones'):
+        for zone in self.get_cluster_zones():
             instance = self.get_instance_in_zone(hostname, zone)
             if instance != None:
                 return instance
         return None
 
     def get_cluster_instances(self):
-        for zone in self.ocpinv().cluster_var('openshift_gcp_zones'):
+        for zone in self.get_cluster_zones():
             for instance in self.get_cluster_instances_in_zone(zone):
                 yield instance
 
@@ -204,7 +229,7 @@ class OpenShiftGCP:
 
     def populate_all_group_vars(self, hosts):
         cluster_zone = self.dnsAPI.managedZones().get(
-            managedZone = self.ocpinv().cluster_var('openshift_gcp_dns_zone_name'),
+            managedZone = self.ocpinv().cluster_var('openshift_provision_gcp_dns_zone_name'),
             project = self.ocpinv().cluster_var('openshift_gcp_project')
         ).execute()
         hosts['all']['vars']['openshift_provision_cluster_domain_dns_servers'] = \
@@ -297,7 +322,9 @@ class OpenShiftGCP:
             if node_group_name == 'master':
                 continue
             minimum_instance_count = node_group.get('minimum_instance_count', node_group.get('instance_count'))
-            gcp_zones = node_group.get('gcp_zones', self.ocpinv().cluster_var('openshift_gcp_zones'))
+            # FIXME - gcp_zones is not a valid setting on a node group and
+            # should support dynamically discovering zones by region.
+            gcp_zones = self.get_cluster_zones()
             zone_count = len(gcp_zones)
             for i, zone in enumerate(gcp_zones):
                 if i >= minimum_instance_count:
