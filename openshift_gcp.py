@@ -300,7 +300,7 @@ class OpenShiftGCP:
             project = self.ocpinv().cluster_var('openshift_gcp_project'),
             body = {
                 "name": image_name,
-                "family": self.ocpinv().cluster_var('openshift_gcp_node_image_family'),
+                "family": self.ocpinv().cluster_var('openshift_provision_gcp_node_image_family'),
                 "labels": {
                     "openshift-cluster": self.ocpinv().cluster_name
                 },

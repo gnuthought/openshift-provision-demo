@@ -4,7 +4,7 @@ openshift_master_api_port: 443
 openshift_master_console_port: 443
 
 # Configure the multi-tenant SDN plugin (default is 'redhat/openshift-ovs-subnet')
-os_sdn_network_plugin_name: redhat/openshift-ovs-multitenant
+os_sdn_network_plugin_name: redhat/openshift-ovs-networkpolicy
 
 # Configure SDN cluster network CIDR block. This network block should
 # be a private block and should not conflict with existing network

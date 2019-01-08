@@ -57,7 +57,7 @@ image_node_boot_disk_type: >-
 image_node_machine_type: >-
   {{ image_node_group_gcp.machine_type
    | default(openshift_provision_gcp_node_machine_type)
-
+  }}
 management_source_ip_range: >-
   {{ openshift_provision_management_source_ip_range | default('') }}
 

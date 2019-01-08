@@ -9,6 +9,20 @@ errexit () {
   exit 1
 }
 
+find_cluster_main () {
+  for EXT in json yaml yml; do
+    CONF="$OPENSHIFT_CONFIG_LOCATION/cluster/$OPENSHIFT_CLUSTER_NAME/vars/main.$EXT"
+    if [[ -f "$CONF" ]]; then
+      echo "$CONF"
+      return
+    fi
+  done
+  errexit "Unable to find cluster main config at any of" \
+    "$OPENSHIFT_CONFIG_LOCATION/cluster/$OPENSHIFT_CLUSTER_NAME/vars/main.json" \
+    "$OPENSHIFT_CONFIG_LOCATION/cluster/$OPENSHIFT_CLUSTER_NAME/vars/main.yaml" \
+    "$OPENSHIFT_CONFIG_LOCATION/cluster/$OPENSHIFT_CLUSTER_NAME/vars/main.yml"
+}
+
 [[ -z "$PLAYBOOK" ]] && errexit "No PLAYBOOK provided."
 [[ -z "$OPENSHIFT_CLUSTER_NAME" ]] && errexit "No OPENSHIFT_CLUSTER_NAME provided."
 
@@ -36,6 +50,8 @@ VAULT_PASSWORD_FILE=${VAULT_PASSWORD_FILE:-$PWD/../.vaultpw}
 [[ -f "$VAULT_PASSWORD_FILE" ]] || \
   errexit "VAULT_PASSWORD_FILE not found at $VAULT_PASSWORD_FILE"
 
+CLUSTER_MAIN_CONF="$(find_cluster_main)"
+
 ANSIBLE_ROLES_PATH=$OPENSHFIT_PROVISION_DEMO_DIR/roles
 
 ANSIBLE_VARS="\
@@ -44,7 +60,8 @@ ANSIBLE_VARS="\
 -e cluster_name=$OPENSHIFT_CLUSTER_NAME \
 -e openshift_ansible_location=$OPENSHIFT_ANSIBLE_LOCATION \
 -e openshift_config_location=$OPENSHIFT_CONFIG_LOCATION \
--e vault_password_file=$VAULT_PASSWORD_FILE"
+-e vault_password_file=$VAULT_PASSWORD_FILE \
+-e @$CLUSTER_MAIN_CONF"
 
 # Add variables with cert paths
 for EXTENSION in cert key ca; do

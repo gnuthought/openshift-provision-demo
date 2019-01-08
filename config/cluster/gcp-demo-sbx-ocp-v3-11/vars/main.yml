@@ -4,5 +4,5 @@ is_sandbox: true
 environment_level: nonprod
 cloud_region: gcp-us-east4
 cloud_provider: gcp
-openshift_release: v3.11
+openshift_release: "3.11"
 deployment_type: openshift-enterprise

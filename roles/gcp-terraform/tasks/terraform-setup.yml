@@ -25,7 +25,8 @@
   vars:
     node_group: "{{ node_group_item.value }}"
     node_group_name: "{{ node_group_item.key }}"
-    node_group_gcp: "{{ node_group.gcp | default({})"
+    node_group_gcp: >-
+      {{ node_group.gcp | default({}) }}
     boot_disk_size_gb: >-
       {{ node_group_gcp.boot_disk_size_gb
        | default(image_node_boot_disk_size_gb)

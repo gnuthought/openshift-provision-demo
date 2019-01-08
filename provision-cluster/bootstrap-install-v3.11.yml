@@ -1,0 +1,21 @@
+---
+- import_playbook: >-
+    {{ openshift_ansible_location }}/playbooks/prerequisites.yml
+
+# Import playbook list from openshift-ansible/playbooks/deploy_cluster.yml
+- import_playbook: >-
+    {{ openshift_ansible_location }}/playbooks/init/main.yml
+  vars:
+    l_networkman_check_hosts: "oo_nodes_to_config"
+
+- import_playbook: >-
+    {{ openshift_ansible_location }}/playbooks/openshift-checks/private/install.yml
+
+- import_playbook: >-
+    {{ openshift_ansible_location }}/playbooks/openshift-node/private/bootstrap.yml
+
+- import_playbook: >-
+    {{ openshift_ansible_location }}/playbooks/common/private/control_plane.yml
+
+- import_playbook: >-
+    {{ openshift_ansible_location }}/playbooks/openshift-node/private/join.yml

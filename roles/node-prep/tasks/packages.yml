@@ -4,7 +4,16 @@
     name: "{{ openshift_provision_prerequisite_remove_packages }}"
     state: absent
 
+# The yum module should be preferable, but was found to frequently hang
 - name: Install Packages
-  yum:
-    name: "{{ openshift_provision_prerequisite_packages }}"
-    state: present
+  become: true
+  command: >-
+    yum install -y
+    {{ openshift_provision_prerequisite_packages | join(' ') }}
+  #'
+  args:
+    warn: false
+  register: yum_install
+  changed_when: >-
+    yum_install.rc == 0 and
+    yum_install.stdout_lines[-1] != 'Nothing to do'

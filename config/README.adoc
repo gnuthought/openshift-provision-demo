@@ -178,6 +178,9 @@ The IP range used to manage the cluster. If not set then the default
 configuration will attempt to dynamically determine the IP address of the
 host from which the ansible playbooks are run.
 
+| openshift_provision_node_groups | required |
+List of node groups, described in detail below.
+
 | openshift_provision_use_controller | True |
 Indicates whether the cluster is managed with a controller instance. If this
 is set to false then the cluster is managed directly from wherever the ansible
@@ -195,3 +198,27 @@ playbooks are run.
 
 |=======================
 
+The variable `openshift_provision_node_groups` should be a dictionary with
+keys for each node group name. Values should include:
+
+[cols="1,1,4",options="header"]
+|=======================
+| Key | Type | Default | Description
+
+| gcp | Dict | none | Description
+Dictionary of node group specific GCP overrides to apply to this node group.
+These may include `boot_disk_size_gb`, `boot_disk_type`, and `machine_type`.
+
+| instance_count | Int | ? |
+
+| labels | Dict | none |
+Dictionary of labels to apply to instances.
+
+| maximum_instance_count | Int | ? |
+
+| minimum_instance_count | Int | ? |
+
+| static_node_group | Boolean | false |
+Indication whether the node group is static or dynamically scaled.
+
+|=======================

@@ -2,6 +2,7 @@
 openshift_cloudprovider_kind: gce
 openshift_gcp_prefix: "{{ cluster_name }}-"
 openshift_gcp_multizone: true
+openshift_provision_gcp_node_image_family: "{{ openshift_gcp_prefix }}node"
 
 # FIXME - Support these settings
 #openshift_gcp_create_registry_bucket: true
