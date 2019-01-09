@@ -8,7 +8,7 @@
 * cloud_region
 * cloud_provider
 * openshift_release
-* deployment_type
+* openshift_deployment_type
 * cluster_name
 
 == Other Variables I Need To Document
@@ -190,11 +190,18 @@ playbooks are run.
 
 | oreg_auth_password | value of environment variable "OREG_AUTH_PASSWORD" |
 
-| redhat_subscription_username | value of environment variable  "REDHAT_SUBSCRIPTION_USERNAME" |
+| openshift_provision_rhsub_user | value of environment variable  "REDHAT_SUBSCRIPTION_USERNAME" |
+Username to use to register the system with Red Hat.
 
-| redhat_subscription_password | value of environment variable "REDHAT_SUBSCRIPTION_PASSWORD" |
+We do not use `rhsub_user` as the standard ansible playbooks are too
+opinionated about yum repositiories, disabling repositories that we may wish to
+have enabled.
 
-| redhat_subscription_pools | value of environment variable "REDHAT_SUBSCRIPTION_POOLS" |
+| openshift_provision_rhsub_pass | value of environment variable "REDHAT_SUBSCRIPTION_PASSWORD" |
+Password to use to register the system with Red Hat.
+
+| openshift_provision_rhsub_pool | value of environment variable "REDHAT_SUBSCRIPTION_POOLS" |
+Red Hat subscriptino pool id.
 
 |=======================
 

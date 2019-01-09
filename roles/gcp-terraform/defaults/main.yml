@@ -1,7 +1,7 @@
 ---
 openshift_gcp_create_network: true
 openshift_gcp_image: >-
-  {{ 'centos-7' if deployment_type == 'origin' else 'rhel-7' }}
+  {{ 'centos-7' if openshift_deployment_type == 'origin' else 'rhel-7' }}
 openshift_gcp_network_name: "{{ cluster_name }}"
 openshift_provision_ansible_ssh_pubkey: ''
 openshift_provision_ansible_user: ansible

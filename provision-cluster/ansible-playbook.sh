@@ -75,4 +75,4 @@ done
 export ANSIBLE_ROLES_PATH \
        OPENSHIFT_CONFIG_LOCATION \
        OPENSHIFT_CLUSTER_NAME
-ansible-playbook -vvv $ANSIBLE_VARS $PLAYBOOK
+ansible-playbook $ANSIBLE_VARS $PLAYBOOK

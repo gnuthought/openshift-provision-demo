@@ -6,10 +6,10 @@ openshift_provision_default_prerequisite_packages:
 - firewalld
 
 openshift_provision_release_prerequisite_packages: []
-openshift_provision_deployment_type_prerequisite_packages: []
+openshift_provision_openshift_deployment_type_prerequisite_packages: []
 
 openshift_provision_prerequisite_packages: >-
   {{ openshift_provision_default_prerequisite_packages
-   | union(openshift_provision_deployment_type_prerequisite_packages)
+   | union(openshift_provision_openshift_deployment_type_prerequisite_packages)
    | union(openshift_provision_release_prerequisite_packages)
   }}

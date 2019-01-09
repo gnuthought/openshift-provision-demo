@@ -1,5 +1,11 @@
 ---
-- include_tasks: subscription-manager.yml
-  when: deployment_type == 'openshift-enterprise'
-- include_tasks: packages.yml
-- include_tasks: cloud-dns-{{ cloud_provider }}.yml
+- name: Subscribe system for openshift-enterprise deployment
+  include_tasks: subscription-manager.yml
+  when:
+  - openshift_deployment_type == 'openshift-enterprise'
+
+- name: Install and uninstall packages
+  include_tasks: packages.yml
+
+- name: Configure cloud provider DNS
+  include_tasks: cloud-dns-{{ cloud_provider }}.yml

@@ -19,7 +19,7 @@ class OpenShiftInventory:
         cluster_main = self.load_cluster_main()
         self.load_cluster_vars('default')
         self.load_cluster_vars('openshift_release', cluster_main['openshift_release'])
-        self.load_cluster_vars('deployment_type', cluster_main['deployment_type'])
+        self.load_cluster_vars('openshift_deployment_type', cluster_main['openshift_deployment_type'])
         self.load_cluster_vars('cloud_provider', cluster_main['cloud_provider'])
         self.load_cluster_vars('cloud_region', cluster_main['cloud_region'])
         self.load_cluster_vars('environment_level', cluster_main['environment_level'])
@@ -108,10 +108,19 @@ class OpenShiftInventory:
             'masters': {
                 'hosts': []
             },
+            'static-nodes': {
+                'children': []
+            },
             '_meta': {
                 'hostvars': {}
             }
         }
+
+        openshift_provision_node_groups = self.cluster_var('openshift_provision_node_groups')
+        for group_name, node_group in openshift_provision_node_groups.items():
+            if node_group.get('static_node_group', False) in [True, "true", "True", "yes"]:
+                ansible_group = 'masters' if group_name == 'master' else group_name
+                hosts['static-nodes']['children'].append(ansible_group)
 
         self.cloud_provider.populate_hosts(hosts)
 

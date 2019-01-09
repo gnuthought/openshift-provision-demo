@@ -6,9 +6,9 @@
 
 - name: Register nodes with subscription-manager
   redhat_subscription:
-    username: "{{ redhat_subscription_username }}"
-    password: "{{ redhat_subscription_password }}"
-    pool_ids: "{{ redhat_subscription_pools }}"
+    username: "{{ openshift_provision_rhsub_user }}"
+    password: "{{ openshift_provision_rhsub_pass }}"
+    pool_ids: "{{ openshift_provision_rhsub_pool }}"
   register: redhat_subscribe_system
 
 - name: Set yum repositories
@@ -17,18 +17,45 @@
     --disable='*'
     --enable=rhel-7-server-ansible-2.4-rpms
     --enable=rhel-7-server-extras-rpms
-    --enable=rhel-7-server-ose-{{ openshift_release[1:] }}-rpms
+    --enable=rhel-7-server-ose-{{ openshift_release }}-rpms
     --enable=rhel-7-server-rpms
     --enable=rhel-7-server-optional-rpms
   when: redhat_subscribe_system.changed
   register: set_yum_repositories
 
-- when: set_yum_repositories.changed
+- name: Remove cloud repos
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+  - /etc/yum.repos.d/google-cloud.repo
+  - /etc/yum.repos.d/rh-cloud.repo
+  register: remove_cloud_repos
+
+- name: Check if epel yum repository is configured
+  stat:
+    path: /etc/yum.repos.d/epel.repo
+  register: epel_repo_stat
+
+- name: Disable epel repository
+  replace:
+    path: /etc/yum.repos.d/epel.repo
+    regexp: ^enabled=1
+    replace: enabled=0
+  when: epel_repo_stat.stat.exists
+
+- when: >-
+    set_yum_repositories.changed or
+    remove_cloud_repos.changed
   block:
   - name: Yum clean
     command: yum clean all
+    args:
+      warn: false
 
   - name: Remove yum cache
     file:
       path: /var/cache/yum
       state: absent
+
+# FIXME - Reboot here

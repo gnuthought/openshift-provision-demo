@@ -2,7 +2,7 @@
 - include_tasks: disable-yum-cron.yml
 
 - include_tasks: subscription-manager.yml
-  when: deployment_type == 'openshift-enterprise'
+  when: openshift_deployment_type == 'openshift-enterprise'
 
 - include_tasks: packages.yml
 

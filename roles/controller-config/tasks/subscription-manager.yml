@@ -8,9 +8,9 @@
 - name: Register controller with subscription-manager
   become: true
   redhat_subscription:
-    username: "{{ redhat_subscription_username }}"
-    password: "{{ redhat_subscription_password }}"
-    pool_ids: "{{ redhat_subscription_pools }}"
+    username: "{{ openshift_provision_rhsub_user }}"
+    password: "{{ openshift_provision_rhsub_pass }}"
+    pool_ids: "{{ openshift_provision_rhsub_pool }}"
   register: redhat_subscribe_system
 
 - name: Set yum repositories
@@ -20,7 +20,7 @@
     --disable='*'
     --enable=rhel-7-server-ansible-2.6-rpms
     --enable=rhel-7-server-extras-rpms
-    --enable=rhel-7-server-ose-{{ openshift_release[1:] }}-rpms
+    --enable=rhel-7-server-ose-{{ openshift_release }}-rpms
     --enable=rhel-7-server-optional-rpms
     --enable=rhel-7-server-rpms
   when: redhat_subscribe_system.changed

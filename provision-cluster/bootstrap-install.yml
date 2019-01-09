@@ -1,9 +1,12 @@
 ---
-- name: Prepare OSEv3 Hosts
+- name: Load dynamic config
   hosts: OSEv3
   pre_tasks:
   - name: Load dynamic config
     import_tasks: ../load-dynamic-config.yml
+
+- name: Static node preparation
+  hosts: static-nodes
   roles:
   - role: node-prep
 

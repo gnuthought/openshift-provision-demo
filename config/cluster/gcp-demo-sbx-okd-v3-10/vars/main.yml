@@ -5,4 +5,4 @@ environment_level: nonprod
 cloud_region: gcp-us-central1
 cloud_provider: gcp
 openshift_release: v3.10
-deployment_type: origin
+openshift_deployment_type: origin

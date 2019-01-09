@@ -16,7 +16,7 @@ openshift_provision_default_projects:
 # Assemble cluster resources list using inheritance hierarchy
 #
 openshift_provision_openshift_release_cluster_resources: []
-openshift_provision_deployment_type_cluster_resources: []
+openshift_provision_openshift_deployment_type_cluster_resources: []
 openshift_provision_cloud_provider_cluster_resources: []
 openshift_provision_cloud_region_cluster_resources: []
 openshift_provision_environment_level_cluster_resources: []
@@ -26,7 +26,7 @@ openshift_provision_cluster_resources: []
 openshift_provision_aggregate_cluster_resources: >-
   {{ openshift_provision_default_cluster_resources
    | union(openshift_provision_openshift_release_cluster_resources)
-   | union(openshift_provision_deployment_type_cluster_resources)
+   | union(openshift_provision_openshift_deployment_type_cluster_resources)
    | union(openshift_provision_cloud_provider_cluster_resources)
    | union(openshift_provision_cloud_region_cluster_resources)
    | union(openshift_provision_environment_level_cluster_resources)
@@ -38,7 +38,7 @@ openshift_provision_aggregate_cluster_resources: >-
 # Assemble cluster role bindings list using inheritance hierarchy
 #
 openshift_provision_openshift_release_cluster_role_bindings: {}
-openshift_provision_deployment_type_cluster_role_bindings: {}
+openshift_provision_openshift_deployment_type_cluster_role_bindings: {}
 openshift_provision_cloud_provider_cluster_role_bindings: {}
 openshift_provision_cloud_region_cluster_role_bindings: {}
 openshift_provision_environment_level_cluster_role_bindings: {}
@@ -48,7 +48,7 @@ openshift_provision_cluster_role_bindings: {}
 openshift_provision_aggregate_cluster_role_bindings: >-
   {{ openshift_provision_default_cluster_role_bindings
    | combine(openshift_provision_openshift_release_cluster_role_bindings)
-   | combine(openshift_provision_deployment_type_cluster_role_bindings)
+   | combine(openshift_provision_openshift_deployment_type_cluster_role_bindings)
    | combine(openshift_provision_cloud_provider_cluster_role_bindings)
    | combine(openshift_provision_cloud_region_cluster_role_bindings)
    | combine(openshift_provision_environment_level_cluster_role_bindings)
@@ -61,7 +61,7 @@ openshift_provision_aggregate_cluster_role_bindings: >-
 # Assemble cluster projects list using inheritance hierarchy
 #
 openshift_provision_openshift_release_projects: {}
-openshift_provision_deployment_type_projects: {}
+openshift_provision_openshift_deployment_type_projects: {}
 openshift_provision_cloud_provider_projects: {}
 openshift_provision_cloud_region_projects: {}
 openshift_provision_environment_level_projects: {}
@@ -71,7 +71,7 @@ openshift_provision_projects: {}
 openshift_provision_aggregate_projects: >-
   {{ openshift_provision_default_projects
    | combine(openshift_provision_openshift_release_projects)
-   | combine(openshift_provision_deployment_type_projects)
+   | combine(openshift_provision_openshift_deployment_type_projects)
    | combine(openshift_provision_cloud_provider_projects)
    | combine(openshift_provision_cloud_region_projects)
    | combine(openshift_provision_environment_level_projects)
@@ -87,7 +87,7 @@ openshift_provision_resource_path_core:
 - "{{ openshift_config_location }}/environment_level/{{ environment_level }}/resources"
 - "{{ openshift_config_location }}/cloud_region/{{ cloud_region }}/resources"
 - "{{ openshift_config_location }}/cloud_provider/{{ cloud_provider }}/resources"
-- "{{ openshift_config_location }}/deployment_type/{{ deployment_type }}/resources"
+- "{{ openshift_config_location }}/openshift_deployment_type/{{ openshift_deployment_type }}/resources"
 - "{{ openshift_config_location }}/openshift_release/{{ openshift_release }}/resources"
 - "{{ openshift_config_location }}/default/resources"
 
