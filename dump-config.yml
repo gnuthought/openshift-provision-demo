@@ -6,7 +6,7 @@
   - name: Load cluster config
     import_tasks: load-config.yml
 
-  - name: Dump config YAML to {{ cluster_name }}-vars.yaml
+  - name: Dump config YAML to {{ openshift_provision_cluster_name }}-vars.yaml
     copy:
       content: "{{ lookup('vars', 'vars') | to_nice_yaml(indent=2) }}"
-      dest: "{{ playbook_dir }}/{{ cluster_name }}-vars.yaml"
+      dest: "{{ playbook_dir }}/{{ openshift_provision_cluster_name }}-vars.yaml"

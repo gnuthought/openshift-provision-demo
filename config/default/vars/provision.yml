@@ -30,7 +30,7 @@ openshift_provision_aggregate_cluster_resources: >-
    | union(openshift_provision_cloud_provider_cluster_resources)
    | union(openshift_provision_cloud_region_cluster_resources)
    | union(openshift_provision_environment_level_cluster_resources)
-   | union(openshift_provision_sandbox_cluster_resources if is_sandbox else [])
+   | union(openshift_provision_sandbox_cluster_resources if openshift_provision_sandbox else [])
    | union(openshift_provision_cluster_resources)
   }}
 
@@ -52,7 +52,7 @@ openshift_provision_aggregate_cluster_role_bindings: >-
    | combine(openshift_provision_cloud_provider_cluster_role_bindings)
    | combine(openshift_provision_cloud_region_cluster_role_bindings)
    | combine(openshift_provision_environment_level_cluster_role_bindings)
-   | combine(openshift_provision_sandbox_cluster_role_bindings if is_sandbox else {})
+   | combine(openshift_provision_sandbox_cluster_role_bindings if openshift_provision_sandbox else {})
    | combine(openshift_provision_cluster_role_bindings)
    | dict_to_named_list(nameattr='role')
   }}
@@ -75,7 +75,7 @@ openshift_provision_aggregate_projects: >-
    | combine(openshift_provision_cloud_provider_projects)
    | combine(openshift_provision_cloud_region_projects)
    | combine(openshift_provision_environment_level_projects)
-   | combine(openshift_provision_sandbox_projects if is_sandbox else {})
+   | combine(openshift_provision_sandbox_projects if openshift_provision_sandbox else {})
    | combine(openshift_provision_projects)
    | dict_to_named_list(nameattr='name')
   }}
@@ -84,15 +84,15 @@ openshift_provision_aggregate_projects: >-
 # Establish resource path to implement inheritance
 #
 openshift_provision_resource_path_core:
-- "{{ openshift_config_location }}/environment_level/{{ environment_level }}/resources"
-- "{{ openshift_config_location }}/cloud_region/{{ cloud_region }}/resources"
-- "{{ openshift_config_location }}/cloud_provider/{{ cloud_provider }}/resources"
-- "{{ openshift_config_location }}/openshift_deployment_type/{{ openshift_deployment_type }}/resources"
-- "{{ openshift_config_location }}/openshift_release/{{ openshift_release }}/resources"
-- "{{ openshift_config_location }}/default/resources"
+- "{{ openshift_provision_config_path }}/environment_level/{{ environment_level }}/resources"
+- "{{ openshift_provision_config_path }}/cloud_region/{{ cloud_region }}/resources"
+- "{{ openshift_provision_config_path }}/cloud_provider/{{ cloud_provider }}/resources"
+- "{{ openshift_provision_config_path }}/openshift_deployment_type/{{ openshift_deployment_type }}/resources"
+- "{{ openshift_provision_config_path }}/openshift_release/{{ openshift_release }}/resources"
+- "{{ openshift_provision_config_path }}/default/resources"
 
 openshift_provision_resource_path: >-
-  {{ [openshift_config_location ~ '/cluster/' ~ cluster_name ~ '/resources']
-   | union([openshift_config_location ~ '/sandbox/resources'] if is_sandbox else [])
+  {{ [openshift_provision_config_path ~ '/cluster/' ~ openshift_provision_cluster_name ~ '/resources']
+   | union([openshift_provision_config_path ~ '/sandbox/resources'] if openshift_provision_sandbox else [])
    | union(openshift_provision_resource_path_core)
   }}

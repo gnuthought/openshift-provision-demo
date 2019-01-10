@@ -19,4 +19,4 @@
   roles:
   - role: node-prep
 
-- import_playbook: "{{ openshift_ansible_location }}/playbooks/prerequisites.yml"
+- import_playbook: "{{ openshift_ansible_path }}/playbooks/prerequisites.yml"

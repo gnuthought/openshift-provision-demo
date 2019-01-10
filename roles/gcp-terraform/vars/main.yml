@@ -3,6 +3,8 @@ cluster_ansible_ssh_pubkey: >-
   {{ openshift_provision_ansible_ssh_pubkey }}
 cluster_ansible_user: >-
   {{ openshift_provision_ansible_user }}
+cluster_name: >-
+  {{ openshift_provision_cluster_name }}
 cluster_subnetwork_name: >-
   {{ openshift_provision_gcp_subnetwork_name }}
 cluster_subnetwork_ip_cidr_range: >-
@@ -94,3 +96,8 @@ node_image_family: >-
   {{ openshift_provision_gcp_node_image_family }}
 node_service_account: >-
   {{ openshift_provision_gcp_node_service_account }}
+
+router_node_group: >-
+  {{ openshift_provision_node_groups.router }}
+router_gcp_zones: >-
+  {{ router_node_group.gcp_zones | default(gcp_zones) }}

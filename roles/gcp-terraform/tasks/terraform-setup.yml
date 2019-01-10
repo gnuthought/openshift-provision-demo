@@ -10,6 +10,7 @@
   - controller
   - masters
   - image-node
+  - router
   loop_control:
     loop_var: component_name
   vars:

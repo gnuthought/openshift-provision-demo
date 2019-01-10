@@ -58,4 +58,18 @@
       path: /var/cache/yum
       state: absent
 
-# FIXME - Reboot here
+# Without a reboot after subscription change yum commands have been found to
+# frequently hang.
+- when: redhat_subscribe_system.changed
+  block:
+  - name: Reboot
+    shell: sleep 5 && reboot
+    async: 1
+    poll: 0
+
+  - name: Wait for system after reboot
+    wait_for_connection:
+      connect_timeout: 20
+      sleep: 5
+      delay: 5
+      timeout: 300

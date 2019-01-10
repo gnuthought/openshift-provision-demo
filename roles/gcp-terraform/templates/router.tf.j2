@@ -1,8 +1,3 @@
-{% set router_node_group = openshift_provision_node_groups.router %}
-{% set router_gcp_zones = router_node_group.gcp_zones | default(openshift_gcp_zones) %}
-{% set router_maximum_instance_count = router_node_group.maximum_instance_count | default(router_node_group.instance_count) %}
-{% set router_managed_instance_group_count = router_maximum_instance_count if router_maximum_instance_count < router_gcp_zones|length else router_gcp_zones|length %}
-
 terraform {
   backend "gcs" {
     bucket  = "{{ openshift_gcp_prefix }}terraform-state"
@@ -20,16 +15,10 @@ data "google_compute_network" "{{ openshift_gcp_network_name }}" {
   project = "{{ openshift_gcp_network_project }}"
 }
 
-data "google_compute_subnetwork" "{{ openshift_gcp_subnetwork_name }}" {
-  name = "{{ openshift_gcp_subnetwork_name }}"
-  project = "{{ openshift_gcp_network_project }}"
-}
-
-{% for i in range(router_managed_instance_group_count) %}
-{%   set gcp_zone = router_gcp_zones[i] %}
+{% for gcp_zone in router_gcp_zones %}
 {%   set instance_group_name = openshift_gcp_prefix ~ 'router' ~ gcp_zone[-2:] %}
 data "google_compute_instance_group" "{{ instance_group_name }}" {
-  name = "{{ instance_group_name }}" {
+  name = "{{ instance_group_name }}"
   zone = "{{ gcp_zone }}"
 }
 {% endfor %}
@@ -47,7 +36,7 @@ resource "google_compute_health_check" "{{ openshift_gcp_prefix }}router" {
 
 resource "google_compute_firewall" "{{ openshift_gcp_prefix }}router-http" {
   name = "{{ openshift_gcp_prefix }}router-http"
-  network = "${google_compute_network.{{ openshift_gcp_network_name }}.name}"
+  network = "${data.google_compute_network.{{ openshift_gcp_network_name }}.name}"
   allow {
     protocol = "tcp"
     ports = ["80", "443"]
@@ -67,17 +56,105 @@ resource "google_compute_firewall" "{{ openshift_gcp_prefix }}router-stats" {
   target_tags = ["{{ openshift_gcp_prefix }}node-router"]
 }
 
-resource "google_compute_region_backend_service" "{{ openshift_gcp_prefix }}router" {
-  name = "{{ openshift_gcp_prefix }}router"
-  protocol = "TCP"
+resource "google_compute_backend_service" "{{ openshift_gcp_prefix }}router-http" {
+  name = "{{ openshift_gcp_prefix }}router-http"
+  port_name = "http"
+  protocol = "HTTP"
+  timeout_sec = 10
 
-{% for i in range(router_managed_instance_group_count) %}
-{%   set gcp_zone = router_gcp_zones[i] %}
+{% for gcp_zone in router_gcp_zones %}
 {%   set instance_group_name = openshift_gcp_prefix ~ 'router' ~ gcp_zone[-2:] %}
   backend {
     group = "${data.google_compute_instance_group.{{ instance_group_name }}.self_link}"
   }
 {% endfor %}
 
-  health_checks = [ "${google_compute_health_check.{{ openshift_gcp_prefix }}router}" ]
+  health_checks = [ "${google_compute_health_check.{{ openshift_gcp_prefix }}router.self_link}" ]
+}
+
+resource "google_compute_backend_service" "{{ openshift_gcp_prefix }}router-https" {
+  name = "{{ openshift_gcp_prefix }}router-https"
+  port_name = "https"
+  protocol = "HTTPS"
+  timeout_sec = 10
+
+{% for gcp_zone in router_gcp_zones %}
+{%   set instance_group_name = openshift_gcp_prefix ~ 'router' ~ gcp_zone[-2:] %}
+  backend {
+    group = "${data.google_compute_instance_group.{{ instance_group_name }}.self_link}"
+  }
+{% endfor %}
+
+  health_checks = [ "${google_compute_health_check.{{ openshift_gcp_prefix }}router.self_link}" ]
+}
+
+resource "google_compute_ssl_certificate" "{{ openshift_gcp_prefix }}router" {
+  name = "{{ openshift_gcp_prefix }}router"
+  certificate = {{ lookup('file', openshift_hosted_router_certificate.certfile) | to_json }}
+  private_key = {{ lookup('file', openshift_hosted_router_certificate.keyfile) | to_json }}
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "google_compute_url_map" "{{ openshift_gcp_prefix }}router-http" {
+  name = "{{ openshift_gcp_prefix }}router-http"
+  description = "Masters for {{ cluster_name }}"
+  default_service = "${google_compute_backend_service.{{ openshift_gcp_prefix }}router-http.self_link}"
+}
+
+resource "google_compute_url_map" "{{ openshift_gcp_prefix }}router-https" {
+  name = "{{ openshift_gcp_prefix }}router-https"
+  description = "Masters for {{ cluster_name }}"
+  default_service = "${google_compute_backend_service.{{ openshift_gcp_prefix }}router-https.self_link}"
+}
+
+resource "google_compute_target_http_proxy" "{{ openshift_gcp_prefix }}router-http" {
+  name = "{{ openshift_gcp_prefix }}router-http"
+  url_map = "${google_compute_url_map.{{ openshift_gcp_prefix }}router-http.self_link}"
+}
+
+resource "google_compute_target_https_proxy" "{{ openshift_gcp_prefix }}router-https" {
+  name = "{{ openshift_gcp_prefix }}router-https"
+  ssl_certificates = ["${google_compute_ssl_certificate.{{ openshift_gcp_prefix }}router.self_link}"]
+  url_map = "${google_compute_url_map.{{ openshift_gcp_prefix }}router-https.self_link}"
+}
+
+resource "google_compute_global_address" "{{ openshift_gcp_prefix }}router" {
+  name = "{{ openshift_gcp_prefix }}router"
+}
+
+resource "google_compute_global_forwarding_rule" "{{ openshift_gcp_prefix }}router-http" {
+  name = "{{ openshift_gcp_prefix }}router-http"
+  ip_protocol = "TCP"
+  ip_address = "${google_compute_global_address.{{ openshift_gcp_prefix }}router.address}"
+  labels = {
+    openshift-cluster = "{{ cluster_name }}"
+  }
+  port_range = "80"
+  target = "${google_compute_target_http_proxy.{{ openshift_gcp_prefix }}router-http.self_link}"
+}
+
+resource "google_compute_global_forwarding_rule" "{{ openshift_gcp_prefix }}router-https" {
+  name = "{{ openshift_gcp_prefix }}router-https"
+  ip_protocol = "TCP"
+  ip_address = "${google_compute_global_address.{{ openshift_gcp_prefix }}router.address}"
+  labels = {
+    openshift-cluster = "{{ cluster_name }}"
+  }
+  port_range = "443"
+  target = "${google_compute_target_https_proxy.{{ openshift_gcp_prefix }}router-https.self_link}"
+}
+
+data "google_dns_managed_zone" "{{ cluster_dns_zone_name }}" {
+  name = "{{ cluster_dns_zone_name }}"
+}
+
+resource "google_dns_record_set" "{{ openshift_gcp_prefix }}router" {
+  name = "*.{{ openshift_master_default_subdomain }}."
+  type = "A"
+  ttl  = 300
+  managed_zone = "${data.google_dns_managed_zone.{{ cluster_dns_zone_name }}.name}"
+  rrdatas = ["${google_compute_global_address.{{ openshift_gcp_prefix }}router.address}"]
 }

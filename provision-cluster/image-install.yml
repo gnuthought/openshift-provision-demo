@@ -6,9 +6,9 @@
   tasks:
   - import_tasks: ../load-config.yml
 
-- import_playbook: "{{ openshift_ansible_location }}/playbooks/openshift-etcd/config.yml"
-#- import_playbook: "{{ openshift_ansible_location }}/playbooks/openshift-nfs/config.yml"
-#- import_playbook: "{{ openshift_ansible_location }}/playbooks/openshift-loadbalancer/config.yml"
-- import_playbook: "{{ openshift_ansible_location }}/playbooks/openshift-master/config.yml"
-- import_playbook: "{{ openshift_ansible_location }}/playbooks/openshift-master/additional_config.yml"
-- import_playbook: "{{ openshift_ansible_location }}/playbooks/openshift-node/config.yml"
+- import_playbook: "{{ openshift_ansible_path }}/playbooks/openshift-etcd/config.yml"
+#- import_playbook: "{{ openshift_ansible_path }}/playbooks/openshift-nfs/config.yml"
+#- import_playbook: "{{ openshift_ansible_path }}/playbooks/openshift-loadbalancer/config.yml"
+- import_playbook: "{{ openshift_ansible_path }}/playbooks/openshift-master/config.yml"
+- import_playbook: "{{ openshift_ansible_path }}/playbooks/openshift-master/additional_config.yml"
+- import_playbook: "{{ openshift_ansible_path }}/playbooks/openshift-node/config.yml"

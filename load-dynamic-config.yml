@@ -2,7 +2,7 @@
 - name: Load dynamic configuration
   include_tasks: "{{ dynamic_vars_file.src }}"
   with_filetree:
-  - "{{ openshift_config_location }}/dynamic"
+  - "{{ openshift_provision_config_path }}/dynamic"
   loop_control:
     loop_var: dynamic_vars_file
   when:

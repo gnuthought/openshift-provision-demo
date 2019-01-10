@@ -1,6 +1,6 @@
 ---
-cluster_name: okd-gcp
-is_sandbox: true
+openshift_provision_cluster_name: okd-gcp
+openshift_provision_sandbox: true
 environment_level: nonprod
 cloud_region: gcp-us-central1
 cloud_provider: gcp

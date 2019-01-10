@@ -3,7 +3,7 @@
 debug_level: 2
 
 # Default sandbox setting to false
-is_sandbox: false
+openshift_provision_sandbox: false
 
 # Default ansible user for OCP systems
 openshift_provision_ansible_user: ansible

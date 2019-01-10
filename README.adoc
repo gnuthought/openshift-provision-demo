@@ -52,9 +52,9 @@ FIXME ...
 
 === TLS Cert Configuration
 
-`cluster/{{ cluster_name }}/tls/master.ca`
-`cluster/{{ cluster_name }}/tls/master.cert`
-`cluster/{{ cluster_name }}/tls/master.key`
+`cluster/{{ openshift_provision_cluster_name }}/tls/master.ca`
+`cluster/{{ openshift_provision_cluster_name }}/tls/master.cert`
+`cluster/{{ openshift_provision_cluster_name }}/tls/master.key`
 
 === Dynamic Inventory
 

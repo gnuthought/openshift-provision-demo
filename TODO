@@ -1,0 +1,12 @@
+Scale up from 0 instance group size
+
+Autodiscover instance groups
+
+Add registry persistence with storage bucket
+
+Finish standardizing variable names:
+- environment_level
+- cloud_region
+- cloud_provider
+
+Automate TLS certificate authority setup

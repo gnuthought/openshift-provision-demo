@@ -2,14 +2,13 @@
 
 == Main Variables
 
-* cluster_name
-* is_sandbox
+* openshift_provision_cluster_name
+* openshift_provision_sandbox
 * environment_level
 * cloud_region
 * cloud_provider
 * openshift_release
 * openshift_deployment_type
-* cluster_name
 
 == Other Variables I Need To Document
 
@@ -27,12 +26,12 @@ Base image used for building cluster node images.
 Boolean to indicate if multiple zones should be used. If set to false then
 `openshift_gcp_zone` must be set.
 
-| openshift_gcp_network_name | "{{ cluster_name }}" |
+| openshift_gcp_network_name | "{{ openshift_provision_cluster_name }}" |
 
 | openshift_gcp_network_project | "{{ openshift_gcp_project }}" |
 GCP project in which the cluster network should be defined.
 
-| openshift_gcp_prefix | "{{ cluster_name }}-" |
+| openshift_gcp_prefix | "{{ openshift_provision_cluster_name }}-" |
 Prefix used for GCP resource names.
 
 | openshift_gcp_project | - required for GCP - |
@@ -103,7 +102,7 @@ For sake of this demo it is set to `openshift.gnuthought.com`, but should
 be customized to match a valid domain for other applications of this config
 architecture.
 
-| openshift_provision_dns_subdomain | "{{ cluster_name }}" |
+| openshift_provision_dns_subdomain | "{{ openshift_provision_cluster_name }}" |
 The name of the subdomain under `openshift_provision_dns_parent_domain`, which
 together defines openshift_provision_dns_cluster_domain`.
 
@@ -127,7 +126,7 @@ GCP name of cloud dns zone name for domain given by
 records for domain listed in `openshift_provision_dns_cluster_domain`. If unset
 then DNS delegation will be skipped.
 
-| openshift_provision_gcp_dns_zone_name | "{{ cluster_name }}" |
+| openshift_provision_gcp_dns_zone_name | "{{ openshift_provision_cluster_name }}" |
 Name of the cluster zone in Google Cloud DNS service. Note, this is not the
 domain name of the zone but rather the Cloud DNS zone name.
 
@@ -163,7 +162,7 @@ Default GCE machine type used for nodes. May be overridden within
 | openshift_provision_gcp_node_service_account | "{{ openshift_grp_prefix }}node" |
 Name of GCP service account used on nodes.
 
-| openshift_provision_gcp_subnetwork_name | "{{ cluster_name }}" |
+| openshift_provision_gcp_subnetwork_name | "{{ openshift_provision_cluster_name }}" |
 
 | openshift_provision_gcp_subnetwork_ip_cidr_range | '10.0.0.0/24' |
 
@@ -177,6 +176,12 @@ availability zones within the region given by `openshift_gcp_region`.
 The IP range used to manage the cluster. If not set then the default
 configuration will attempt to dynamically determine the IP address of the
 host from which the ansible playbooks are run.
+
+| openshift_provision_master_cluster_public_cafile | ${OPENSHIFT_PROVISION_CONFIG_PATH}/cluster/${OPENSHIFT_PROVISION_CLUSTER_NAME}/tls/master.ca |
+
+| openshift_provision_master_cluster_public_certfile | ${OPENSHIFT_PROVISION_CONFIG_PATH}/cluster/${OPENSHIFT_PROVISION_CLUSTER_NAME}/tls/master.cert |
+
+| openshift_provision_master_cluster_public_keyfile | ${OPENSHIFT_PROVISION_CONFIG_PATH}/cluster/${OPENSHIFT_PROVISION_CLUSTER_NAME}/tls/master.key |
 
 | openshift_provision_node_groups | required |
 List of node groups, described in detail below.

@@ -10,7 +10,7 @@
   delegate_to: localhost
   command: tar czvf {{ temptar.path }} .
   args:
-    chdir: "{{ openshift_provision_demo_location }}"
+    chdir: "{{ openshift_provision_demo_path }}"
 
 - name: Create ~/openshift-provision-demo on controller
   file:

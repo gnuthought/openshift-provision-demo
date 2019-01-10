@@ -1,5 +1,17 @@
 ---
+openshift_master_overwrite_named_certificates: true
 openshift_master_named_certificates:
-- certfile: "{{ openshift_master_cluster_public_certfile }}"
-  keyfile: "{{ openshift_master_cluster_public_keyfile }}"
-  cafile: "{{ openshift_master_cluster_public_cafile }}"
+- certfile: >-
+    {{ openshift_provision_config_path }}/cluster/{{ openshift_provision_cluster_name }}/tls/master.crt
+  keyfile: >-
+    {{ openshift_provision_config_path }}/cluster/{{ openshift_provision_cluster_name }}/tls/master.key
+  cafile: >-
+    {{ openshift_provision_config_path }}/cluster/{{ openshift_provision_cluster_name }}/tls/master-ca.crt
+
+openshift_hosted_router_certificate:
+  certfile: >-
+    {{ openshift_provision_config_path }}/cluster/{{ openshift_provision_cluster_name }}/tls/router.crt
+  keyfile: >-
+    {{ openshift_provision_config_path }}/cluster/{{ openshift_provision_cluster_name }}/tls/router.key
+  cafile: >-
+    {{ openshift_provision_config_path }}/cluster/{{ openshift_provision_cluster_name }}/tls/router-ca.crt

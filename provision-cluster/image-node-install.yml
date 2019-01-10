@@ -24,16 +24,16 @@
   - role: node-prep
 
 - import_playbook: >-
-    {{ openshift_ansible_location }}/playbooks/prerequisites.yml
+    {{ openshift_ansible_path }}/playbooks/prerequisites.yml
 # OCP 3.10
 - import_playbook: >-
-    {{ openshift_ansible_location }}/playbooks/openshift-checks/pre-install.yml
+    {{ openshift_ansible_path }}/playbooks/openshift-checks/pre-install.yml
 # OCP 3.10
 - import_playbook: >-
-    {{ openshift_ansible_location }}/playbooks/openshift-node/bootstrap.yml
+    {{ openshift_ansible_path }}/playbooks/openshift-node/bootstrap.yml
 # OCP 3.10
 - import_playbook: >-
-    {{ openshift_ansible_location }}/playbooks/openshift-node/join.yml
+    {{ openshift_ansible_path }}/playbooks/openshift-node/join.yml
 # OCP 3.9
 #- import_playbook: >-
-#    {{ openshift_ansible_location }}/playbooks/openshift-node/config.yml
+#    {{ openshift_ansible_path }}/playbooks/openshift-node/config.yml

@@ -1,0 +1,5 @@
+---
+openshift_docker_log_driver: json-file
+openshift_docker_log_options:
+- max-file=5
+- max-size=50m

@@ -86,6 +86,7 @@ class OpenShiftGCP:
         for instance in self.get_instances_in_zone(zone):
             if( self.instance_belongs_to_cluster(instance)
             and self.ansible_group_filter(instance) ):
+                # FIXME - Should have a mechanism to exclude dynamic/autoscaling instances
                 yield instance
 
     def get_instances_in_zone(self, zone):
@@ -194,7 +195,7 @@ class OpenShiftGCP:
             return True
         for role in os.environ['OPENSHIFT_ROLE_FILTER'].split(','):
             kuberole = 'node-role.kubernetes.io/' + role
-            if kuberole in hostvars['openshift_node_labels']:
+            if kuberole in hostvars.get('openshift_node_labels', {}):
                 return True
         return False
 

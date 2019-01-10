@@ -185,11 +185,12 @@ resource "google_compute_url_map" "{{ openshift_gcp_prefix }}master" {
   default_service = "${google_compute_backend_service.{{ openshift_gcp_prefix }}master-https.self_link}"
 }
 
-# FIXME? - Support passthrough https to masters?
-resource "google_compute_ssl_certificate" "{{ openshift_gcp_prefix }}master" {
+# Note - Currently GCP with terraform only supports a single master certificate.
+
+resource "google_compute_ssl_certificate" "{{ openshift_gcp_prefix }}master-0" {
   name = "{{ openshift_gcp_prefix }}master"
-  certificate = "${file("{{ openshift_master_named_certificates[0].certfile }}")}"
-  private_key = "${file("{{ openshift_master_named_certificates[0].keyfile }}")}"
+  certificate = {{ lookup('file', openshift_master_named_certificates[0].certfile) | to_json }}
+  private_key = {{ lookup('file', openshift_master_named_certificates[0].keyfile) | to_json }}
 
   lifecycle {
     create_before_destroy = true
@@ -198,7 +199,9 @@ resource "google_compute_ssl_certificate" "{{ openshift_gcp_prefix }}master" {
 
 resource "google_compute_target_https_proxy" "{{ openshift_gcp_prefix }}master" {
   name = "{{ openshift_gcp_prefix }}master"
-  ssl_certificates = ["${google_compute_ssl_certificate.{{ openshift_gcp_prefix }}master.self_link}"]
+  ssl_certificates = [
+    "${google_compute_ssl_certificate.{{ openshift_gcp_prefix }}master-0.self_link}"
+  ]
   url_map = "${google_compute_url_map.{{ openshift_gcp_prefix }}master.self_link}"
 }
 

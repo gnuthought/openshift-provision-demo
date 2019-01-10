@@ -6,6 +6,8 @@
   - name: Load dynamic config
     import_tasks: ../load-dynamic-config.yml
 
+  - debug: var=openshift_gcp_prefix
+
   - name: Include terraform role for bootstrap
     include_role:
       name: "{{ cloud_provider }}-terraform"

@@ -20,6 +20,11 @@ data "google_service_account" "{{ node_service_account }}" {
   account_id = "{{ node_service_account }}"
 }
 
+data "google_compute_network" "{{ openshift_gcp_network_name }}" {
+  name = "{{ openshift_gcp_network_name }}"
+  project = "{{ openshift_gcp_network_project }}"
+}
+
 data "google_compute_subnetwork" "{{ cluster_subnetwork_name }}" {
   name = "{{ cluster_subnetwork_name }}"
   project = "{{ openshift_gcp_network_project }}"

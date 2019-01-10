@@ -16,4 +16,5 @@
       - image-node
       - masters
       - node-groups
+      - router
       terraform_dir: "{{ playbook_dir }}/terraform"

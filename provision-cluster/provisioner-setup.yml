@@ -34,7 +34,7 @@
   - name: Save provisioner token with ansible-vault
     command: >-
       ansible-vault encrypt --vault-password-file={{ vault_password_file }}
-      --output={{ openshift_config_location }}/cluster/{{ cluster_name }}/openshift-connection.yml
+      --output={{ openshift_provision_config_path }}/cluster/{{ openshift_provision_cluster_name }}/openshift-connection.yml
     args:
       stdin: "openshift_connection_token: {{ get_provisioner_token.stdout | to_json }}"
     delegate_to: localhost

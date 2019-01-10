@@ -2,10 +2,10 @@
 openshift_gcp_create_network: true
 openshift_gcp_image: >-
   {{ 'centos-7' if openshift_deployment_type == 'origin' else 'rhel-7' }}
-openshift_gcp_network_name: "{{ cluster_name }}"
+openshift_gcp_network_name: "{{ openshift_provision_cluster_name }}"
 openshift_provision_ansible_ssh_pubkey: ''
 openshift_provision_ansible_user: ansible
-openshift_provision_gcp_subnetwork_name: "{{ cluster_name }}"
+openshift_provision_gcp_subnetwork_name: "{{ openshift_provision_cluster_name }}"
 openshift_provision_gcp_subnetwork_ip_cidr_range: '10.0.0.0/24'
 
 openshift_provision_use_controller: true

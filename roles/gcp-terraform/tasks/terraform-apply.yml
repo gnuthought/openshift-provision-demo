@@ -38,3 +38,13 @@
   until: terraform_apply.rc == 0
   retries: 2
   delay: 5
+
+- name: Run terraform apply for router
+  command: terraform apply -auto-approve
+  args:
+    chdir: "{{ terraform_dir }}/router"
+  register: terraform_apply
+  changed_when: >-
+    "Resources: 0 added, 0 changed, 0 destroyed." not in terraform_apply.stdout
+  when: >-
+    'router' in terraform_components
