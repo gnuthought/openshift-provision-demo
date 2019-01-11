@@ -2,15 +2,22 @@
 
 import json
 import re
+import time
+import traceback
 import urllib2
 import yaml
 
 def get_metadata_attributes():
-    request = urllib2.Request(
-        'http://metadata.google.internal/computeMetadata/v1/instance/attributes/?recursive=true',
-        headers = { "Metadata-Flavor": "Google" }
-    )
-    return json.loads(urllib2.urlopen(request).read())
+    while True:
+        try:
+            request = urllib2.Request(
+                'http://metadata.google.internal/computeMetadata/v1/instance/attributes/?recursive=true',
+                headers = { "Metadata-Flavor": "Google" }
+            )
+            return json.loads(urllib2.urlopen(request).read())
+        except Exception:
+            traceback.print_exec()
+            time.sleep(10)
 
 def get_node_group(metadata_attributes):
     return metadata_attributes['openshift-node-group']

@@ -36,6 +36,14 @@
       {{ node_group_gcp.boot_disk_type
        | default(image_node_boot_disk_type)
       }}
+    kube_reserved_cpu: >-
+      {{ node_group_gcp.kube_reserved_cpu
+       | default(openshift_provision_node_kube_reserved_cpu)
+      }}
+    kube_reserved_memory: >-
+      {{ node_group_gcp.kube_reserved_memory
+       | default(openshift_provision_node_kube_reserved_memory)
+      }}
     machine_type: >-
       {{ node_group_gcp.machine_type
        | default(image_node_machine_type)

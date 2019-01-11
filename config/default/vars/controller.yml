@@ -16,6 +16,7 @@ openshift_provision_controller_packages:
 - git
 - kexec-tools
 - openshift-ansible
+- "{{ openshift_service_type }}-clients"
 - net-tools
 - psacct
 - python-dns

@@ -1,12 +1,12 @@
-Scale up from 0 instance group size
-
-Autodiscover instance groups
-
 Add registry persistence with storage bucket
 
 Finish standardizing variable names:
 - environment_level
 - cloud_region
 - cloud_provider
+- kube_cluster_autoscaler_image
 
 Automate TLS certificate authority setup
+
+Deal with node labeling in roles/gcp-terraform/templates/node-group.tf.j2 and
+node startup. Do we really need these labels in metadata?

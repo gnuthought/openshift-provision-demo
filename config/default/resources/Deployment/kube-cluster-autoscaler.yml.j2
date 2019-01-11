@@ -22,10 +22,23 @@ spec:
       - command:
         - /usr/bin/cluster-autoscaler
         - --balance-similar-node-groups
-        - --configmap=kube-cluster-autoscaler
         - --logtostderr
         - --namespace=kube-cluster-autoscaler
         - --write-status-configmap=true
+{% for node_group_name, node_group in openshift_provision_node_groups.items() %}
+{%   if 'minimum_instance_count' in node_group and 'maximum_instance_count' in node_group %}
+{%     if cloud_provider == 'gcp' %}
+{%       set gcp_zones = node_group.gcp_zones | default(openshift_provision_gcp_zones) %}
+{%       set outer_loop_last = loop.last %}
+{%       for gcp_zone in gcp_zones %}
+{%         set instance_group_name = openshift_gcp_prefix ~ node_group_name ~ gcp_zone[-2:] %}
+{%         set zone_max = ((node_group.maximum_instance_count + gcp_zones|length - loop.index) / gcp_zones|length) | int %}
+{%         set zone_min = ((node_group.minimum_instance_count + gcp_zones|length - loop.index) / gcp_zones|length) | int %}
+        - "--nodes={{ zone_min }}:{{ zone_max }}:https://www.googleapis.com/compute/v1/projects/{{ openshift_gcp_project }}/zones/{{ gcp_zone }}/instanceGroups/{{ instance_group_name }}"
+{%       endfor %}
+{%     endif %}
+{%   endif %}
+{% endfor %}
         env:
         - name: LOG_OUTPUT
           value: /dev/stdout

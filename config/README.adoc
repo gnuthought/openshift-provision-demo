@@ -186,6 +186,10 @@ host from which the ansible playbooks are run.
 | openshift_provision_node_groups | required |
 List of node groups, described in detail below.
 
+| openshift_provision_node_kube_reserved_cpu | "500m" |
+
+| openshift_provision_node_kube_reserved_memory | "500Mi" |
+
 | openshift_provision_use_controller | True |
 Indicates whether the cluster is managed with a controller instance. If this
 is set to false then the cluster is managed directly from wherever the ansible

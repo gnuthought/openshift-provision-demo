@@ -58,10 +58,15 @@ resource "google_compute_instance_template" "{{ instance_template_name }}" {
     ansible-host-group-nodes = "true"
     ansible-host-group-{{ node_group_name }}-node = "true"
     openshift-node-group = "{{ node_group_name }}"
-    # Labels included in metadata for node bootstrap labeling
+
+    kube-env = "AUTOSCALER_ENV_VARS: kube_reserved=cpu={{ kube_reserved_cpu }},memory={{ kube_reserved_memory }};node_labels={{ node_group.labels|op_map_to_pairs }};node_taints={{ node_group.taints|default({})|op_map_to_pairs }};\n"
+
+    # Labels are included in metadata for node bootstrap labeling
+    # FIXME - We should be able to get the labels from the kube-env now
 {% for k, v in node_group.labels.items() %}
     openshift-node-label-{{ loop.index }} = "{{ k }}={{ v }}"
 {% endfor %}
+
 {% if cluster_ansible_ssh_pubkey %}
     sshKeys = "{{ cluster_ansible_user }}:{{ cluster_ansible_ssh_pubkey }} {{ cluster_ansible_user }}"
 {% endif %}
