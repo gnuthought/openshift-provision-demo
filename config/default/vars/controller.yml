@@ -22,6 +22,7 @@ openshift_provision_controller_packages:
 - psacct
 - python-dns
 - python2-pip
+- rng-tools
 - screen
 - sos
 - tmux

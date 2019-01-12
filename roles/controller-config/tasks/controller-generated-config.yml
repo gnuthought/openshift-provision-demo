@@ -4,4 +4,4 @@
     dest: ~/openshift-provision-demo/config/default/vars/controller-generated.yml
     content: |
       openshift_provision_is_running_from_controller: true
-      openshift_provision_gpg_pubkey: {{ openshift_provision_gpg_pubkey }}
+      openshift_provision_gpg_pubkey: {{ openshift_provision_gpg_pubkey | to_json }}

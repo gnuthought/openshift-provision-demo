@@ -21,6 +21,9 @@
     dest: "{{ temp_gpg_gen_conf.path }}"
     mode: u=rw,go=
 
+- name: Generate GPG key
+  command: gpg2 --batch --gen-key "{{ temp_gpg_gen_conf.path }}"
+
 - name: Remove tempfile for GPG key generation
   file:
     path: "{{ temp_gpg_gen_conf.path }}"

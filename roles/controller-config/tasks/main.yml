@@ -13,6 +13,9 @@
 
 - include_tasks: install-terraform.yml
 
+- name: Run rngd to feed entroy to the kernel
+  include_tasks: rngd.yml
+
 - include_tasks: ssh-keygen.yml
 
 - name: GPG

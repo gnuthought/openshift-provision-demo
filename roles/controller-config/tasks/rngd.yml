@@ -1,0 +1,6 @@
+---
+- name: Start and enable rngd
+  service:
+    name: rngd
+    state: started
+    enabled: true
