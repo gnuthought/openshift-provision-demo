@@ -14,3 +14,9 @@
 - include_tasks: install-terraform.yml
 
 - include_tasks: ssh-keygen.yml
+
+- name: GPG
+  include_tasks: gpg.yml
+
+- name: Controller generated config
+  include: controller-generated-config.yml

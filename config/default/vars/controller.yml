@@ -14,6 +14,7 @@ openshift_provision_controller_packages:
 - dnsmasq
 - firewalld
 - git
+- gnupg2
 - kexec-tools
 - openshift-ansible
 - "{{ openshift_service_type }}-clients"

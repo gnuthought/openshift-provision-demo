@@ -27,9 +27,3 @@
   file:
     path: "{{ temptar.path }}"
     state: absent
-
-- name: Create var to indicate running from controller
-  copy:
-    dest: ~/openshift-provision-demo/config/default/vars/running-from-controller.yml
-    content: |
-      openshift_provision_is_running_from_controller: true

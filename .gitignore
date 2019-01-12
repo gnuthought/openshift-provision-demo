@@ -8,4 +8,4 @@ env/
 terraform/
 tls/
 openshift-connection.yml
-config/default/vars/running-from-controller.yml
+config/default/vars/controller-generated.yml
