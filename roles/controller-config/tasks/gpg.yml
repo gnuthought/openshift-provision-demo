@@ -8,12 +8,3 @@
 - name: Create GPG key {{ openshift_provision_gpg_key_email }}
   include_tasks: create-gpg-key.yml
   when: get_gpg_key.rc != 0
-
-- name: Export GPG public key {{ openshift_provision_gpg_key_email }}
-  command: gpg2 --armor --export {{ openshift_provision_gpg_key_email }}
-  changed_when: false
-  register: export_gpg_key
-
-- name: Set fact for openshift_provision_gpg_pubkey
-  set_fact:
-    openshift_provision_gpg_pubkey: "{{ export_gpg_key.stdout }}"

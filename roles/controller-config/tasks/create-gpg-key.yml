@@ -7,12 +7,10 @@
 - name: Create GPG key gen conf
   copy:
     content: |-
-      %echo Generating a basic OpenPGP key
-      Key-Type: RSA
-      Key-Length: 2048
-      Subkey-Type: RSA
-      Subkey-Length: 2048
+      Key-Type: default
+      Subkey-Type: default
       Name-Real: {{ openshift_provision_gpg_key_name }}
+      Name-Comment: with stupid passphrase
       Name-Email: {{ openshift_provision_gpg_key_email }}
       Expire-Date: 0
       Passphrase: {{ openshift_provision_gpg_key_passphrase }}
