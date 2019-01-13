@@ -1,4 +1,0 @@
----
-- include_tasks: set-facts-from-terraform-base-output.yml
-  when: >-
-    'base' in terraform_components

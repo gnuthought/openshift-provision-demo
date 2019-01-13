@@ -13,7 +13,7 @@
     vars:
       terraform_action: apply
       terraform_components:
-      - base
+      - network
       - controller
       terraform_dir: "{{ playbook_dir }}/terraform"
 

@@ -7,8 +7,10 @@
   changed_when: >-
     "Resources: 0 added, 0 changed, 0 destroyed." not in terraform_apply.stdout
   with_items:
-  - base
+  - network
   - controller
+  - service-accounts
+  - registry-storage
   - masters
   - image-node
   loop_control:

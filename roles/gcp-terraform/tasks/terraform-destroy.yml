@@ -40,10 +40,12 @@
   changed_when: >-
     "Resources: 0 added, 0 changed, 0 destroyed." not in terraform_destroy.stdout
   with_items:
-  - base
-  - controller
-  - masters
   - image-node
+  - masters
+  - registry-storage
+  - service-accounts
+  - controller
+  - network
   loop_control:
     loop_var: component_name
   when: >-

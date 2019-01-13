@@ -1,5 +1,12 @@
 ---
+openshift_gcp_create_registry_bucket: true
+openshift_gcp_registry_bucket_name: "{{ openshift_gcp_prefix }}registry"
+openshift_gcp_registry_bucket_keyfile: "{{ openshift_provision_config_path }}/cluster/{{ openshift_provision_cluster_name }}/vars"
+
 openshift_hosted_registry_storage_provider: gcs
-openshift_hosted_registry_storage_gcs_bucket: "{{ openshift_provision_cluster_name }}/docker-registry"
-#openshift_hosted_registry_storage_gcs_keyfile: docker-registry-key.json
-openshift_hosted_registry_storage_gcs_rootdirectory: /registry
+openshift_hosted_registry_storage_gcs_bucket: "{{ openshift_gcp_registry_bucket_name }}"
+openshift_hosted_registry_storage_gcs_keyfile: "{{ openshift_gcp_registry_bucket_keyfile }}"
+openshift_hosted_registry_storage_gcs_rootdirectory: /docker-registry
+
+openshift_provision_gcp_create_registry_service_account: true
+openshift_provision_gcp_registry_service_account_id: "{{ openshift_gcp_prefix }}registry"

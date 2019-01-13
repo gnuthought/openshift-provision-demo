@@ -13,8 +13,10 @@
     vars:
       terraform_action: destroy
       terraform_components:
-      - image-node
-      - masters
-      - node-groups
       - router
+      - image-node
+      - node-groups
+      - masters
+      - registry-storage
+      - service-accounts
       terraform_dir: "{{ playbook_dir }}/terraform"

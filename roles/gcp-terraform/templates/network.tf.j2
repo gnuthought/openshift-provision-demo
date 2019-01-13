@@ -1,37 +1,17 @@
 #
-# The base template includes network components and service accounts
+# Network configuration
 #
 
 terraform {
   backend "gcs" {
     bucket  = "{{ openshift_gcp_prefix }}terraform-state"
-    prefix  = "cluster-core"
+    prefix  = "network"
   }
 }
 
 provider "google" {
   project = "{{ openshift_gcp_project }}"
   region = "{{ openshift_gcp_region }}"
-}
-
-resource "google_service_account" "{{ master_service_account }}" {
-  account_id = "{{ master_service_account }}"
-  display_name = "{{ cluster_name }} master"
-}
-
-resource "google_project_iam_member" "{{ master_service_account }}-compute-admin" {
-  role = "roles/compute.admin"
-  member = "serviceAccount:${google_service_account.{{ master_service_account }}.email}"
-}
-
-resource "google_service_account" "{{ node_service_account }}" {
-  account_id = "{{ node_service_account }}"
-  display_name = "{{ cluster_name }} node"
-}
-
-resource "google_project_iam_member" "{{ node_service_account }}-compute-viewer" {
-  role = "roles/compute.viewer"
-  member = "serviceAccount:${google_service_account.{{ node_service_account }}.email}"
 }
 
 # FIXME - Add support for when not creating network
@@ -47,7 +27,6 @@ resource "google_compute_subnetwork" "{{ cluster_subnetwork_name }}" {
   network = "${google_compute_network.{{ openshift_gcp_network_name }}.self_link}"
 }
 
-# FIXME - add support for etcd when not located on masters
 resource "google_compute_firewall" "{{ openshift_gcp_prefix }}master-etcd" {
   name = "{{ openshift_gcp_prefix }}master-etcd"
   network = "${google_compute_network.{{ openshift_gcp_network_name }}.name}"

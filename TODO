@@ -1,4 +1,18 @@
+Create registry bucket service account, get the key, decrypt with gpg
+and encrypt with vault, store on controller
+- openshift_provision_gcp_create_registry_service_account
+- openshift_provision_gcp_registry_service_account_id
+- openshift_hosted_registry_storage_gcs_keyfile (openshift_gcp_registry_bucket_keyfile)
+
+Create registry bucket, grant access to the service account
+- openshift_gcp_create_registry_bucket
+- openshift_hosted_registry_storage_gcs_bucket (openshift_gcp_registry_bucket_name)
+
 Add registry persistence with storage bucket
+
+- openshift_gcp_registry_bucket_keyfile
+- openshift_hosted_registry_storage_gcs_keyfile
+- openshift_hosted_registry_storage_gcs_rootdirectory: /registry
 
 Finish standardizing variable names:
 - environment_level
@@ -10,3 +24,7 @@ Automate TLS certificate authority setup
 
 Deal with node labeling in roles/gcp-terraform/templates/node-group.tf.j2 and
 node startup. Do we really need these labels in metadata?
+
+Support:
+- openshift_gcp_create_network
+- openshift_gcp_iam_service_account_keyfile

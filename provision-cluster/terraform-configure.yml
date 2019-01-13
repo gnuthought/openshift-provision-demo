@@ -13,9 +13,11 @@
     vars:
       terraform_action: apply
       terraform_components:
-      - base
+      - network
+      - service-accounts
+      - registry-storage
+      - image-node
       - masters
-      - node-groups
       - router
       terraform_dir: "{{ playbook_dir }}/terraform"
 

@@ -1,0 +1,36 @@
+#
+# Docker registry storage
+#
+
+terraform {
+  backend "gcs" {
+    bucket  = "{{ openshift_gcp_prefix }}terraform-state"
+    prefix  = "registry-storage"
+  }
+}
+
+provider "google" {
+  project = "{{ openshift_gcp_project }}"
+  region = "{{ openshift_gcp_region }}"
+}
+
+data "google_service_account" "{{ registry_service_account_id }}" {
+  account_id = "{{ registry_service_account_id }}"
+}
+
+resource "google_storage_bucket" "{{ registry_bucket_name }}" {
+  name = "{{ registry_bucket_name }}"
+  location = "{{ openshift_gcp_region }}"
+  storage_class = "REGIONAL"
+  labels = {
+    openshift-cluster = "{{ cluster_name }}"
+  }
+}
+
+resource "google_storage_bucket_iam_binding" "{{ registry_bucket_name }}" {
+  bucket = "${google_storage_bucket.{{ registry_bucket_name }}.name}"
+  role = "roles/storage.objectAdmin"
+  members = [
+    "serviceAccount:${data.google_service_account.{{ registry_service_account_id }}.email}"
+  ]
+}

@@ -1,0 +1,17 @@
+---
+#
+# Get GPG key
+#
+- when:
+  - openshift_provision_gpg_key_email is defined
+  block:
+  - name: Export GPG key
+    shell: >-
+      gpg --export {{ openshift_provision_gpg_key_email | quote }} 
+      | base64 -w0
+    register: export_gpg_key
+    changed_when: false
+
+  - name: Set openshift_provision_management_source_ip_range
+    set_fact:
+      openshift_provision_gpg_pubkey: "{{ export_gpg_key.stdout }}"

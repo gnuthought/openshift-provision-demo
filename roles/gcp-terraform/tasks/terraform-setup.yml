@@ -6,8 +6,10 @@
 
 - include_tasks: terraform-setup-template.yml
   with_items:
-  - base
+  - network
   - controller
+  - service-accounts
+  - registry-storage
   - masters
   - image-node
   - router
