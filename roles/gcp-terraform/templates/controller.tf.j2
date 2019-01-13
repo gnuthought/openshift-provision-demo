@@ -53,7 +53,12 @@ resource "google_compute_firewall" "{{ openshift_gcp_prefix }}mangement-to-contr
 
   allow {
     protocol = "tcp"
-    ports = [{{ controller_ansible_port }}]
+    ports = [
+{% if controller_ansible_port != 22 %}
+      {{ controller_ansible_port }},
+{% endif %}
+      22
+    ]
   }
   source_ranges = ["{{ management_source_ip_range }}"]
   target_tags = ["{{ openshift_gcp_prefix }}controller"]
@@ -92,7 +97,7 @@ resource "google_compute_instance" "{{ openshift_gcp_prefix }}controller" {
     sshKeys = "{{ controller_ansible_user }}:{{ controller_ansible_ssh_pubkey }} {{ controller_ansible_user }}"
 {% endif %}
 {% if 22 != controller_ansible_port | default(22) %}
-    startup-script = {{ lookup('file', 'ssh-tcp-redirect-startup.sh.j2') | to_json }}
+    startup-script = {{ lookup('template', 'ssh-tcp-redirect-startup.sh.j2') | to_json }}
 {% endif %}
   }
 

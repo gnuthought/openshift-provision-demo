@@ -1,9 +1,10 @@
 #!/bin/sh
 
-if systemctl is-active -q firewalld
+if systemctl is-enabled -q firewalld
 then
-  firewall-cmd --add-forward-port=port={{ controller_ansible_port }}:proto=tcp:toport=22
-  firewall-cmd --permanent --add-forward-port=port={{ controller_ansible_port }}:proto=tcp:toport=22
+  firewall-cmd --permanent --zone=trusted --add-forward-port=port={{ controller_ansible_port }}:proto=tcp:toport=22
+  firewall-cmd --permanent --zone=public --add-forward-port=port={{ controller_ansible_port }}:proto=tcp:toport=22
+  firewall-cmd --reload
 else
   iptables -t nat -I PREROUTING -p tcp --dport {{ controller_ansible_port }} -j REDIRECT --to-ports=22
 fi
