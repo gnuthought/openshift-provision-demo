@@ -1,2 +1,2 @@
 ---
-kube_cluster_autoscaler_image: registry.redhat.io/openshift3/ose-cluster-autoscaler:v{{ openshift_release }}
+openshift_provision_cluster_autoscaler_image: registry.redhat.io/openshift3/ose-cluster-autoscaler:v{{ openshift_release }}

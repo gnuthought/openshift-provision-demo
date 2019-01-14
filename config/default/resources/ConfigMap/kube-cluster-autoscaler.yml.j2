@@ -11,7 +11,7 @@ data:
        "nodeGroups": [
 {% for node_group_name, node_group in openshift_provision_node_groups.items() %}
 {%   if 'minimum_instance_count' in node_group and 'maximum_instance_count' in node_group %}
-{%     if cloud_provider == 'gcp' %}
+{%     if openshift_provision_cloud_provider == 'gcp' %}
 {%       set gcp_zones = node_group.gcp_zones | default(openshift_provision_gcp_zones) %}
 {%       set outer_loop_last = loop.last %}
 {%       for gcp_zone in gcp_zones %}

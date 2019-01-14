@@ -7,4 +7,4 @@ openshift_provision_project_kube_cluster_autoscaler:
   resources:
   - Deployment/kube-cluster-autoscaler.yml.j2
 
-kube_cluster_autoscaler_image_pull_policy: Always
+openshift_provision_cluster_autoscaler_image_pull_policy: Always

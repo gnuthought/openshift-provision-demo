@@ -4,9 +4,9 @@
 
 * openshift_provision_cluster_name
 * openshift_provision_sandbox
-* environment_level
-* cloud_region
-* cloud_provider
+* openshift_provision_environment_level
+* openshift_provision_cloud_region
+* openshift_provision_cloud_provider
 * openshift_release
 * openshift_deployment_type
 

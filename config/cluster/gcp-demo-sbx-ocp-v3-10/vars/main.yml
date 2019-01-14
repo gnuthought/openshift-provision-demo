@@ -1,8 +1,8 @@
 ---
 openshift_provision_cluster_name: gcp-demo-sbx-ocp-v3.10
 openshift_provision_sandbox: true
-environment_level: nonprod
-cloud_region: gcp-us-east4
-cloud_provider: gcp
+openshift_provision_environment_level: nonprod
+openshift_provision_cloud_region: gcp-us-east4
+openshift_provision_cloud_provider: gcp
 openshift_release: v3.10
 openshift_deployment_type: openshift-enterprise

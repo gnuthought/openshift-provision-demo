@@ -11,7 +11,7 @@
 
   - name: Include terraform role for image-node
     include_role:
-      name: "{{ cloud_provider }}-terraform"
+      name: "{{ openshift_provision_cloud_provider }}-terraform"
       allow_duplicates: true
 
   - name: Wait for all instances to be running

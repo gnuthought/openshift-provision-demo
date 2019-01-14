@@ -20,13 +20,13 @@ class OpenShiftInventory:
         self.load_cluster_vars('default')
         self.load_cluster_vars('openshift_release', cluster_main['openshift_release'])
         self.load_cluster_vars('openshift_deployment_type', cluster_main['openshift_deployment_type'])
-        self.load_cluster_vars('cloud_provider', cluster_main['cloud_provider'])
-        self.load_cluster_vars('cloud_region', cluster_main['cloud_region'])
-        self.load_cluster_vars('environment_level', cluster_main['environment_level'])
+        self.load_cluster_vars('cloud_provider', cluster_main['openshift_provision_cloud_provider'])
+        self.load_cluster_vars('cloud_region', cluster_main['openshift_provision_cloud_region'])
+        self.load_cluster_vars('environment_level', cluster_main['openshift_provision_environment_level'])
         if cluster_main.get('openshift_provision_sandbox', False):
             self.load_cluster_vars('sandbox')
         self.load_cluster_vars('cluster', self.cluster_name)
-        self.cloud_provider_class = __import__('openshift_' + cluster_main['cloud_provider'])
+        self.cloud_provider_class = __import__('openshift_' + cluster_main['openshift_provision_cloud_provider'])
         self.cloud_provider = getattr(
             self.cloud_provider_class,
             self.cloud_provider_class.inventory_class_name

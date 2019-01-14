@@ -84,9 +84,9 @@ openshift_provision_aggregate_projects: >-
 # Establish resource path to implement inheritance
 #
 openshift_provision_resource_path_core:
-- "{{ openshift_provision_config_path }}/environment_level/{{ environment_level }}/resources"
-- "{{ openshift_provision_config_path }}/cloud_region/{{ cloud_region }}/resources"
-- "{{ openshift_provision_config_path }}/cloud_provider/{{ cloud_provider }}/resources"
+- "{{ openshift_provision_config_path }}/environment_level/{{ openshift_provision_environment_level }}/resources"
+- "{{ openshift_provision_config_path }}/cloud_region/{{ openshift_provision_cloud_region }}/resources"
+- "{{ openshift_provision_config_path }}/cloud_provider/{{ openshift_provision_cloud_provider }}/resources"
 - "{{ openshift_provision_config_path }}/openshift_deployment_type/{{ openshift_deployment_type }}/resources"
 - "{{ openshift_provision_config_path }}/openshift_release/{{ openshift_release }}/resources"
 - "{{ openshift_provision_config_path }}/default/resources"

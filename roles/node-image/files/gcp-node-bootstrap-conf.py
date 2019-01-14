@@ -23,11 +23,24 @@ def get_node_group(metadata_attributes):
     return metadata_attributes['openshift-node-group']
 
 def get_node_labels(metadata_attributes):
-    node_labels = []
-    for attr, value in metadata_attributes.items():
-         if attr.startswith('openshift-node-label-'):
-             node_labels.append(value.encode('ascii'))
-    return node_labels
+    """
+    Return node labels dict parsed from kube-env metadata.
+
+    We expect the kube-env to be valid YAML data including a line of the format:
+
+    AUTOSCALER_ENV_VARS: kube_reserved=cpu=200m,memory=200Mi;node_labels=role=foo,foo=bar;node_taints=;
+
+    This example should return: [ "role=foo", "foo=bar" }
+
+    If node labels are not found, then return: [ "node-role.kubernetes.io/compute=true" ]
+    """
+    kube_env = yaml.load(metadata_attributes.get('kube-env', '{}'))
+    autoscaler_env_vars = kube_env.get('AUTOSCALER_ENV_VARS', '')
+    m = re.search(r'(?:^|;)node_labels=([^;]+)', autoscaler_env_vars)
+    if m:
+        return m.group(1).split(",")
+    else:
+        return [ "node-role.kubernetes.io/compute=true" ]
 
 def set_node_labels(node_labels):
     node_config = yaml.load(open('/etc/origin/node/node-config.yaml', 'r'))

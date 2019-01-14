@@ -26,17 +26,17 @@
 
 - name: Load cloud provider vars
   include_vars:
-    dir: "{{ openshift_provision_config_path }}/cloud_provider/{{ _config_main.cloud_provider }}/vars"
+    dir: "{{ openshift_provision_config_path }}/cloud_provider/{{ _config_main.openshift_provision_cloud_provider }}/vars"
     files_matching: '[a-z0-9].*\.(json|ya?ml)$'
 
 - name: Load cloud region vars
   include_vars:
-    dir: "{{ openshift_provision_config_path }}/cloud_region/{{ _config_main.cloud_region }}/vars"
+    dir: "{{ openshift_provision_config_path }}/cloud_region/{{ _config_main.openshift_provision_cloud_region }}/vars"
     files_matching: '[a-z0-9].*\.(json|ya?ml)$'
 
 - name: Load environment level vars
   include_vars:
-    dir: "{{ openshift_provision_config_path }}/environment_level/{{ _config_main.environment_level }}/vars"
+    dir: "{{ openshift_provision_config_path }}/environment_level/{{ _config_main.openshift_provision_environment_level }}/vars"
     files_matching: '[a-z0-9].*\.(json|ya?ml)$'
 
 - name: Load sandbox vars

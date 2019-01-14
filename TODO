@@ -1,13 +1,6 @@
-Finish standardizing variable names:
-- environment_level
-- cloud_region
-- cloud_provider
-- kube_cluster_autoscaler_image
-
 Automate TLS certificate authority setup
 
-Deal with node labeling in roles/gcp-terraform/templates/node-group.tf.j2 and
-node startup. Do we really need the node labels in metadata?
+Support OKD 3.11 on CentOS
 
 Support:
 - openshift_gcp_create_network
