@@ -8,7 +8,7 @@ openshift_provision_controller_cloud_packages_enablerepo:
 openshift_provision_controller_cloud_python_packages: []
 
 openshift_provision_gcp_controller_iam_roles:
-- editor
+- owner
 
 #openshift_provision_gcp_controller_boot_disk_image: >-
 #  {{ 'centos-7' if openshift_deployment_type == 'origin' else 'rhel-7' }}

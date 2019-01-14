@@ -17,7 +17,7 @@ openshift_provision_gcp_controller_boot_disk_image: >-
   {{ openshift_gcp_image }}
 openshift_provision_gcp_controller_boot_disk_size_gb: 50
 openshift_provision_gcp_controller_iam_roles:
-- editor
+- owner
 openshift_provision_gcp_controller_machine_type: n1-standard-1
 openshift_provision_gcp_controller_service_account: "{{ openshift_gcp_prefix }}controller"
 

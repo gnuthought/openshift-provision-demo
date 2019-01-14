@@ -21,5 +21,8 @@
 - name: GPG
   include_tasks: gpg.yml
 
+- name: TLS cert generation
+  include: tls-cert-generation.yml
+
 - name: Controller generated config
   include: controller-generated-config.yml
