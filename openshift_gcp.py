@@ -229,12 +229,15 @@ class OpenShiftGCP:
                     }
 
     def populate_all_group_vars(self, hosts):
-        cluster_zone = self.dnsAPI.managedZones().get(
-            managedZone = self.ocpinv().cluster_var('openshift_provision_gcp_dns_zone_name'),
-            project = self.ocpinv().cluster_var('openshift_gcp_project')
-        ).execute()
-        hosts['all']['vars']['openshift_provision_cluster_domain_dns_servers'] = \
-            cluster_zone['nameServers']
+        try:
+            cluster_zone = self.dnsAPI.managedZones().get(
+                managedZone = self.ocpinv().cluster_var('openshift_provision_gcp_dns_zone_name'),
+                project = self.ocpinv().cluster_var('openshift_gcp_project')
+            ).execute()
+            hosts['all']['vars']['openshift_provision_cluster_domain_dns_servers'] = \
+                cluster_zone['nameServers']
+        except:
+            pass
 
     def populate_hosts(self, hosts):
         self.populate_all_group_vars(hosts)

@@ -16,7 +16,6 @@
       - network
       - service-accounts
       - registry-storage
-      - image-node
       - masters
       - router
       terraform_dir: "{{ playbook_dir }}/terraform"

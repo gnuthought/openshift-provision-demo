@@ -1,7 +1,7 @@
 terraform {
   backend "gcs" {
     bucket  = "{{ openshift_gcp_prefix }}terraform-state"
-    prefix  = "image-node"
+    prefix  = "router"
   }
 }
 

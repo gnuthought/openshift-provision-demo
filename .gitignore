@@ -9,3 +9,4 @@ terraform/
 tls/
 openshift-connection.yml
 config/default/vars/controller-generated.yml
+config/cluster/gcp-demo-sbx-ocp-v3-11/registry-gcs.key

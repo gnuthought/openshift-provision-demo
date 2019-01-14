@@ -18,6 +18,11 @@
   when: >-
     component_name in terraform_components
 
+- name: Get service account keys
+  include_tasks: get-service-account-keys.yml
+  when: >-
+    'service-accounts' in terraform_components
+
 - name: Run terraform apply for node-group components
   command: terraform apply -auto-approve
   args:
