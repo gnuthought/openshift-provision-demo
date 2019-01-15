@@ -2,6 +2,8 @@
 
 import json
 import re
+import socket
+import subprocess
 import time
 import traceback
 import urllib2
@@ -63,6 +65,12 @@ def set_bootstrap_config_name(node_group):
     set_bootstrap_config_name_in('/etc/sysconfig/origin-node', node_group)
     set_bootstrap_config_name_in('/etc/sysconfig/atomic-openshift-node', node_group)
 
+def set_fqdn_hostname():
+    fqd = socket.getfqdn()
+    subprocess.call(['hostname', fqdn])
+    with open('/etc/hostname', 'w') as fh:
+        fh.write(fqdn)
+
 def main():
     metadata_attributes = get_metadata_attributes()
     node_group = get_node_group(metadata_attributes)
@@ -71,6 +79,7 @@ def main():
     print(node_labels)
     set_node_labels(node_labels)
     set_bootstrap_config_name(node_group)
+    set_fqdn_hostname()
 
 if __name__ == '__main__':
     main()

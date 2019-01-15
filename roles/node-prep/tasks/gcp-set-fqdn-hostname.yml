@@ -1,0 +1,19 @@
+---
+- name: Adjust google_set_hostname to set fqdn
+  copy:
+    src: google_set_hostname
+    dest: /bin/google_set_hostname
+    mode: u=rwx,go=rx
+
+- name: Set hostname to full hostname
+  hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Set hostname in /etc/hostname
+  copy:
+    content: "{{ inventory_hostname }}"
+    dest: /etc/hostname
+
+- name: Set ansible_hostname fact
+  set_fact:
+    ansible_hostname: "{{ inventory_hostname }}"

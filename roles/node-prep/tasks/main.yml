@@ -7,5 +7,5 @@
 - name: Install and uninstall packages
   include_tasks: packages.yml
 
-- name: Configure cloud provider DNS
-  include_tasks: cloud-dns-{{ openshift_provision_cloud_provider }}.yml
+- name: Configure for cloud provider
+  include_tasks: cloud-provider-{{ openshift_provision_cloud_provider }}.yml

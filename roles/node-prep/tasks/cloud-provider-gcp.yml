@@ -1,0 +1,6 @@
+---
+- name: Set hostname to GCP FQDN
+  include_tasks: gcp-set-fqdn-hostname.yml
+
+- name: Configure GCP DNS
+  include_tasks: gcp-cloud-dns.yml
