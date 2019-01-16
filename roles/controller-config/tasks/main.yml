@@ -25,13 +25,13 @@
   include_tasks: gpg.yml
 
 - name: TLS cert generation
-  include: tls-cert-generation.yml
+  include_tasks: tls-cert-generation.yml
 
 - name: Controller generated config
-  include: controller-generated-config.yml
+  include_tasks: controller-generated-config.yml
 
 - name: Git clone openshift-ansible
-  include: openshift-ansible-git.yml
+  include_tasks: openshift-ansible-git.yml
 
 - name: Include cloud provider specific configuration
-  include: cloud-provider-{{ openshift_provision_cloud_provider }}.yml
+  include_tasks: cloud-provider-{{ openshift_provision_cloud_provider }}.yml

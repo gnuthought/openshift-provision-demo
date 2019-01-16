@@ -11,4 +11,4 @@ openshift_provision_gcp_node_image_family: "{{ openshift_gcp_prefix }}node"
 #openshift_gcp_registry_bucket_keyfile: ''
 #openshift_gcp_registry_bucket_name: "{{ openshift_gcp_prefix }}-docker-registry"
 
-openshift_provision_gcp_use_fqdn: true
+openshift_provision_gcp_use_fqdn: false
