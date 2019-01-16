@@ -29,3 +29,9 @@
 
 - name: Controller generated config
   include: controller-generated-config.yml
+
+- name: Git clone openshift-ansible
+  include: openshift-ansible-git.yml
+
+- name: Include cloud provider specific configuration
+  include: cloud-provider-{{ openshift_provision_cloud_provider }}.yml

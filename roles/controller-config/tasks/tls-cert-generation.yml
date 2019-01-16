@@ -4,6 +4,11 @@
     openshift_provision_cluster_tls_dir: >-
       ~{{ openshift_provision_controller_ansible_user }}/openshift-provision-demo/config/cluster/{{ openshift_provision_cluster_name }}/tls
 
+- name: Create openshift_provision_cluster_tls_dir
+  file:
+    path: "{{ openshift_provision_cluster_tls_dir }}"
+    state: directory
+
 - name: Create self-signed master cert
   command: >-
     openssl req -new -nodes -x509

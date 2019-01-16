@@ -1,0 +1,13 @@
+---
+- name: Apply GCP FQDN patch to ~/openshift-ansbile
+  patch:
+    basedir: ~/openshift-ansible
+    src: openshift-ansible-gcp-fqdn.patch
+    strip: 1
+
+- name: Apply GCP FQDN patch to /usr/share/ansible/openshift-ansible
+  become: true
+  patch:
+    basedir: /usr/share/ansible/openshift-ansible
+    src: openshift-ansible-gcp-fqdn.patch
+    strip: 1

@@ -166,6 +166,8 @@ Name of GCP service account used on nodes.
 
 | openshift_provision_gcp_subnetwork_ip_cidr_range | '10.0.0.0/24' |
 
+| openshift_provision_gcp_use_fqdn | false |
+
 | openshift_provision_gcp_zones | varies by region |
 List of availability zones used for the cluster. If `openshift_gcp_multizone`
 is false then this defaults to a list only containing `openshift_gcp_zone`.

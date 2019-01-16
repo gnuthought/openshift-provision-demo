@@ -1,6 +1,7 @@
 .*
 *.env
 *.json
+*.key
 *.pyc
 *.retry
 *.token

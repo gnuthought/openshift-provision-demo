@@ -1,0 +1,21 @@
+index 177d60f..7b11791 100755
+--- a/roles/openshift_facts/library/openshift_facts.py
++++ b/roles/openshift_facts/library/openshift_facts.py
+@@ -229,7 +229,7 @@ def normalize_gce_facts(metadata, facts):
+     pub_ip = facts['network']['interfaces'][0]['public_ips'][0]
+     facts['network']['public_ip'] = pub_ip
+     # Split instance hostname from GCE metadata to use the short instance name
+-    facts['network']['hostname'] = metadata['instance']['hostname'].split('.')[0]
++    facts['network']['hostname'] = metadata['instance']['hostname']
+ 
+     # TODO: attempt to resolve public_hostname
+     facts['network']['public_hostname'] = facts['network']['public_ip']
+@@ -482,7 +482,7 @@ def set_nodename(facts):
+     """ set nodename """
+     if 'node' in facts and 'common' in facts:
+         if 'cloudprovider' in facts and facts['cloudprovider']['kind'] == 'gce':
+-            facts['node']['nodename'] = facts['provider']['metadata']['instance']['hostname'].split('.')[0]
++            facts['node']['nodename'] = facts['provider']['metadata']['instance']['hostname']
+ 
+         # TODO: The openstack cloudprovider nodename setting was too opinionaed.
+         #       It needs to be generalized before it can be enabled again.

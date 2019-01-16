@@ -1,0 +1,4 @@
+---
+- name: Apply GCP fqdn patch
+  include: gcp-fqdn-patch.yml
+  when: openshift_provision_gcp_use_fqdn | bool
