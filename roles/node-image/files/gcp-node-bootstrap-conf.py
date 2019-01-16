@@ -2,6 +2,7 @@
 
 import json
 import re
+import requests
 import socket
 import subprocess
 import time
@@ -46,7 +47,6 @@ def get_node_labels(metadata_attributes):
 
 def set_node_labels(node_labels):
     node_config = yaml.load(open('/etc/origin/node/node-config.yaml', 'r'))
-    print(node_config)
     node_config['kubeletArguments']['node-labels'] = node_labels
     open('/etc/origin/node/node-config.yaml', 'w').write(yaml.dump(node_config))
 
@@ -65,21 +65,22 @@ def set_bootstrap_config_name(node_group):
     set_bootstrap_config_name_in('/etc/sysconfig/origin-node', node_group)
     set_bootstrap_config_name_in('/etc/sysconfig/atomic-openshift-node', node_group)
 
-def set_fqdn_hostname():
-    fqd = socket.getfqdn()
-    subprocess.call(['hostname', fqdn])
+def set_fqdn_gcp_hostname():
+    r = requests.get(
+        'http://metadata.google.internal/computeMetadata/v1/instance/hostname',
+        headers={'Metadata-Flavor': 'Google'}
+    )
+    subprocess.call(['hostname', r.text])
     with open('/etc/hostname', 'w') as fh:
-        fh.write(fqdn)
+        fh.write(r.text)
 
 def main():
     metadata_attributes = get_metadata_attributes()
     node_group = get_node_group(metadata_attributes)
     node_labels = get_node_labels(metadata_attributes)
-    print(node_group)
-    print(node_labels)
     set_node_labels(node_labels)
     set_bootstrap_config_name(node_group)
-    set_fqdn_hostname()
+    set_fqdn_gcp_hostname()
 
 if __name__ == '__main__':
     main()
