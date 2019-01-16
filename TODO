@@ -1,10 +1,6 @@
-Complete support for GCP fqdn by adding hacks to openshift-ansible
-
-Finish support for use of fqdn including variable to enable
-
-Support using environment variable to specify cluster
-
 Environment setup for controller
+
+Support using xip.io or nip.io? Remove need for google DNS?
 
 Support:
 - openshift_gcp_create_network
