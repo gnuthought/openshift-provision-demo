@@ -1,0 +1,9 @@
+---
+osm_cluster_network_cidr: 100.64.0.0/16
+osm_cluster_networks:
+- cidr: 100.64.0.0/16
+  host_subnet_length: 8
+- cidr: 100.65.0.0/16
+  host_subnet_length: 8
+
+openshift_provision_controller_ansible_port: 443

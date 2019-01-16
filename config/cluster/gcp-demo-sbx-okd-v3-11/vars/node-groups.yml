@@ -1,0 +1,37 @@
+---
+openshift_disable_check: memory_availability,disk_availability
+
+openshift_provision_node_groups:
+  master:
+    instance_count: 1
+    labels:
+      logging-infra-fluentd: "true"
+      node-role.kubernetes.io/master: "true"
+    static_node_group: true
+  image:
+    labels:
+      node-role.kubernetes.io/image: "true"
+    static_node_group: true
+  infra:
+    minimum_instance_count: 1
+    maximum_instance_count: 3
+    labels:
+      logging-infra-fluentd: "true"
+      node-role.kubernetes.io/infra: "true"
+      node-role.kubernetes.io/infra-app: "true"
+    gcp:
+      machine_type: n1-standard-2
+  router:
+    minimum_instance_count: 1
+    maximum_instance_count: 3
+    labels:
+      logging-infra-fluentd: "true"
+      node-role.kubernetes.io/infra: "true"
+      node-role.kubernetes.io/router: "true"
+  app:
+    minimum_instance_count: 1
+    maximum_instance_count: 3
+    labels:
+      logging-infra-fluentd: "true"
+      node-role.kubernetes.io/app: "true"
+      node-role.kubernetes.io/compute: "true"
