@@ -1,0 +1,6 @@
+---
+- name: Install centos release for openshift origin
+  yum:
+    name: "{{ openshift_provision_yum_pkg_release_openshift_origin }}"
+    state: latest
+  become: yes

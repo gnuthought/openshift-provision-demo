@@ -1,0 +1,3 @@
+---
+openshift_provision_yum_pkg_release_openshift_origin: >-
+  centos-release-openshift-origin{{ openshift_release | replace('.','') }}
