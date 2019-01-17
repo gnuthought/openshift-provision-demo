@@ -35,3 +35,6 @@
 
 - name: Include cloud provider specific configuration
   include_tasks: cloud-provider-{{ openshift_provision_cloud_provider }}.yml
+
+- name: Setup user environment
+  include_tasks: user-env.yml

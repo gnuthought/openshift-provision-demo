@@ -1,7 +1,19 @@
-Environment setup for controller
+Node image update process
 
 Support using xip.io or nip.io? Remove need for google DNS?
 
-Support:
-- openshift_gcp_create_network
-- openshift_gcp_iam_service_account_keyfile
+Document how to deploy from scratch in a google cloud project
+
+Make sure all variables are at least listed in config README
+
+Support openshift_gcp_create_network, thi should control run of terraform for network
+
+Support openshift_gcp_iam_service_account_keyfile to point to GCP service account keyfile
+
+Master update process?
+
+Deploy gitlab in new cluster with provision
+
+Populate openshift-provision-demo into gitlab
+
+Git2Namespace?
