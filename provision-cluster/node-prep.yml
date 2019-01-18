@@ -3,7 +3,7 @@
 - name: Prepare Nodes for openshift-ansible
   hosts: nodes
   vars:
-    terraform_dir: "{{ playbook_dir }}/terraform"
+    terraform_dir: "{{ playbook_dir }}/terraform/{{ openshift_provision_cluster_name }}"
 
   pre_tasks:
   - name: Load cluster config

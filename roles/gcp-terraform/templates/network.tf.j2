@@ -120,7 +120,7 @@ output "cloud_dns_servers" {
   value = "${google_dns_managed_zone.{{ cluster_dns_zone_name }}.name_servers}"
 }
 
-{% if delegation_dns_zone_name %}
+{% if handle_dns_delegation %}
 data "google_dns_managed_zone" "{{ delegation_dns_zone_name }}" {
   name = "{{ delegation_dns_zone_name }}"
 }

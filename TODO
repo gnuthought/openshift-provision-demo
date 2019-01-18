@@ -1,14 +1,29 @@
+Setup ~/.vaultpw on controller
+
+Split up jinja templates with includes?
+
+Bootstrap/deploying a cluster should not run network terraform when using controller.
+
 Node image update process
 
-Support using xip.io or nip.io? Remove need for google DNS?
+Setup instructions
 
-Document how to deploy from scratch in a google cloud project
+Support using xip.io or nip.io? Remove need for google DNS?
+- add variable openshift_provision_wildcard_dns_domain
+- get public ip for master and router during network setup
+- master public ip set using dynamic inventory
+- master default subdomain set using dynamic inventory
+
+Use Let's Encrypt?
+- https://blog.openshift.com/create-https-based-encrypted-urls-using-routes/
 
 Make sure all variables are at least listed in config README
 
-Support openshift_gcp_create_network, thi should control run of terraform for network
+Document how to deploy from scratch in a google cloud project
 
-Support openshift_gcp_iam_service_account_keyfile to point to GCP service account keyfile
+Support openshift_gcp_create_network, thi should control run of terraform for network?
+
+Support openshift_gcp_iam_service_account_keyfile to point to GCP service account keyfile?
 
 Master update process?
 

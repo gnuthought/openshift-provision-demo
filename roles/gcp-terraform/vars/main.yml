@@ -38,6 +38,8 @@ controller_service_account: >-
 
 delegation_dns_zone_name: >-
   {{ openshift_provision_gcp_dns_delegation_zone_name }}
+handle_dns_delegation: >-
+  {{ openshift_provision_handle_dns_delegation }}
 
 gcp_zones: >-
   {{ openshift_provision_gcp_zones }}

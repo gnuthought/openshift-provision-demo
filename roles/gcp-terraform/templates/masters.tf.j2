@@ -21,10 +21,6 @@ data "google_service_account" "{{ master_service_account }}" {
   account_id = "{{ master_service_account }}"
 }
 
-data "google_dns_managed_zone" "{{ cluster_dns_zone_name }}" {
-  name = "{{ cluster_dns_zone_name }}"
-}
-
 {# Spread masters between available zones #}
 {% for n in range(t_master_count|int) %}
 {%   set t_master_name = openshift_gcp_prefix ~ 'master-' ~ n %}
@@ -213,6 +209,10 @@ resource "google_compute_global_forwarding_rule" "{{ openshift_gcp_prefix }}mast
   }
   port_range = "443"
   target = "${google_compute_target_https_proxy.{{ openshift_gcp_prefix }}master.self_link}"
+}
+
+data "google_dns_managed_zone" "{{ cluster_dns_zone_name }}" {
+  name = "{{ cluster_dns_zone_name }}"
 }
 
 resource "google_dns_record_set" "{{ openshift_gcp_prefix }}master" {

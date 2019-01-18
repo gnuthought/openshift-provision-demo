@@ -19,4 +19,4 @@
       - masters
       - registry-storage
       - service-accounts
-      terraform_dir: "{{ playbook_dir }}/terraform"
+      terraform_dir: "{{ playbook_dir }}/terraform/{{ openshift_provision_cluster_name }}"

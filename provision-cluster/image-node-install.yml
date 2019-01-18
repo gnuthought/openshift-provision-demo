@@ -20,7 +20,7 @@
 - name: Run node-prep on image node
   hosts: image
   vars:
-    terraform_dir: "{{ playbook_dir }}/terraform"
+    terraform_dir: "{{ playbook_dir }}/terraform/{{ openshift_provision_cluster_name }}"
   roles:
   - role: node-prep
 

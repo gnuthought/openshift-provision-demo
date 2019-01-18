@@ -18,7 +18,7 @@
       - registry-storage
       - image-node
       - masters
-      terraform_dir: "{{ playbook_dir }}/terraform"
+      terraform_dir: "{{ playbook_dir }}/terraform/{{ openshift_provision_cluster_name }}"
 
   - name: Wait for all instances to be running
     command: ../hosts.py --wait 300

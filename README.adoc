@@ -28,7 +28,9 @@ uses the DNS domain "openshift-provision-demo.gnuthought.com". If you use this
 unchanged then you will need to setup local DNS overrides from your test system
 hosts file for names such as "master.openshift-provision-demo.gnuthought.com".
 
-FIXME ...
+== Prerequisites
+
+ansible, terraform, jq
 
 === Ansible Vault
 

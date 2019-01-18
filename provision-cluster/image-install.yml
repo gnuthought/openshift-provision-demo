@@ -3,7 +3,7 @@
 - name: Load cluster config
   hosts: OSEv3
   vars:
-    terraform_dir: "{{ playbook_dir }}/terraform"
+    terraform_dir: "{{ playbook_dir }}/terraform/{{ openshift_provision_cluster_name }}"
   tasks:
   - import_tasks: ../load-config.yml
 
