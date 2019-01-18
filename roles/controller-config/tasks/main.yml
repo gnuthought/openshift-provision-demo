@@ -24,6 +24,9 @@
 - name: GPG
   include_tasks: gpg.yml
 
+- name: Setup for ansible-vault
+  include_tasks: setup-ansible-vault.yml
+
 - name: TLS cert generation
   include_tasks: tls-cert-generation.yml
 

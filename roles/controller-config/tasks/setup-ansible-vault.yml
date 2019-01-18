@@ -1,0 +1,5 @@
+---
+- name: Create ~/.vaultpw
+  command: dd if=/dev/urandom of=.vaultpw bs=1024 count=4
+  args:
+    creates: ~/.vaultpw
