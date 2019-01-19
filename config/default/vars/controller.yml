@@ -15,6 +15,7 @@ openshift_provision_controller_packages:
 - firewalld
 - git
 - gnupg2
+- jq
 - kexec-tools
 - openshift-ansible
 - "{{ openshift_service_type }}-clients"
