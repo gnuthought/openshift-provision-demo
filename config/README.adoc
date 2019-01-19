@@ -175,6 +175,11 @@ If `openshift_gcp_multizone` is true then this defaults to a dynamic list of
 availability zones within the region given by `openshift_gcp_region`.
 
 | openshift_provision_handle_dns_delegation | false |
+Boolean to indicate whether the terraform automation should attempt to
+configure DNS delegation for `openshift_provision_dns_cluster_domain`
+from `openshift_provision_dns_parent_domain`. If this feature is not
+used then DNS delegation will need to be handled manually or use a wildcard
+DNS service with `openshift_provision_wildcard_dns`.
 
 | openshift_provision_management_source_ip_range | dynamic ip of host |
 The IP range used to manage the cluster. If not set then the default
@@ -216,6 +221,10 @@ Password to use to register the system with Red Hat.
 | openshift_provision_rhsub_pool | value of environment variable "REDHAT_SUBSCRIPTION_POOLS" |
 Red Hat subscriptino pool id.
 
+| openshift_provision_wildcard_dns | "xip.io" |
+Wildcard DNS service such as xip.io or nip.io to use for
+`openshift_master_cluster_public_hostname` and `openshift_master_default_subdomain`.
+This is useful when DNS delegation is not available.
 |=======================
 
 The variable `openshift_provision_node_groups` should be a dictionary with

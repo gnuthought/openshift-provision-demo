@@ -1,0 +1,49 @@
+---
+- name: Generate missing platform service certificates
+  hosts: masters[0]
+  tasks:
+  - name: Check if registry-console-cert secret exists
+    command: >-
+      oc get secret -n default registry-console-cert
+    changed_when: false
+    failed_when: false
+    register: get_registry_console_cert
+
+  - name: Get registry-console service
+    command: >-
+      oc get svc -n default registry-console -o json
+    changed_when: false
+    register: get_registry_console_svc
+
+  - when: get_registry_console_cert.rc != 0
+    block:
+    - name: Create temp dir for registry console cert
+      tempfile:
+        state: directory
+      register: tempdir
+
+    - name: Create registry-console-cert
+      command: >-
+        oc adm ca create-server-cert
+        --hostnames=registry-console-default.{{ openshift_master_default_subdomain }},{{ registry_console_svc_ip }},registry-console.default.svc,registry-console.default.svc.cluster.local
+        --cert={{ tempdir.path }}/cert
+        --key={{ tempdir.path }}/key
+        --signer-cert=/etc/origin/master/ca.crt
+        --signer-key=/etc/origin/master/ca.key
+        --signer-serial=/etc/origin/master/ca.serial.txt                                                                   
+      vars:
+        registry_console_svc_ip: >-
+          {{ get_registry_console_svc.stdout | from_json | json_query('spec.clusterIP') }}
+
+    - name: Combine registry console cert and key
+      shell: cat {{ tempdir.path }}/cert {{ tempdir.path }}/key >{{ tempdir.path }}/console.cert
+
+    - name: Create registry-console-cert
+      command: >-
+        oc create secret generic registry-console-cert
+        --from-file={{ tempdir.path }}/console.cert
+
+    - name: Clean up tempdir
+      file:
+        path: "{{ tempdir.path }}"
+        state: absent

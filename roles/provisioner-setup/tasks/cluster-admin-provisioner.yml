@@ -1,0 +1,15 @@
+---
+- name: Check cluster-admin provisioner ClusterRoleBinding
+  command: >-
+    oc get ClusterRoleBinding cluster-admin-provisioner -o json
+  changed_when: false
+  failed_when: false
+  register: get_provisioner_cluster_admin
+
+- name: Grant cluster-admin to provisioner
+  command: >-
+    oc adm policy add-cluster-role-to-user
+    --rolebinding-name=cluster-admin-provisioner
+    cluster-admin system:serviceaccount:default:provisioner
+  when: get_provisioner_cluster_admin.rc != 0
+

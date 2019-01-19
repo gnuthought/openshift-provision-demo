@@ -1,9 +1,3 @@
-{% set instance_template_name =
-         openshift_gcp_prefix ~
-         node_group_name ~ '-' ~
-         ansible_date_time.iso8601 | regex_replace('[^0-9]', '')
-%}
-
 terraform {
   backend "gcs" {
     bucket  = "{{ openshift_gcp_prefix }}terraform-state"
@@ -91,18 +85,32 @@ resource "google_compute_instance_template" "{{ instance_template_name }}" {
   }
 }
 
-# FIXME - Allow zero scale instance groups
-{% set gcp_zones = node_group.gcp_zones | default(gcp_zones) %}
-{% set maximum_instance_count = node_group.maximum_instance_count | default(node_group.instance_count) %}
-{% set managed_instance_group_count = maximum_instance_count if maximum_instance_count < gcp_zones|length else gcp_zones|length %}
-{% for i in range(managed_instance_group_count) %}
-{%   set gcp_zone = gcp_zones[i] %}
-{%   set instance_group_name = openshift_gcp_prefix ~ node_group_name ~ gcp_zone[-2:] %}
-resource "google_compute_instance_group_manager" "{{ instance_group_name }}" {
-  name = "{{ instance_group_name }}"
-  base_instance_name = "{{ instance_group_name }}"
+{% for i in range(gcp_zones|length) %}
+{%   set t_gcp_zone = gcp_zones[i] %}
+{%   set t_instance_group_name = openshift_gcp_prefix ~ node_group_name ~ t_gcp_zone[-2:] %}
+
+resource "google_compute_instance_group_manager" "{{ t_instance_group_name }}" {
+  name = "{{ t_instance_group_name }}"
+  base_instance_name = "{{ t_instance_group_name }}"
   instance_template = "${google_compute_instance_template.{{ instance_template_name }}.self_link}"
   update_strategy = "NONE"
-  zone = "{{ gcp_zone }}"
+  zone = "{{ t_gcp_zone }}"
+
+{%   if node_group_name == 'router' %}
+  # Named ports for router load balancing
+  named_port {
+    name = "http"
+    port = "80"
+  }
+  named_port {
+    name = "https"
+    port = "443"
+  }
+  named_port {
+    name = "stats"
+    port = "1936"
+  }
+{%   endif %}
+
 }
 {% endfor %}

@@ -110,6 +110,22 @@ resource "google_compute_firewall" "{{ openshift_gcp_prefix }}mangement-to-node-
 {%   endif %}
 {% endif %}
 
+resource "google_compute_global_address" "{{ openshift_gcp_prefix }}master" {
+  name = "{{ openshift_gcp_prefix }}master"
+}
+
+output "master_public_ip" {
+  value = "${google_compute_global_address.{{ openshift_gcp_prefix }}master.address}"
+}
+
+resource "google_compute_global_address" "{{ openshift_gcp_prefix }}router" {
+  name = "{{ openshift_gcp_prefix }}router"
+}
+
+output "router_public_ip" {
+  value = "${google_compute_global_address.{{ openshift_gcp_prefix }}router.address}"
+}
+
 resource "google_dns_managed_zone" "{{ cluster_dns_zone_name }}" {
   name        = "{{ cluster_dns_zone_name }}"
   dns_name    = "{{ cluster_dns_domain }}."

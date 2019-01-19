@@ -1,21 +1,18 @@
-Setup ~/.vaultpw on controller
+Switch all passthrough routes to reencrypt
+- kube-service-catalog   apiserver
+
+Fix issues with routes:
+kube-service-catalog               apiserver           apiserver-kube-service-catalog.35.227.192.203.xip.io    
+
+Fix issue with mis-identified updates when running provision
 
 Split up jinja templates with includes?
 
-Bootstrap/deploying a cluster should not run network terraform when using controller.
+Check that from-scratch build sets up global address as static
 
 Node image update process
 
 Setup instructions
-
-Support using xip.io or nip.io? Remove need for google DNS?
-- add variable openshift_provision_wildcard_dns_domain
-- get public ip for master and router during network setup
-- master public ip set using dynamic inventory
-- master default subdomain set using dynamic inventory
-
-Use Let's Encrypt?
-- https://blog.openshift.com/create-https-based-encrypted-urls-using-routes/
 
 Make sure all variables are at least listed in config README
 
@@ -32,3 +29,13 @@ Deploy gitlab in new cluster with provision
 Populate openshift-provision-demo into gitlab
 
 Git2Namespace?
+
+Immutable master replacement
+- reserve n+1 master network ips
+- Set network_interface.network_ip for masters instances
+- Ansible playbook to add/remove masters
+
+Add an imagestream for the kube-cluster-autoscaler image pull
+
+Use Let's Encrypt?
+- https://blog.openshift.com/create-https-based-encrypted-urls-using-routes/

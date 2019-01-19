@@ -8,6 +8,7 @@ openshift_provision_ansible_user: ansible
 openshift_provision_gcp_subnetwork_name: "{{ openshift_provision_cluster_name }}"
 openshift_provision_gcp_subnetwork_ip_cidr_range: '10.0.0.0/24'
 openshift_provision_handle_dns_delegation: false
+openshift_provision_wildcard_dns: false
 
 openshift_provision_use_controller: true
 openshift_provision_controller_ansible_port: 22

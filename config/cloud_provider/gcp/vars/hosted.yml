@@ -3,6 +3,15 @@ openshift_gcp_create_registry_bucket: true
 openshift_gcp_registry_bucket_name: "{{ openshift_gcp_prefix }}registry"
 openshift_gcp_registry_bucket_keyfile: "{{ openshift_provision_config_path }}/cluster/{{ openshift_provision_cluster_name }}/registry-gcs.key"
 
+# Passthrough routs to the registry do not work properly with GCP load
+# balancing because the load balancer does not set SNI...
+#
+# We do not actually set openshift_hosted_registry_routetermination because the
+# openshift-ansible playbooks needlessly demand that
+# openshift_hosted_registry_routecertificates be set. So we instead manipulate
+# the route post-install with openshift-provision
+#openshift_hosted_registry_routetermination: reencrypt
+
 openshift_hosted_registry_storage_provider: gcs
 openshift_hosted_registry_storage_kind: object
 openshift_hosted_registry_storage_gcs_bucket: "{{ openshift_gcp_registry_bucket_name }}"

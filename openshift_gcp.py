@@ -230,14 +230,55 @@ class OpenShiftGCP:
 
     def populate_all_group_vars(self, hosts):
         try:
-            cluster_zone = self.dnsAPI.managedZones().get(
-                managedZone = self.ocpinv().cluster_var('openshift_provision_gcp_dns_zone_name'),
-                project = self.ocpinv().cluster_var('openshift_gcp_project')
-            ).execute()
             hosts['all']['vars']['openshift_provision_cluster_domain_dns_servers'] = \
-                cluster_zone['nameServers']
+                self.get_cluster_domain_dns_servers()
+            wildcard_dns = self.ocpinv().cluster_var('openshift_provision_wildcard_dns')
         except:
+            # FIXME - Should we really ignore all errors?
             pass
+
+        if wildcard_dns:
+            master_ip, router_ip = self.get_master_and_router_ip()
+            if master_ip:
+                hosts['all']['vars']['openshift_master_cluster_public_hostname'] = \
+                    "master.{}.{}".format(
+                        master_ip,
+                        wildcard_dns
+                    )
+            if router_ip:
+                hosts['all']['vars']['openshift_master_default_subdomain'] = \
+                    "{}.{}".format(
+                        router_ip,
+                        wildcard_dns
+                    )
+
+    def get_cluster_domain_dns_servers(self):
+        cluster_zone = self.dnsAPI.managedZones().get(
+            managedZone = self.ocpinv().cluster_var('openshift_provision_gcp_dns_zone_name'),
+            project = self.ocpinv().cluster_var('openshift_gcp_project')
+        ).execute()
+        return cluster_zone['nameServers']
+
+    def get_master_and_router_ip(self):
+        master_ip = router_ip = None
+        req = self.computeAPI.globalAddresses().list(
+            project = self.ocpinv().cluster_var('openshift_gcp_project')
+        )
+        gcp_prefix = self.ocpinv().cluster_var('openshift_gcp_prefix')
+        while req:
+            resp = req.execute()
+            for address in resp.get('items', []):
+                if 'name' not in address:
+                    pass
+                elif address['name'] == gcp_prefix + 'master':
+                    master_ip = address['address']
+                elif address['name'] == gcp_prefix + 'router':
+                    router_ip = address['address']
+            req = self.computeAPI.instances().list_next(
+                previous_request = req,
+                previous_response = resp
+            )
+        return master_ip, router_ip
 
     def populate_hosts(self, hosts):
         self.populate_all_group_vars(hosts)

@@ -1,0 +1,14 @@
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: registry-console
+spec:
+  host: registry-console-default.{{ openshift_master_default_subdomain }}
+  tls:
+    termination: reencrypt
+  to:
+    kind: Service
+    name: registry-console
+    weight: 100
+  wildcardPolicy: None

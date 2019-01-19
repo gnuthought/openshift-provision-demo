@@ -121,14 +121,14 @@ resource "google_compute_target_https_proxy" "{{ openshift_gcp_prefix }}router-h
   url_map = "${google_compute_url_map.{{ openshift_gcp_prefix }}router-https.self_link}"
 }
 
-resource "google_compute_global_address" "{{ openshift_gcp_prefix }}router" {
+data "google_compute_global_address" "{{ openshift_gcp_prefix }}router" {
   name = "{{ openshift_gcp_prefix }}router"
 }
 
 resource "google_compute_global_forwarding_rule" "{{ openshift_gcp_prefix }}router-http" {
   name = "{{ openshift_gcp_prefix }}router-http"
   ip_protocol = "TCP"
-  ip_address = "${google_compute_global_address.{{ openshift_gcp_prefix }}router.address}"
+  ip_address = "${data.google_compute_global_address.{{ openshift_gcp_prefix }}router.address}"
   labels = {
     openshift-cluster = "{{ cluster_name }}"
   }
@@ -139,7 +139,7 @@ resource "google_compute_global_forwarding_rule" "{{ openshift_gcp_prefix }}rout
 resource "google_compute_global_forwarding_rule" "{{ openshift_gcp_prefix }}router-https" {
   name = "{{ openshift_gcp_prefix }}router-https"
   ip_protocol = "TCP"
-  ip_address = "${google_compute_global_address.{{ openshift_gcp_prefix }}router.address}"
+  ip_address = "${data.google_compute_global_address.{{ openshift_gcp_prefix }}router.address}"
   labels = {
     openshift-cluster = "{{ cluster_name }}"
   }
@@ -147,6 +147,7 @@ resource "google_compute_global_forwarding_rule" "{{ openshift_gcp_prefix }}rout
   target = "${google_compute_target_https_proxy.{{ openshift_gcp_prefix }}router-https.self_link}"
 }
 
+{% if not openshift_provision_wildcard_dns %}
 data "google_dns_managed_zone" "{{ cluster_dns_zone_name }}" {
   name = "{{ cluster_dns_zone_name }}"
 }
@@ -156,5 +157,6 @@ resource "google_dns_record_set" "{{ openshift_gcp_prefix }}router" {
   type = "A"
   ttl  = 300
   managed_zone = "${data.google_dns_managed_zone.{{ cluster_dns_zone_name }}.name}"
-  rrdatas = ["${google_compute_global_address.{{ openshift_gcp_prefix }}router.address}"]
+  rrdatas = ["${data.google_compute_global_address.{{ openshift_gcp_prefix }}router.address}"]
 }
+{% endif %}

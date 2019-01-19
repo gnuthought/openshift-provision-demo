@@ -85,7 +85,7 @@ class OpenShiftInventory:
     def print_host_json(self, hostname):
         host = self.cloud_provider.get_host(hostname)
         if host:
-            print(json.dumps(host))
+            print(json.dumps(host, sort_keys=True, indent=2))
         else:
             print('{}')
 
@@ -130,7 +130,7 @@ class OpenShiftInventory:
                 'children': ['masters']
             }
 
-        print(json.dumps(hosts))
+        print(json.dumps(hosts, sort_keys=True, indent=2))
 
     def wait_for_hosts_running(self, timeout):
         self.cloud_provider.wait_for_hosts_running(timeout)

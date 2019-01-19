@@ -38,6 +38,17 @@
       {{ node_group_gcp.boot_disk_type
        | default(image_node_boot_disk_type)
       }}
+    # Templates are immutable, so we must create a new template on each change
+    instance_template_name: >-
+      {{ openshift_gcp_prefix
+       ~ node_group_name ~ '-'
+       ~ ansible_date_time.year
+       ~ ansible_date_time.month
+       ~ ansible_date_time.day
+       ~ ansible_date_time.hour
+       ~ ansible_date_time.minute
+       ~ ansible_date_time.second
+      }}
     kube_reserved_cpu: >-
       {{ node_group_gcp.kube_reserved_cpu
        | default(openshift_provision_node_kube_reserved_cpu)

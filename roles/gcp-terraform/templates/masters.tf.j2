@@ -201,9 +201,14 @@ resource "google_compute_target_https_proxy" "{{ openshift_gcp_prefix }}master" 
   url_map = "${google_compute_url_map.{{ openshift_gcp_prefix }}master.self_link}"
 }
 
+data "google_compute_global_address" "{{ openshift_gcp_prefix }}master" {
+  name = "{{ openshift_gcp_prefix }}master"
+}
+
 resource "google_compute_global_forwarding_rule" "{{ openshift_gcp_prefix }}master" {
   name = "{{ openshift_gcp_prefix }}master"
   ip_protocol = "TCP"
+  ip_address = "${data.google_compute_global_address.{{ openshift_gcp_prefix }}master.address}"
   labels = {
     openshift-cluster = "{{ cluster_name }}"
   }
@@ -215,6 +220,7 @@ data "google_dns_managed_zone" "{{ cluster_dns_zone_name }}" {
   name = "{{ cluster_dns_zone_name }}"
 }
 
+{% if not openshift_provision_wildcard_dns %}
 resource "google_dns_record_set" "{{ openshift_gcp_prefix }}master" {
   name = "{{ openshift_master_cluster_public_hostname }}."
   type = "A"
@@ -222,6 +228,7 @@ resource "google_dns_record_set" "{{ openshift_gcp_prefix }}master" {
   managed_zone = "${data.google_dns_managed_zone.{{ cluster_dns_zone_name }}.name}"
   rrdatas = ["${google_compute_global_forwarding_rule.{{ openshift_gcp_prefix }}master.ip_address}"]
 }
+{% endif %}
 
 resource "google_dns_record_set" "{{ openshift_gcp_prefix }}master-internal" {
   name = "{{ openshift_master_cluster_hostname }}."
