@@ -1,16 +1,20 @@
-Node image update process
+Create GCP node manager operator to roll out new images on autoscaling nodes
 
 Make sure all variables are at least listed in config README
 
 Setup instructions
+
+Replace OPENSHIFT_ROLE_FILTER with a node group filter
+
+Generate local certificate authority on cluster and sign certs with that after
+terraform network processing. So that the master and router certificates can
+include the dynamic hostnames.
 
 Document how to deploy from scratch in a google cloud project
 
 Support openshift_gcp_create_network?
 
 Support openshift_gcp_iam_service_account_keyfile to point to GCP service account keyfile?
-
-Master update process?
 
 Deploy gitlab in new cluster with provision
 
@@ -24,6 +28,8 @@ Immutable master replacement
 - Ansible playbook to add/remove masters
 
 Add an imagestream for the kube-cluster-autoscaler image pull
+
+Master update process?
 
 Split up terraform jinja templates with includes?
 
