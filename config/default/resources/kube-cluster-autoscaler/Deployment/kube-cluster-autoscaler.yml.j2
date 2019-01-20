@@ -3,6 +3,8 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: kube-cluster-autoscaler
+  labels:
+    name: kube-cluster-autoscaler
 spec:
   replicas: 1
   selector:

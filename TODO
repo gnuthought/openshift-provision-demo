@@ -1,7 +1,3 @@
-Fix issue with mis-identified update to kube-cluster-autoscaler when running provision
-
-Split up terraform jinja templates with includes?
-
 Node image update process
 
 Make sure all variables are at least listed in config README
@@ -28,6 +24,8 @@ Immutable master replacement
 - Ansible playbook to add/remove masters
 
 Add an imagestream for the kube-cluster-autoscaler image pull
+
+Split up terraform jinja templates with includes?
 
 Use Let's Encrypt?
 - https://blog.openshift.com/create-https-based-encrypted-urls-using-routes/
