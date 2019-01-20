@@ -13,24 +13,7 @@
     vars:
       terraform_action: apply
       terraform_components:
-      - image-node
-      - masters
+      - network
+      - service-accounts
+      - registry-storage
       terraform_dir: "{{ playbook_dir }}/terraform/{{ openshift_provision_cluster_name }}"
-
-  - name: Wait for all instances to be running
-    command: ../hosts.py --wait 300
-    changed_when: false
-
-  - name: Refresh inventory
-    meta: refresh_inventory
-
-- name: Wait for bootstrap instances
-  hosts: OSEv3
-  gather_facts: false
-  tasks:
-  - name: Wait for connection to instances
-    wait_for_connection:
-      connect_timeout: 20
-      sleep: 5
-      delay: 5
-      timeout: 300

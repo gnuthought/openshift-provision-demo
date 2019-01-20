@@ -1,14 +1,10 @@
-Create GCP node manager operator to roll out new images on autoscaling nodes
-
 Make sure all variables are at least listed in config README
 
 Setup instructions
 
 Replace OPENSHIFT_ROLE_FILTER with a node group filter
 
-Generate local certificate authority on cluster and sign certs with that after
-terraform network processing. So that the master and router certificates can
-include the dynamic hostnames.
+Create GCP node manager operator to roll out new images on autoscaling nodes
 
 Document how to deploy from scratch in a google cloud project
 

@@ -1,34 +1,39 @@
 ---
-- include_tasks: disable-yum-cron.yml
+- name: Disable yum cron on controller
+  include_tasks: disable-yum-cron.yml
 
-- include_tasks: subscription-manager.yml
+- name: Register controller with subscription-manager
+  include_tasks: subscription-manager.yml
   when: openshift_deployment_type == 'openshift-enterprise'
 
-- include_tasks: origin-yum-repos.yml
+- name: Configure yum repos for controller
+  include_tasks: origin-yum-repos.yml
   when: openshift_deployment_type == 'origin'
 
-- include_tasks: packages.yml
+- name: Install packages on controller
+  include_tasks: packages.yml
 
-- include_tasks: cluster-domain-dns.yml
+- name: Configure dnsmasq on controller for cloud DNS
+  include_tasks: cluster-domain-dns.yml
   when: openshift_provision_cluster_domain_dns_servers is defined
 
-- include_tasks: openshift-provision-demo-init.yml
+- name: Copy openshift-provision-demo to controller
+  include_tasks: openshift-provision-demo-init.yml
 
-- include_tasks: install-terraform.yml
+- name: Install terraform on controller
+  include_tasks: install-terraform.yml
 
 - name: Run rngd to feed entroy to the kernel
   include_tasks: rngd.yml
 
-- include_tasks: ssh-keygen.yml
+- name: Create SSH controller ansible keypair
+  include_tasks: ssh-keygen.yml
 
 - name: GPG
   include_tasks: gpg.yml
 
 - name: Setup for ansible-vault
   include_tasks: setup-ansible-vault.yml
-
-- name: TLS cert generation
-  include_tasks: tls-cert-generation.yml
 
 - name: Controller generated config
   include_tasks: controller-generated-config.yml

@@ -1,0 +1,3 @@
+---
+openshift_provision_cluster_tls_dir: >-
+  {{ openshift_provision_config_path }}/cluster/{{ openshift_provision_cluster_name }}/tls

@@ -1,0 +1,11 @@
+---
+- name: Create openshift_provision_cluster_tls_dir
+  file:
+    path: "{{ openshift_provision_cluster_tls_dir }}"
+    state: directory
+
+- name: Create self-signed master public cert
+  include_tasks: master-cert.yml
+
+- name: Create self-signed router cert
+  include_tasks: router-cert.yml

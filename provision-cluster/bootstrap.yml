@@ -1,4 +1,6 @@
 ---
+- import_playbook: terraform-base.yml
+- import_playbook: tls-cert-generation.yml
 - import_playbook: terraform-bootstrap.yml
 - import_playbook: bootstrap-install.yml
 - import_playbook: create-node-image.yml

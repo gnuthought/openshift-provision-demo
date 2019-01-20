@@ -1,0 +1,4 @@
+---
+- name: update-ca-trust
+  become: true
+  command: update-ca-trust
