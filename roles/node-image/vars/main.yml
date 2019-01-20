@@ -1,0 +1,2 @@
+---
+node_service: "{{ openshift_service_type }}-node"

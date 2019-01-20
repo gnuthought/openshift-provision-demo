@@ -1,4 +1,3 @@
 ---
-openshift_node_service: atomic-openshift-node
 openshift_service_type: atomic-openshift
 openshift_provision_release_prerequisite_packages: []

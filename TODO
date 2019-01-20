@@ -1,5 +1,3 @@
-Make sure all variables are at least listed in config README
-
 Setup instructions
 
 Replace OPENSHIFT_ROLE_FILTER with a node group filter
@@ -25,9 +23,9 @@ Immutable master replacement
 
 Add an imagestream for the kube-cluster-autoscaler image pull
 
-Master update process?
-
 Split up terraform jinja templates with includes?
 
 Use Let's Encrypt?
 - https://blog.openshift.com/create-https-based-encrypted-urls-using-routes/
+
+Implement openshift_gcp_multizone=false
