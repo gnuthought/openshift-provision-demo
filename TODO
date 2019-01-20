@@ -6,13 +6,13 @@ Split up terraform jinja templates with includes?
 
 Node image update process
 
-Setup instructions
-
 Make sure all variables are at least listed in config README
+
+Setup instructions
 
 Document how to deploy from scratch in a google cloud project
 
-Support openshift_gcp_create_network, thi should control run of terraform for network?
+Support openshift_gcp_create_network?
 
 Support openshift_gcp_iam_service_account_keyfile to point to GCP service account keyfile?
 
