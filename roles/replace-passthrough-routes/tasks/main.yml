@@ -1,0 +1,11 @@
+---
+- when: openshift_provision_replace_passthrough_routes
+  block:
+  - name: Replace docker-registry passthrough route
+    include: docker-registry.yml
+
+  - name: Replace registry-console passthrough route
+    include: registry-console.yml
+
+  - name: Replace kube-service-catalog apiserver passthrough route
+    include: kube-service-catalog-apiserver.yml

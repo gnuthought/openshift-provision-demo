@@ -11,7 +11,6 @@ openshift_provision_default_cluster_role_bindings:
 openshift_provision_default_projects:
   default: "{{ openshift_provision_project_default }}"
   kube-cluster-autoscaler: "{{ openshift_provision_project_kube_cluster_autoscaler }}"
-  kube-service-catalog: "{{ openshift_provision_project_kube_service_catalog }}"
 
 #
 # Assemble cluster resources list using inheritance hierarchy

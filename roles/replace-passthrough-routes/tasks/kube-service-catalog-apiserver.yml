@@ -1,0 +1,25 @@
+---
+- name: Get kube-service-catalog apiserver route termination
+  command: >-
+    oc get route -n kube-service-catalog apiserver
+    -o jsonpath={.spec.tls.termination}
+  changed_when: false
+  register: get_kube_service_catalog_apiserver_route_termination
+
+- when: get_kube_service_catalog_apiserver_route_termination.stdout == 'passthrough'
+  block:
+  - name: Get service catalog ca cert
+    slurp:
+      src: /etc/origin/service-catalog/ca.crt
+    register: service_catalog_ca
+
+  - name: Patch kube-service-catalog apiserver route to reencrypt
+    command: >-
+      oc patch route -n kube-service-catalog apiserver
+      -p {{ patch | to_json | quote }}
+    vars:
+      patch:
+        spec:
+          tls:
+            termination: reencrypt
+            destinationCACertificate: "{{ service_catalog_ca.content | b64decode }}"

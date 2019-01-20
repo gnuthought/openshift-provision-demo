@@ -3,14 +3,4 @@ openshift_provision_project_default:
   annotations:
     # Allow resources in default project to run on any node
     openshift.io/node-selector: ""
-  resources:
-  - default/DeploymentConfig/registry-console.yml.j2
-  - default/Route/docker-registry.yml.j2
-  - default/Route/registry-console.yml.j2
-
-openshift_provision_project_kube_service_catalog:
-  annotations:
-    # Allow resources in default project to run on any node
-    openshift.io/node-selector: ""
-  resources:
-  - kube-service-catalog/Route/apiserver.yml.j2
+  resources: []

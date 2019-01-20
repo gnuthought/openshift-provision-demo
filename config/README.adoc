@@ -204,9 +204,9 @@ Indicates whether the cluster is managed with a controller instance. If this
 is set to false then the cluster is managed directly from wherever the ansible
 playbooks are run.
 
-| oreg_auth_user | value of environment variable "OREG_AUTH_USER" |
-
-| oreg_auth_password | value of environment variable "OREG_AUTH_PASSWORD" |
+| openshift_provision_replace_passthrough_routes | False (True for GCP) |
+Boolean flag to indicate whether passthrough routes should be reconfigured to
+reencrypt.
 
 | openshift_provision_rhsub_user | value of environment variable  "REDHAT_SUBSCRIPTION_USERNAME" |
 Username to use to register the system with Red Hat.
@@ -225,6 +225,11 @@ Red Hat subscriptino pool id.
 Wildcard DNS service such as xip.io or nip.io to use for
 `openshift_master_cluster_public_hostname` and `openshift_master_default_subdomain`.
 This is useful when DNS delegation is not available.
+
+| oreg_auth_user | value of environment variable "OREG_AUTH_USER" |
+
+| oreg_auth_password | value of environment variable "OREG_AUTH_PASSWORD" |
+
 |=======================
 
 The variable `openshift_provision_node_groups` should be a dictionary with

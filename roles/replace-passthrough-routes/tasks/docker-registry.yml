@@ -1,0 +1,18 @@
+---
+- name: Get docker-registry route termination
+  command: >-
+    oc get route -n default docker-registry
+    -o jsonpath={.spec.tls.termination}
+  changed_when: false
+  register: get_docker_registry_route_termination
+
+- name: Patch docker-registry route to reencrypt
+  when: get_docker_registry_route_termination.stdout == 'passthrough'
+  command: >-
+    oc patch route -n default docker-registry
+    -p {{ patch | to_json | quote }}
+  vars:
+    patch:
+      spec:
+        tls:
+          termination: reencrypt

@@ -1,0 +1,5 @@
+---
+- name: Remove passthrough routes
+  hosts: masters[0]
+  roles:
+  - replace-passthrough-routes

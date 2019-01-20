@@ -12,3 +12,5 @@
 
 - import_playbook: >-
    {{ openshift_ansible_path }}/playbooks/common/private/components.yml
+
+- import_playbook: replace-passthrough-routes.yml

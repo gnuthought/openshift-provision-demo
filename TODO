@@ -1,14 +1,8 @@
-Switch all passthrough routes to reencrypt
-- kube-service-catalog   apiserver
-
-Fix issues with routes:
-kube-service-catalog               apiserver           apiserver-kube-service-catalog.35.227.192.203.xip.io    
-
-Fix issue with mis-identified updates when running provision
-
-Split up jinja templates with includes?
-
 Check that from-scratch build sets up global address as static
+
+Fix issue with mis-identified update to kube-cluster-autoscaler when running provision
+
+Split up terraform jinja templates with includes?
 
 Node image update process
 

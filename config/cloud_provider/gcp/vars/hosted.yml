@@ -6,11 +6,12 @@ openshift_gcp_registry_bucket_keyfile: "{{ openshift_provision_config_path }}/cl
 # Passthrough routs to the registry do not work properly with GCP load
 # balancing because the load balancer does not set SNI...
 #
-# We do not actually set openshift_hosted_registry_routetermination because the
-# openshift-ansible playbooks needlessly demand that
-# openshift_hosted_registry_routecertificates be set. So we instead manipulate
-# the route post-install with openshift-provision
-#openshift_hosted_registry_routetermination: reencrypt
+# We do not set openshift_hosted_registry_routetermination because the
+# openshift-ansible playbooks requires that the variable
+# openshift_hosted_registry_routecertificates be set. There is no real need to
+# set certificates because the docker-registry service will already run with an
+# appropiate certificate by default.
+openshift_provision_replace_passthrough_routes: true
 
 openshift_hosted_registry_storage_provider: gcs
 openshift_hosted_registry_storage_kind: object

@@ -1,0 +1,98 @@
+---
+- name: Check if registry-console-cert secret exists
+  command: >-
+    oc get secret -n default registry-console-cert
+  changed_when: false
+  failed_when: false
+  register: get_registry_console_cert
+
+- when: get_registry_console_cert.rc != 0
+  block:
+  - name: Create temp dir for registry console cert
+    tempfile:
+      state: directory
+    register: tempdir
+
+  - name: Get registry-console service
+    command: >-
+      oc get svc -n default registry-console
+      -o jsonpath={.spec.clusterIP}
+    changed_when: false
+    register: get_registry_console_svc_ip
+
+  - name: Create registry-console-cert
+    command: >-
+      oc adm ca create-server-cert
+      --hostnames={{ hostnames | join(',') }}
+      --cert={{ tempdir.path }}/cert
+      --key={{ tempdir.path }}/key
+      --signer-cert=/etc/origin/master/ca.crt
+      --signer-key=/etc/origin/master/ca.key
+      --signer-serial=/etc/origin/master/ca.serial.txt                                                                   
+    vars:
+      hostnames:
+      - registry-console-default.{{ openshift_master_default_subdomain }}
+      - "{{ get_registry_console_svc_ip.stdout }}"
+      - registry-console.default.svc
+      - registry-console.default.svc.cluster.local
+
+  - name: Combine registry console cert and key
+    shell: >-
+      cat {{ tempdir.path }}/cert {{ tempdir.path }}/key
+      >{{ tempdir.path }}/console.cert
+
+  - name: Create registry-console-cert secret
+    command: >-
+      oc create secret generic registry-console-cert
+      --from-file={{ tempdir.path }}/console.cert
+
+  - name: Clean up tempdir
+    file:
+      path: "{{ tempdir.path }}"
+      state: absent
+
+- name: Get registry-console-cert secret in registry-console deployment config
+  command: >-
+    oc get deploymentconfig -n default registry-console
+    -o "jsonpath={.spec.template.spec.volumes[?(@.name=='registry-console-cert')].secret.secretName}"
+  changed_when: false
+  register: get_registry_console_dc_secret
+
+- name: Patch registry-console deployment config
+  when: get_registry_console_dc_secret.stdout != 'registry-console-cert'
+  command: >-
+    oc patch deploymentconfig -n default registry-console
+    -p {{ patch | to_json | quote }}
+  vars:
+    patch:
+      spec:
+        template:
+          spec:
+            containers:
+            - name: registry-console
+              volumeMounts:
+              - name: registry-console-cert
+                mountPath: /etc/cockpit/ws-certs.d
+            volumes:
+            - name: registry-console-cert
+              secret:
+                defaultMode: 0644
+                secretName: registry-console-cert
+
+- name: Get registry-console route termination
+  command: >-
+    oc get route -n default registry-console
+    -o jsonpath={.spec.tls.termination}
+  changed_when: false
+  register: get_registry_console_route_termination
+
+- name: Patch registry-console route to reencrypt
+  when: get_registry_console_route_termination.stdout == 'passthrough'
+  command: >-
+    oc patch route -n default registry-console
+    -p {{ patch | to_json | quote }}
+  vars:
+    patch:
+      spec:
+        tls:
+          termination: reencrypt
