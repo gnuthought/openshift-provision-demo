@@ -1,5 +1,3 @@
-Check that from-scratch build sets up global address as static
-
 Fix issue with mis-identified update to kube-cluster-autoscaler when running provision
 
 Split up terraform jinja templates with includes?
