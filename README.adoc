@@ -1,68 +1,84 @@
 = OpenShift Provision Demo
 
-This repository provides examples of how to use the openshift-provision
-ansible role using a configuration repository that also drives the OpenShift
-installation as well as low level infrastructure provisioning with terraform.
+OpenShift is inherently complicated. Effectively managing OpenShift is
+accomplished by managing its complexity.
+
+In this repository you will find a proven approach to manage OpenShift
+3 clusters from cloud infrastructure provisioning, to installation, and
+continuing management using ansible, terraform, and a common scalable
+configuration structure.
+
+We suggest you begin by running through the Google Cloud (GCP) demo setup
+and then explore pushing out a new autoscaling node image, using the
+openshift-provision ansible module, and other execrises describe below.
 
 While you may choose to use this repository directly to provision OpenShift
-clusters, it is meant more as a collection of examples and design patterns to
-borrow from to build out your own tooling. All code in this repository is GPLv3.
-This means you are free to take code and do what you will with it, but if you
-_distribute_ new tools that use code from this repository then those tools must
-also be available under the GPLv3. Of course, if your tools you build from this
-are for internal ted then simply do as you will because the GPLv3 provisions
-only regard distribution. The ideas and inspiration you may take from this are
-all completely free.
+clusters, we encourage you to approach it as a collection of examples and
+design pattern to borrow from to build out your own tooling. All code in
+this repository is GPLv3.
 
 This demo includes cluster configuration, infrastructure provisioning with
 terraform, cluster installation with ansible, and post installation cluster
 configuration all in a single repository. You may wish to break these functions
-into multiple repositories for your own implementation. Separating your code and
-configuration repositories is a good practice.
-
-== Using this Demo
-
-To take this demo for a spin you may want to setup a cluster under the config
-directory. The config directory includes configuration for a "demo" cluster that
-uses the DNS domain "openshift-provision-demo.gnuthought.com". If you use this
-unchanged then you will need to setup local DNS overrides from your test system
-hosts file for names such as "master.openshift-provision-demo.gnuthought.com".
+into multiple repositories for your own implementation.
 
 == Prerequisites
 
-ansible, terraform, jq
+For this demo we deploy a virtual server for controlling the cluster, but there
+are still some requiremens needed to get the control host up and running:
 
-=== GCP 
+ansible 2.6+
+jq 1.5+
+terraform 0.11+
+
+You will need to also need an account cloud provider account with sufficient
+access to create the control host and configure the cluster.  At this time GCP
+is the only supported cloud provider. Because this demo manages all aspects
+of cluster deployment it requires that you have owner access of a GCP project.
+We recommend creating an isolated GCP project dedicated for this purpose then
+create a service account with owner access to the project and set the
+environment variable `GOOGLE_APPLICATION_CREDENTIALS` with the path to your
+GCP credentials file.
+
+We include both support for OKD and OCP. If you are using the OCP demo then
+you will need to have an OpenShift subscription and set the following
+environment variables before configuring your control host:
+
+```
+# Credentials used to register systems with subscriptions for software
+# installation and updates
+export REDHAT_SUBSCRIPTION_USERNAME=... 
+export REDHAT_SUBSCRIPTION_PASSWORD=...
+export REDHAT_SUBSCRIPTION_POOLS=...
+
+# Credentials for retrieving images from registry.redhat.io
+export OREG_AUTH_USER=...
+export OREG_AUTH_PASSWORD=...
+```
+
+== GCP Setup
 
 FIXME ...
 
-== Design Patterns Shown Here
+== 
 
 FIXME ...
 
-=== Config Repository
+== Config Repository
 
 The link:config[] directory includes an example of how to lay out a
 configuration repositories with an inheritance structure to make it easy to
 manage multiple clusters.
 
-FIXME ...
-
-=== TLS Cert Configuration
-
-`cluster/{{ openshift_provision_cluster_name }}/tls/master.ca`
-`cluster/{{ openshift_provision_cluster_name }}/tls/master.cert`
-`cluster/{{ openshift_provision_cluster_name }}/tls/master.key`
-
-=== Dynamic Inventory
+== Dynamic Inventory
 
 FIXME ...
 
-=== Resource Hierarchy
+== Resource Hierarchy
 
 FIXME ...
 
-=== Terraform with Jinja Templates
+== Terraform with Jinja Templates
 
 FIXME ...
 

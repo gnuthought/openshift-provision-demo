@@ -1,10 +1,12 @@
 Setup instructions
 
+Add git branch process and protections
+
+Document how to deploy from scratch in a google cloud project
+
 Replace OPENSHIFT_ROLE_FILTER with a node group filter
 
 Create GCP node manager operator to roll out new images on autoscaling nodes
-
-Document how to deploy from scratch in a google cloud project
 
 Support openshift_gcp_create_network?
 

@@ -321,3 +321,12 @@ Dictionary of labels to apply to instances.
 Indication whether the node group is static or dynamically scaled.
 
 |=======================
+
+=== TLS Cert Configuration
+
+`cluster/{{ openshift_provision_cluster_name }}/tls/master.ca.crt`
+`cluster/{{ openshift_provision_cluster_name }}/tls/master.crt`
+`cluster/{{ openshift_provision_cluster_name }}/tls/master.key`
+`cluster/{{ openshift_provision_cluster_name }}/tls/router.ca.crt`
+`cluster/{{ openshift_provision_cluster_name }}/tls/router.crt`
+`cluster/{{ openshift_provision_cluster_name }}/tls/router.key`
