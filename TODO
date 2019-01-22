@@ -31,3 +31,5 @@ Use Let's Encrypt?
 - https://blog.openshift.com/create-https-based-encrypted-urls-using-routes/
 
 Implement openshift_gcp_multizone=false
+
+Add glusterfs setup with variable to set number of glusterfs nodes

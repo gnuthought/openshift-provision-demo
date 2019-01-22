@@ -229,6 +229,7 @@ class OpenShiftGCP:
                     }
 
     def populate_all_group_vars(self, hosts):
+        wildcard_dns = None
         try:
             hosts['all']['vars']['openshift_provision_cluster_domain_dns_servers'] = \
                 self.get_cluster_domain_dns_servers()
