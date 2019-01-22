@@ -52,13 +52,22 @@ environment variables before configuring your control host:
 ```
 # Credentials used to register systems with subscriptions for software
 # installation and updates
-export REDHAT_SUBSCRIPTION_USERNAME=... 
+export REDHAT_SUBSCRIPTION_USERNAME=...
 export REDHAT_SUBSCRIPTION_PASSWORD=...
 export REDHAT_SUBSCRIPTION_POOLS=...
 
 # Credentials for retrieving images from registry.redhat.io
 export OREG_AUTH_USER=...
 export OREG_AUTH_PASSWORD=...
+```
+
+Finally, there is an environment variable used by the ansible inventory to
+configure whether instances will be contacted by the internal or external
+IP address. You will probably want to set this to use the external (NAT)
+IP to access your controller:
+
+```
+GCP_ANSIBLE_INVENTORY_USE_NAT_IP=true
 ```
 
 There is a sample environement file at `gcp-demo.env.example` which can for
@@ -127,6 +136,10 @@ To process openshift-provision for the cluster:
 ./openshift-provision.sh
 ```
 
+This is the main mechanism for routine cluster configuration management and
+leverages the
+https://github.com/gnuthought/ansible-role-openshift-provision[openshift-provision ansible role].
+
 To generate an updated node image:
 
 ```
@@ -156,7 +169,34 @@ manage multiple clusters.
 
 == Dynamic Inventory
 
-FIXME ...
+The dynamic inventory uses the following environment variables:
+
+[cols="1,4",options="header"]
+|=======================
+| Variable | Description
+
+| ANSIBLE_GROUP_FILTER |
+Restrict the dynamic inventory to only return instances belonging to a
+specified ansible group.
+
+| GCP_ANSIBLE_INVENTORY_USE_NAT_IP |
+Set to "true" to use external (NAT) IP addresses to access instances. This is
+normally required to access the controller unless you have a VPN configuration
+to access the internal address space for your cluster.
+
+| OPENSHIFT_PROVISION_CONFIG_PATH |
+Path to the cluster configuration directory.
+
+| OPENSHIFT_PROVISION_CLUSTER_NAME |
+Cluster name within the cluster configuration directory. At a minimum each
+cluster should have a main vars file under the configuration path at
+"clusters/${OPENSHIFT_PROVISION_CLUSTER_NAME}/vars/main.yaml".
+
+| OPENSHIFT_ROLE_FILTER |
+Restrict the ansible inventory to only return nodes marked with the specified
+comma separated list of roles.
+
+|=======================
 
 == Resource Hierarchy
 
