@@ -31,6 +31,11 @@ ansible 2.6+
 jq 1.5+
 terraform 0.11+
 
+To access the controller you will need an SSH key pair with a public key at
+`~/.ssh/id_rsa.pub` or configure your public key using
+`openshift_provision_controller_ansible_ssh_pubkey` in
+`config/default/vars/controller.yml`.
+
 You will need to also need an account cloud provider account with sufficient
 access to create the control host and configure the cluster.  At this time GCP
 is the only supported cloud provider. Because this demo manages all aspects
@@ -56,13 +61,92 @@ export OREG_AUTH_USER=...
 export OREG_AUTH_PASSWORD=...
 ```
 
-== GCP Setup
+There is a sample environement file at `gcp-demo.env.example` which can for
+reference when setting your environment.
 
-FIXME ...
+== Controller Setup
 
-== 
+With your environment set, you can run the `configure-controller.sh` script
+to deploy and configure the controller instance for a cluster.
 
-FIXME ...
+```
+./configure-controller.sh gcp-demo-sbx-okd3
+```
+
+When this command exits it will print the ssh command to contact the cluster.
+
+The cluster firewall will be configured to allow SSH access from your source
+IP address as seen by http://ipv4bot.whatismyipaddress.com/. If you know your
+source IP range does not change, you can configure
+`openshift_provision_management_source_ip_range`. Whenever your source range
+changes, just rerun the `configure-controller.sh` script.
+
+Note that the default SSH port for the controller configured for tcp 443 using
+`openshift_provision_controller_ansible_port` in
+`config/default/vars/controller.yml`. This has proved useful for accessing the
+demo cluster from networks with restrictive firewalls.
+
+To continue with the demo, SSH into the controller and start a `tmux` or
+`screen` session. This will allow you to disconnect and reconnect to long
+running ansible jobs which is crucial if your network connection is not
+reliable completely.
+
+For example just login and run:
+
+```
+tmux
+```
+
+If you lose your network connection, just return later and use:
+
+```
+tmux attach
+```
+
+To disconnect from a tmux session without closing the session, use "CTRL+b, d".
+
+== Bootstrapping a Cluster
+
+To bootstrap up your cluster, from a tmux or screen session run:
+
+```
+./bootstrap.sh
+```
+
+== Reconfiguring a Cluster
+
+To reconfigure your cluster, use:
+
+```
+./configure.sh
+```
+
+To process openshift-provision for the cluster:
+
+```
+./openshift-provision.sh
+```
+
+To generate an updated node image:
+
+```
+./update-node-image.sh
+```
+
+== Destroying your Cluster
+
+To destroy your cluster run the following from the control node:
+
+```
+./destroy.sh
+```
+
+To destroy your controller, run the `destroy-controller.sh` script with your
+cluster name from the host you used to setup the controller. For example:
+
+```
+./destroy-controller.sh gcp-demo-sbx-okd3
+```
 
 == Config Repository
 
