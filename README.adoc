@@ -45,6 +45,12 @@ create a service account with owner access to the project and set the
 environment variable `GOOGLE_APPLICATION_CREDENTIALS` with the path to your
 GCP credentials file.
 
+Documentation for creating a GCP service account and access key can be found
+at:
+
+https://cloud.google.com/iam/docs/creating-managing-service-accounts
+https://cloud.google.com/iam/docs/creating-managing-service-account-keys
+
 We include both support for OKD and OCP. If you are using the OCP demo then
 you will need to have an OpenShift subscription and set the following
 environment variables before configuring your control host:
