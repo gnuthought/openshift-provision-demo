@@ -46,12 +46,17 @@
   retries: 2
   delay: 5
 
-- name: Run terraform apply for router
+- name: Run terraform apply for components
   command: terraform apply -auto-approve
   args:
-    chdir: "{{ terraform_dir }}/router"
+    chdir: "{{ terraform_dir }}/{{ component_name }}"
   register: terraform_apply
   changed_when: >-
     "Resources: 0 added, 0 changed, 0 destroyed." not in terraform_apply.stdout
+  with_items:
+  - router
+  - public-load-balancer
+  loop_control:
+    loop_var: component_name
   when: >-
-    'router' in terraform_components
+    component_name in terraform_components

@@ -275,6 +275,10 @@ We do not use `rhsub_user` as the standard ansible playbooks are too
 opinionated about yum repositiories, disabling repositories that we may wish to
 have enabled.
 
+| openshift_provision_shared_public_load_balancer | True |
+Boolean flag to indicate whether a common address should be used for router
+and master public access.
+
 | openshift_provision_use_controller | True |
 Indicates whether the cluster is managed with a controller instance. If this
 is set to false then the cluster is managed directly from wherever the ansible

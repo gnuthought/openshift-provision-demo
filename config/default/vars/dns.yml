@@ -2,7 +2,10 @@
 openshift_provision_dns_cluster_domain: "{{ openshift_provision_dns_subdomain }}.{{ openshift_provision_dns_parent_domain }}"
 openshift_provision_dns_parent_domain: openshift.gnuthought.com
 openshift_provision_dns_subdomain: "{{ openshift_provision_cluster_name }}"
-openshift_master_cluster_hostname: master-internal.{{ openshift_provision_dns_cluster_domain }}
+
+# If openshift_master_cluster_hostname then it must be resolvable, if not set
+# then the load balancer IP will automatically be set for this value.
+#openshift_master_cluster_hostname: master-internal.{{ openshift_provision_dns_cluster_domain }}
 
 # Use a wildcard DNS service such as xip.io or nip.io for
 # openshift_master_cluster_public_hostname and openshift_master_default_subdomain
@@ -12,6 +15,10 @@ openshift_provision_wildcard_dns: xip.io
 # openshift_master_cluster_public_hostname and openshift_master_default_subdomain
 #openshift_master_cluster_public_hostname: master.{{ openshift_provision_dns_cluster_domain }}
 #openshift_master_default_subdomain: app.{{ openshift_provision_dns_cluster_domain }}
+
+# Use of cloud DNS requires extra access rights and the demo cluster can
+# function without this.
+openshift_provision_use_cloud_dns: False
 
 # If openshift_provision_handle_dns_delegation is set then we will attempt to 
 # configure DNS delegation with terraform using the cloud provider DNS

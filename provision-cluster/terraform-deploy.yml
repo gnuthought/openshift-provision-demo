@@ -15,6 +15,7 @@
       terraform_components:
       - node-groups
       - router
+      - public-load-balancer
       terraform_dir: "{{ playbook_dir }}/terraform/{{ openshift_provision_cluster_name }}"
 
   - name: Scale-up cluster

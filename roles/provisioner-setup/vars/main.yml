@@ -1,0 +1,2 @@
+---
+cluster_config_path: "{{ openshift_provision_config_path }}/cluster/{{ openshift_provision_cluster_name }}"

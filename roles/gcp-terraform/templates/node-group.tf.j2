@@ -85,6 +85,7 @@ resource "google_compute_instance_template" "{{ instance_template_name }}" {
   }
 }
 
+# FIXME - what's with the "i"?
 {% for i in range(gcp_zones|length) %}
 {%   set t_gcp_zone = gcp_zones[i] %}
 {%   set t_instance_group_name = openshift_gcp_prefix ~ node_group_name ~ t_gcp_zone[-2:] %}

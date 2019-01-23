@@ -1,13 +1,18 @@
 ---
-- name: Run terraform destroy for router
+- name: Run terraform destroy for components
   command: terraform destroy -auto-approve
   args:
-    chdir: "{{ terraform_dir }}/router"
+    chdir: "{{ terraform_dir }}/{{ component_name }}"
   register: terraform_destroy
   changed_when: >-
     "Resources: 0 added, 0 changed, 0 destroyed." not in terraform_destroy.stdout
+  with_items:
+  - public-load-balancer
+  - router
+  loop_control:
+    loop_var: component_name
   when: >-
-    'router' in terraform_components
+    component_name in terraform_components
 
 - name: Run terraform destroy for node-group components
   command: terraform destroy -auto-approve

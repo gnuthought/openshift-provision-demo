@@ -1,3 +1,16 @@
+Document need to enable Google Compute Engine
+
+Document need to enable IAM api (or automate need to do so)
+
+Document need to enable cloud resource manager api (or automate need to do so)
+
+Document need to enable Google DNS api? Or remove need for DNS api entirely
+
+Figure out how to dynamically configure openshift_gcp_project
+- needs to be project id
+
+Need to have random unique cluster names
+
 Deploy gitlab in new cluster with provision
 
 Populate openshift-provision-demo into gitlab

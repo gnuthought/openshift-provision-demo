@@ -40,6 +40,8 @@ delegation_dns_zone_name: >-
   {{ openshift_provision_gcp_dns_delegation_zone_name }}
 handle_dns_delegation: >-
   {{ openshift_provision_handle_dns_delegation }}
+use_cloud_dns: >-
+  {{ openshift_provision_use_cloud_dns }}
 
 gcp_zones: >-
   {{ openshift_provision_gcp_zones }}
@@ -108,7 +110,5 @@ registry_bucket_name: >-
 registry_service_account_id: >-
   {{ openshift_provision_gcp_registry_service_account_id }}
 
-router_node_group: >-
-  {{ openshift_provision_node_groups.router }}
-router_gcp_zones: >-
-  {{ router_node_group.gcp_zones | default(gcp_zones) }}
+use_shared_public_load_balancer: >-
+  {{ openshift_provision_shared_public_load_balancer }}

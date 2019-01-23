@@ -13,4 +13,4 @@
   include_tasks: cluster-admin-provisioner.yml
 
 - name: Record openshift connection settings
-  include_tasks: openshift-connection.yml
+  include_tasks: configure-openshift-connection.yml

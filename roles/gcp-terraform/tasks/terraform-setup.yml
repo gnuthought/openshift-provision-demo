@@ -13,6 +13,7 @@
   - masters
   - image-node
   - router
+  - public-load-balancer
   loop_control:
     loop_var: component_name
   vars:

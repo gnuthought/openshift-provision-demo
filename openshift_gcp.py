@@ -228,52 +228,69 @@ class OpenShiftGCP:
                         'hosts': [fqdn]
                     }
 
-    def populate_all_group_vars(self, hosts):
-        wildcard_dns = None
-        try:
-            hosts['all']['vars']['openshift_provision_cluster_domain_dns_servers'] = \
-                self.get_cluster_domain_dns_servers()
-            wildcard_dns = self.ocpinv().cluster_var('openshift_provision_wildcard_dns')
-        except:
-            # FIXME - Should we really ignore all errors?
-            pass
+    def set_all_group_vars(self, hosts):
+        if self.ocpinv().cluster_var('openshift_provision_use_cloud_dns'):
+            self.set_cluster_domain_dns_servers(hosts)
+        else:
+            self.set_master_cluster_hostname_with_ip(hosts)
 
-        if wildcard_dns:
-            master_ip, router_ip = self.get_master_and_router_ip()
-            if master_ip:
-                hosts['all']['vars']['openshift_master_cluster_public_hostname'] = \
-                    "master.{}.{}".format(
-                        master_ip,
-                        wildcard_dns
-                    )
-            if router_ip:
-                hosts['all']['vars']['openshift_master_default_subdomain'] = \
-                    "{}.{}".format(
-                        router_ip,
-                        wildcard_dns
-                    )
+        if self.ocpinv().cluster_var('openshift_provision_wildcard_dns'):
+            self.set_wildcard_dns_vars(hosts)
 
-    def get_cluster_domain_dns_servers(self):
+    def set_wildcard_dns_vars(self, hosts):
+        wildcard_dns = self.ocpinv().cluster_var('openshift_provision_wildcard_dns')
+        master_ip, router_ip = self.get_master_and_router_ip()
+        if master_ip:
+            hosts['all']['vars']['openshift_master_cluster_public_hostname'] = \
+                "master.{}.{}".format(
+                    master_ip,
+                    wildcard_dns
+                )
+        if router_ip:
+            hosts['all']['vars']['openshift_master_default_subdomain'] = \
+                "{}.{}".format(
+                    router_ip,
+                    wildcard_dns
+                )
+
+    def set_cluster_domain_dns_servers(self, hosts):
         cluster_zone = self.dnsAPI.managedZones().get(
             managedZone = self.ocpinv().cluster_var('openshift_provision_gcp_dns_zone_name'),
             project = self.ocpinv().cluster_var('openshift_gcp_project')
         ).execute()
-        return cluster_zone['nameServers']
+        hosts['all']['vars']['openshift_provision_cluster_domain_dns_servers'] = \
+            cluster_zone['nameServers']
+
+    def set_master_cluster_hostname_with_ip(self, hosts):
+        gcp_prefix = self.ocpinv().cluster_var('openshift_gcp_prefix')
+        resp = self.computeAPI.forwardingRules().list(
+            filter = '(name="{}master")'.format(gcp_prefix),
+            project = self.ocpinv().cluster_var('openshift_gcp_project'),
+            region = self.ocpinv().cluster_var('openshift_gcp_region')
+        ).execute()
+        for forwarding_rule in resp.get('items', []):
+            hosts['all']['vars']['openshift_master_cluster_hostname'] = \
+                forwarding_rule['IPAddress']
+            return
 
     def get_master_and_router_ip(self):
         master_ip = router_ip = None
+        # FIXME - Can this be done better with labels?
+        gcp_prefix = self.ocpinv().cluster_var('openshift_gcp_prefix')
+        use_shared_lb = self.ocpinv().cluster_var('openshift_provision_shared_public_load_balancer')
+        master_address_name = gcp_prefix + 'public' if use_shared_lb else gcp_prefix + 'master'
+        router_address_name = gcp_prefix + 'public' if use_shared_lb else gcp_prefix + 'router'
         req = self.computeAPI.globalAddresses().list(
             project = self.ocpinv().cluster_var('openshift_gcp_project')
         )
-        gcp_prefix = self.ocpinv().cluster_var('openshift_gcp_prefix')
         while req:
             resp = req.execute()
             for address in resp.get('items', []):
                 if 'name' not in address:
-                    pass
-                elif address['name'] == gcp_prefix + 'master':
+                    continue
+                if address['name'] == master_address_name:
                     master_ip = address['address']
-                elif address['name'] == gcp_prefix + 'router':
+                if address['name'] == router_address_name:
                     router_ip = address['address']
             req = self.computeAPI.instances().list_next(
                 previous_request = req,
@@ -282,7 +299,7 @@ class OpenShiftGCP:
         return master_ip, router_ip
 
     def populate_hosts(self, hosts):
-        self.populate_all_group_vars(hosts)
+        self.set_all_group_vars(hosts)
         self.populate_hosts_with_instances(hosts)
 
     def wait_for_hosts_running(self, timeout):
@@ -365,30 +382,37 @@ class OpenShiftGCP:
     def scaleup(self):
         node_groups = self.ocpinv().cluster_config.get('openshift_provision_node_groups', {})
         for node_group_name, node_group in node_groups.items():
-            if node_group_name == 'master':
+            if node_group.get('static_node_group', False):
                 continue
-            minimum_instance_count = node_group.get('minimum_instance_count', node_group.get('instance_count'))
-            # FIXME - gcp_zones is not a valid setting on a node group and
-            # should support dynamically discovering zones by region.
+            minimum_instance_count = node_group.get(
+                'minimum_instance_count',
+                node_group.get('instance_count', 0)
+            )
             gcp_zones = self.get_cluster_zones()
             zone_count = len(gcp_zones)
             for i, zone in enumerate(gcp_zones):
-                if i >= minimum_instance_count:
-                    # If minimum instance_count is less than the number of zones
-                    # then instance group managers may not be defined
-                    continue
+                minimum_target_size = int(
+                    (minimum_instance_count + zone_count - i - 1) / zone_count
+                )
 
-                target_size = (minimum_instance_count + zone_count - i - 1) / zone_count
-                instance_group_name = self.ocpinv().cluster_var('openshift_gcp_prefix') + node_group_name + zone[-2:]
+                instance_group_name = (
+                    self.ocpinv().cluster_var('openshift_gcp_prefix') +
+                    node_group_name + zone[-2:]
+                )
 
                 self.scaleup_managed_instance_group(
                     instance_group_name,
                     zone,
-                    target_size
+                    minimum_target_size
                 )
 
-    def scaleup_managed_instance_group(self, instance_group_name, zone, target_size):
-        if target_size < 1:
+    def scaleup_managed_instance_group(
+        self,
+        instance_group_name,
+        zone,
+        minimum_target_size
+    ):
+        if minimum_target_size < 1:
             return
 
         instance_group_manager = self.computeAPI.instanceGroupManagers().get(
@@ -397,12 +421,12 @@ class OpenShiftGCP:
             instanceGroupManager = instance_group_name
         ).execute()
 
-        if instance_group_manager['targetSize'] < target_size:
-            logging.info("Scaling up %s to %d" % (instance_group_name, target_size))
+        if instance_group_manager['targetSize'] < minimum_target_size:
+            logging.info("Scaling up %s to %d" % (instance_group_name, minimum_target_size))
             instance_group_manager = self.computeAPI.instanceGroupManagers().resize(
                 project = self.ocpinv().cluster_var('openshift_gcp_project'),
                 zone = zone,
                 instanceGroupManager = instance_group_name,
-                size = target_size
+                size = minimum_target_size
             ).execute()
             return True
