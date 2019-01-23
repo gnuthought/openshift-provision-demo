@@ -9,6 +9,7 @@ import logging
 import os
 import re
 import requests
+import socket
 import sys
 import time
 import traceback
@@ -16,6 +17,10 @@ import weakref
 import yaml
 
 inventory_class_name = 'OpenShiftGCP'
+
+# The call to create a disk image has been seen to timeout with the default
+# 60 second limit.
+socket.setdefaulttimeout(120) 
 
 class OpenShiftGCP:
     def __init__(self, ocpinv):
