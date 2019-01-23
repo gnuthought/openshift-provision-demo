@@ -47,6 +47,9 @@ GCP project in which to provision all resources.
 
 | openshift_gcp_registry_bucket_name | ... |
 
+| openshift_gcp_subnetwork_name | "{{ openshift_provision_cluster_name }}" |
+GCP subnetwork name.
+
 | openshift_gcp_zone | required if `openshift_gcp_multizone` is false |
 GCP zone for cluster if not using multiple zones.
 
@@ -193,8 +196,6 @@ Default GCE machine type used for nodes. May be overridden within
 Name of GCP service account used on nodes.
 
 | openshift_provision_gcp_registry_service_account_id | "{{ openshift_gcp_prefix }}registry" |
-| openshift_provision_gcp_subnetwork_name | "{{ openshift_provision_cluster_name }}" |
-GCP subnetwork name.
 
 | openshift_provision_gcp_subnetwork_ip_cidr_range | '10.0.0.0/24' |
 

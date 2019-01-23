@@ -6,7 +6,7 @@ cluster_ansible_user: >-
 cluster_name: >-
   {{ openshift_provision_cluster_name }}
 cluster_subnetwork_name: >-
-  {{ openshift_provision_gcp_subnetwork_name }}
+  {{ openshift_gcp_subnetwork_name }}
 cluster_subnetwork_ip_cidr_range: >-
   {{ openshift_provision_gcp_subnetwork_ip_cidr_range }}
 
