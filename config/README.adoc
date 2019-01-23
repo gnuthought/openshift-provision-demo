@@ -38,7 +38,7 @@ GCP project in which the cluster network should be defined.
 | openshift_gcp_prefix | "{{ openshift_provision_cluster_name }}-" |
 Prefix used for GCP resource names.
 
-| openshift_gcp_project | - required for GCP - |
+| openshift_gcp_project | automatic detection |
 GCP project in which to provision all resources.
 
 | openshift_gcp_region | - required for GCP - |
@@ -291,7 +291,7 @@ This is useful when DNS delegation is not available.
 
 | openshift_provision_yum_pkg_release_openshift_origin | "centos-release-openshift-origin{{ openshift_release | replace('.','') }}" |
 Yum package to setup yum repositories for origin installation.
- 
+
 | openshift_service_type | "origin" or "atomic-openshift" |
 Set by value of openshift_deployment_type, "origin" or "openshift-enterprise".
 

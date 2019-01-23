@@ -13,6 +13,7 @@
     vars:
       terraform_action: destroy
       terraform_components:
+      - public-load-balancer
       - router
       - image-node
       - node-groups

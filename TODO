@@ -1,13 +1,28 @@
-Document need to enable Google Compute Engine
+Increase timeout for create node image
+  Traceback (most recent call last):
+  File \"../hosts.py\", line 58, in <module>
+    main()
+  File \"../hosts.py\", line 45, in main
+    ocpinv.create_node_image()
+  File \"/home/ansible/openshift-provision-demo/openshift_inventory.py\", line 145, in create_node_image
+    self.cloud_provider.create_node_image()
+  File \"/home/ansible/openshift-provision-demo/openshift_gcp.py\", line 412, in create_node_image
+    project = self.ocpinv().cluster_var('openshift_gcp_project'),
+  File \"/usr/lib/python2.7/site-packages/oauth2client/_helpers.py\", line 133, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File \"/usr/lib/python2.7/site-packages/googleapiclient/http.py\", line 837, in execute
+    method=str(self.method), body=self.body, headers=self.headers)
+  File \"/usr/lib/python2.7/site-packages/googleapiclient/http.py\", line 176, in _retry_request
+    raise exception
+  ssl.SSLError: ('The read operation timed out',)
 
-Document need to enable IAM api (or automate need to do so)
+Handle static ip not being deleted by terraform destroy
 
-Document need to enable cloud resource manager api (or automate need to do so)
-
-Document need to enable Google DNS api? Or remove need for DNS api entirely
-
-Figure out how to dynamically configure openshift_gcp_project
-- needs to be project id
+Need to activate various APIs, document on automate:
+- Google Compute Engine
+- IAM
+- Cloud Resource Manager
+- DNS (if openshift_provision_use_cloud_dns)
 
 Need to have random unique cluster names
 

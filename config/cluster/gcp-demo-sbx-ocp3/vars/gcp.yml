@@ -1,5 +1,4 @@
 ---
-openshift_gcp_project: openshift-provision
 openshift_gcp_prefix: demo-sbx-ocp3-
 openshift_provision_gcp_dns_delegation_zone_name: openshift-gnuthought-com
 openshift_provision_gcp_controller_machine_type: n1-standard-1

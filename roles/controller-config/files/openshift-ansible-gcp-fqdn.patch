@@ -7,7 +7,7 @@ index 177d60f..7b11791 100755
      # Split instance hostname from GCE metadata to use the short instance name
 -    facts['network']['hostname'] = metadata['instance']['hostname'].split('.')[0]
 +    facts['network']['hostname'] = metadata['instance']['hostname']
- 
+
      # TODO: attempt to resolve public_hostname
      facts['network']['public_hostname'] = facts['network']['public_ip']
 @@ -482,7 +482,7 @@ def set_nodename(facts):
@@ -16,6 +16,6 @@ index 177d60f..7b11791 100755
          if 'cloudprovider' in facts and facts['cloudprovider']['kind'] == 'gce':
 -            facts['node']['nodename'] = facts['provider']['metadata']['instance']['hostname'].split('.')[0]
 +            facts['node']['nodename'] = facts['provider']['metadata']['instance']['hostname']
- 
+
          # TODO: The openstack cloudprovider nodename setting was too opinionaed.
          #       It needs to be generalized before it can be enabled again.

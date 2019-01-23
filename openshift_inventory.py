@@ -26,6 +26,7 @@ class OpenShiftInventory:
         if cluster_main.get('openshift_provision_sandbox', False):
             self.load_cluster_vars('sandbox')
         self.load_cluster_vars('cluster', self.cluster_name)
+        self.cluster_config['openshift_provision_dynamic_vars'] = {}
         self.cloud_provider_class = __import__('openshift_' + cluster_main['openshift_provision_cloud_provider'])
         self.cloud_provider = getattr(
             self.cloud_provider_class,
@@ -72,6 +73,13 @@ class OpenShiftInventory:
             return self.value_expand(raw_value)
         else:
             return raw_value
+
+    def set_dynamic_cluster_var(self, varname, value):
+        """
+        Set the value of specified inventory variable.
+        """
+        self.cluster_config[varname] = value
+        self.cluster_config['openshift_provision_dynamic_vars'][varname] = value
 
     def value_expand(self, value, depth=0):
         if depth > 10:

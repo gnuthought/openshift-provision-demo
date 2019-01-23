@@ -8,7 +8,10 @@ import json
 import logging
 import os
 import re
+import requests
+import sys
 import time
+import traceback
 import weakref
 import yaml
 
@@ -19,6 +22,110 @@ class OpenShiftGCP:
         self.ocpinv = weakref.ref(ocpinv)
         self.computeAPI = googleapiclient.discovery.build('compute', 'v1')
         self.dnsAPI = googleapiclient.discovery.build('dns', 'v1')
+        self.set_dynamic_cloud_vars()
+
+    def set_dynamic_cloud_vars(self):
+        if not self.ocpinv().cluster_var('openshift_gcp_project'):
+            self.set_openshift_gcp_project()
+        if self.ocpinv().cluster_var('openshift_provision_use_cloud_dns'):
+            self.set_cluster_domain_dns_servers()
+        if not self.ocpinv().cluster_var('openshift_master_cluster_hostname'):
+            self.set_master_cluster_hostname_with_loadbalancer_ip()
+        if self.ocpinv().cluster_var('openshift_provision_wildcard_dns'):
+            self.set_wildcard_dns_vars()
+
+    def set_openshift_gcp_project(self):
+        if 'GOOGLE_APPLICATION_CREDENTIALS' in os.environ:
+            self.set_openshift_gcp_project_from_google_creds()
+        else:
+            self.set_openshift_gcp_project_from_metadata()
+
+    def set_openshift_gcp_project_from_google_creds(self):
+        try:
+            fh = open(os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'))
+            gcred = json.loads(fh.read())
+            self.ocpinv().set_dynamic_cluster_var('openshift_gcp_project', gcred['project_id'])
+        except:
+            traceback.print_exec()
+            raise Exception("Unable to determine openshift_gcp_project from GOOGLE_APPLICATION_CREDENTIALS")
+
+    def set_openshift_gcp_project_from_metadata(self):
+        try:
+            r = requests.get(
+                'http://metadata.google.internal/computeMetadata/v1/project/project-id',
+                headers = { "Metadata-Flavor": "Google" }
+            )
+            r.raise_for_status()
+            self.ocpinv().set_dynamic_cluster_var('openshift_gcp_project', r.text)
+        except:
+            traceback.print_exec()
+            raise Exception("Unable to determine openshift_gcp_project from GOOGLE_APPLICATION_CREDENTIALS")
+
+    def set_cluster_domain_dns_servers(self):
+        """
+        Set openshift_provision_cluster_domain_dns_servers based on dynamically
+        determined name server list.
+        """
+        cluster_zone = self.dnsAPI.managedZones().get(
+            managedZone = self.ocpinv().cluster_var('openshift_provision_gcp_dns_zone_name'),
+            project = self.ocpinv().cluster_var('openshift_gcp_project')
+        ).execute()
+        self.ocpinv().set_dynamic_cluster_var(
+            'openshift_provision_cluster_domain_dns_servers',
+            cluster_zone['nameServers']
+        )
+
+    def set_master_cluster_hostname_with_loadbalancer_ip(self):
+        gcp_prefix = self.ocpinv().cluster_var('openshift_gcp_prefix')
+        resp = self.computeAPI.forwardingRules().list(
+            filter = '(name="{}master")'.format(gcp_prefix),
+            project = self.ocpinv().cluster_var('openshift_gcp_project'),
+            region = self.ocpinv().cluster_var('openshift_gcp_region')
+        ).execute()
+        for forwarding_rule in resp.get('items', []):
+            self.ocpinv().set_dynamic_cluster_var(
+                'openshift_master_cluster_hostname',
+                forwarding_rule['IPAddress']
+            )
+            return
+
+    def set_wildcard_dns_vars(self):
+        wildcard_dns = self.ocpinv().cluster_var('openshift_provision_wildcard_dns')
+        master_ip, router_ip = self.get_master_and_router_ip()
+        if master_ip:
+            self.ocpinv().set_dynamic_cluster_var(
+                'openshift_master_cluster_public_hostname',
+                "master.{}.{}".format(
+                    master_ip,
+                    wildcard_dns
+                )
+            )
+        if router_ip:
+            self.ocpinv().set_dynamic_cluster_var(
+                'openshift_master_default_subdomain',
+                "{}.{}".format(
+                    router_ip,
+                    wildcard_dns
+                )
+            )
+
+    def get_master_and_router_ip(self):
+        gcp_prefix = self.ocpinv().cluster_var('openshift_gcp_prefix')
+        if self.ocpinv().cluster_var('openshift_provision_shared_public_load_balancer'):
+            ip = self.get_globaladdress_ip(gcp_prefix + 'public')
+            return ip, ip
+        else:
+            master_ip = self.get_globaladdress_ip(gcp_prefix + 'master')
+            router_ip = self.get_globaladdress_ip(gcp_prefix + 'router')
+            return master_ip, router_ip
+
+    def get_globaladdress_ip(self, name):
+        resp = self.computeAPI.globalAddresses().list(
+            filter = 'name="{}"'.format(name),
+            project = self.ocpinv().cluster_var('openshift_gcp_project')
+        ).execute()
+        for address in resp.get('items', []):
+            return address['address']
 
     def instance_fqdn(self, instance):
         return '%s.c.%s.internal' % (
@@ -228,78 +335,7 @@ class OpenShiftGCP:
                         'hosts': [fqdn]
                     }
 
-    def set_all_group_vars(self, hosts):
-        if self.ocpinv().cluster_var('openshift_provision_use_cloud_dns'):
-            self.set_cluster_domain_dns_servers(hosts)
-        else:
-            self.set_master_cluster_hostname_with_ip(hosts)
-
-        if self.ocpinv().cluster_var('openshift_provision_wildcard_dns'):
-            self.set_wildcard_dns_vars(hosts)
-
-    def set_wildcard_dns_vars(self, hosts):
-        wildcard_dns = self.ocpinv().cluster_var('openshift_provision_wildcard_dns')
-        master_ip, router_ip = self.get_master_and_router_ip()
-        if master_ip:
-            hosts['all']['vars']['openshift_master_cluster_public_hostname'] = \
-                "master.{}.{}".format(
-                    master_ip,
-                    wildcard_dns
-                )
-        if router_ip:
-            hosts['all']['vars']['openshift_master_default_subdomain'] = \
-                "{}.{}".format(
-                    router_ip,
-                    wildcard_dns
-                )
-
-    def set_cluster_domain_dns_servers(self, hosts):
-        cluster_zone = self.dnsAPI.managedZones().get(
-            managedZone = self.ocpinv().cluster_var('openshift_provision_gcp_dns_zone_name'),
-            project = self.ocpinv().cluster_var('openshift_gcp_project')
-        ).execute()
-        hosts['all']['vars']['openshift_provision_cluster_domain_dns_servers'] = \
-            cluster_zone['nameServers']
-
-    def set_master_cluster_hostname_with_ip(self, hosts):
-        gcp_prefix = self.ocpinv().cluster_var('openshift_gcp_prefix')
-        resp = self.computeAPI.forwardingRules().list(
-            filter = '(name="{}master")'.format(gcp_prefix),
-            project = self.ocpinv().cluster_var('openshift_gcp_project'),
-            region = self.ocpinv().cluster_var('openshift_gcp_region')
-        ).execute()
-        for forwarding_rule in resp.get('items', []):
-            hosts['all']['vars']['openshift_master_cluster_hostname'] = \
-                forwarding_rule['IPAddress']
-            return
-
-    def get_master_and_router_ip(self):
-        master_ip = router_ip = None
-        # FIXME - Can this be done better with labels?
-        gcp_prefix = self.ocpinv().cluster_var('openshift_gcp_prefix')
-        use_shared_lb = self.ocpinv().cluster_var('openshift_provision_shared_public_load_balancer')
-        master_address_name = gcp_prefix + 'public' if use_shared_lb else gcp_prefix + 'master'
-        router_address_name = gcp_prefix + 'public' if use_shared_lb else gcp_prefix + 'router'
-        req = self.computeAPI.globalAddresses().list(
-            project = self.ocpinv().cluster_var('openshift_gcp_project')
-        )
-        while req:
-            resp = req.execute()
-            for address in resp.get('items', []):
-                if 'name' not in address:
-                    continue
-                if address['name'] == master_address_name:
-                    master_ip = address['address']
-                if address['name'] == router_address_name:
-                    router_ip = address['address']
-            req = self.computeAPI.instances().list_next(
-                previous_request = req,
-                previous_response = resp
-            )
-        return master_ip, router_ip
-
     def populate_hosts(self, hosts):
-        self.set_all_group_vars(hosts)
         self.populate_hosts_with_instances(hosts)
 
     def wait_for_hosts_running(self, timeout):

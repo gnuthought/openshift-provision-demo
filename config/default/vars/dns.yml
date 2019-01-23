@@ -20,6 +20,6 @@ openshift_provision_wildcard_dns: xip.io
 # function without this.
 openshift_provision_use_cloud_dns: False
 
-# If openshift_provision_handle_dns_delegation is set then we will attempt to 
+# If openshift_provision_handle_dns_delegation is set then we will attempt to
 # configure DNS delegation with terraform using the cloud provider DNS
 openshift_provision_handle_dns_delegation: False

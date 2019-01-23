@@ -11,8 +11,15 @@
     --output={{ cluster_config_path }}/openshift-connection.yml
   args:
     stdin: |-
+      {% if openshift_provision_wildcard_dns %}
+      openshift_connection_insecure_skip_tls_verify:
+      {% else %}
       openshift_connection_certificate_authority: {{ cluster_config_path }}/tls/master-ca.crt
+      {% endif %}
       openshift_connection_server: https://{{ openshift_master_cluster_public_hostname }}/
       openshift_connection_token: {{ get_provisioner_token.stdout | to_json }}
+      {% for var, value in openshift_provision_dynamic_vars.items() %}
+      {{ var }}: {{ value | to_json }}
+      {% endfor %}
   delegate_to: localhost
   register: encrypt_provisioner_token

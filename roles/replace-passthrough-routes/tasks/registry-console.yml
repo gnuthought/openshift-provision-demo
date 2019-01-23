@@ -28,7 +28,7 @@
       --key={{ tempdir.path }}/key
       --signer-cert=/etc/origin/master/ca.crt
       --signer-key=/etc/origin/master/ca.key
-      --signer-serial=/etc/origin/master/ca.serial.txt                                                                   
+      --signer-serial=/etc/origin/master/ca.serial.txt
     vars:
       hostnames:
       - registry-console-default.{{ openshift_master_default_subdomain }}
