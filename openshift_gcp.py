@@ -456,7 +456,7 @@ class OpenShiftGCP:
         while req:
             resp = req.execute()
             for image in resp.get('items', []):
-                print("Deleting address {}".format(image['name']))
+                print("Deleting image {}".format(image['name']))
                 self.computeAPI.images().delete(
                     project = self.ocpinv().cluster_var('openshift_gcp_project'),
                     image = image['id']
