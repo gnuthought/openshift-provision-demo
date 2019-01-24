@@ -59,9 +59,9 @@ class OpenShiftGCP:
             url = 'http://metadata.google.internal/computeMetadata/v1/project/project-id'
             headers = { "Metadata-Flavor": "Google" }
             req = urllib2.Request(url, None, headers)
-            response = urllib2.urlopen(req)
-            project = response.read()
-            self.ocpinv().set_dynamic_cluster_var('openshift_gcp_project', project.text)
+            resp = urllib2.urlopen(req)
+            p = resp.read()
+            self.ocpinv().set_dynamic_cluster_var('openshift_gcp_project', p.text)
         except:
             traceback.print_exec()
             raise Exception("Unable to determine openshift_gcp_project from GOOGLE_APPLICATION_CREDENTIALS")
