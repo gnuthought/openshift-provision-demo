@@ -9,7 +9,7 @@ openshift_provision_dns_subdomain: "{{ openshift_provision_cluster_name }}"
 
 # Use a wildcard DNS service such as xip.io or nip.io for
 # openshift_master_cluster_public_hostname and openshift_master_default_subdomain
-openshift_provision_wildcard_dns: xip.io
+openshift_provision_wildcard_dns: nip.io
 
 # If not using wildcard_dns then values must be set for
 # openshift_master_cluster_public_hostname and openshift_master_default_subdomain
