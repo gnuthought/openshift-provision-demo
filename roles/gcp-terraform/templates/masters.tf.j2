@@ -1,16 +1,8 @@
+#
+# Masters
+#
+
 {% set t_master_count = master_node_group.instance_count | default(1) %}
-
-terraform {
-  backend "gcs" {
-    bucket  = "{{ openshift_provision_gcp_terraform_state_bucket }}"
-    prefix  = "masters"
-  }
-}
-
-provider "google" {
-  project = "{{ openshift_gcp_project }}"
-  region = "{{ openshift_gcp_region }}"
-}
 
 data "google_compute_subnetwork" "{{ cluster_subnetwork_name }}" {
   name   = "{{ cluster_subnetwork_name }}"

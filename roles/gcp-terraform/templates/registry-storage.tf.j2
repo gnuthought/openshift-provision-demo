@@ -2,18 +2,6 @@
 # Docker registry storage
 #
 
-terraform {
-  backend "gcs" {
-    bucket  = "{{ openshift_provision_gcp_terraform_state_bucket }}"
-    prefix  = "registry-storage"
-  }
-}
-
-provider "google" {
-  project = "{{ openshift_gcp_project }}"
-  region = "{{ openshift_gcp_region }}"
-}
-
 data "google_service_account" "{{ registry_service_account_id }}" {
   account_id = "{{ registry_service_account_id }}"
 }

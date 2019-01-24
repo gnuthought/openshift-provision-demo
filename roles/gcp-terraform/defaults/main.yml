@@ -26,6 +26,8 @@ openshift_provision_gcp_controller_service_account: "{{ openshift_gcp_prefix }}c
 
 openshift_provision_gcp_dns_delegation_zone_name: ''
 
+openshift_provision_gcp_manage_firewall: true
+
 openshift_provision_gcp_master_boot_disk_image: >-
   {{ openshift_gcp_image }}
 openshift_provision_gcp_master_boot_disk_size_gb: 50

@@ -16,7 +16,7 @@ Document how to deploy from scratch in a google cloud project
 
 Create GCP node manager operator to roll out new images on autoscaling nodes
 
-Support openshift_gcp_create_network?
+Functionality to detect new base image and automatically create new disk image
 
 Support openshift_gcp_iam_service_account_keyfile to point to GCP service account keyfile?
 
@@ -28,8 +28,6 @@ Immutable master replacement
 - Ansible playbook to add/remove masters
 
 Add an imagestream for the kube-cluster-autoscaler image pull
-
-Split up terraform jinja templates with includes?
 
 Use Let's Encrypt?
 - https://blog.openshift.com/create-https-based-encrypted-urls-using-routes/

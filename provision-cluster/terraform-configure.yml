@@ -18,6 +18,7 @@
       - registry-storage
       - masters
       - router
+      - public-load-balancer
       terraform_dir: "{{ playbook_dir }}/terraform/{{ openshift_provision_cluster_name }}"
 
   - name: Wait for all instances to be running

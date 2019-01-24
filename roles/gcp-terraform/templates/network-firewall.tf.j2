@@ -1,0 +1,85 @@
+#
+# Network firewall
+#
+
+resource "google_compute_firewall" "{{ openshift_gcp_prefix }}master-etcd" {
+  name = "{{ openshift_gcp_prefix }}master-etcd"
+  network = "{{ t_network_name }}"
+  allow {
+    protocol = "tcp"
+    ports = ["2379", "2380"]
+  }
+  source_tags = ["{{ openshift_gcp_prefix }}node-master"]
+  target_tags = ["{{ openshift_gcp_prefix }}node-master"]
+}
+
+resource "google_compute_firewall" "{{ openshift_gcp_prefix }}master-https" {
+  name = "{{ openshift_gcp_prefix }}master-https"
+  network = "{{ t_network_name }}"
+  allow {
+    protocol = "tcp"
+    ports = ["443"]
+  }
+  source_ranges = ["0.0.0.0/0"]
+  target_tags = ["{{ openshift_gcp_prefix }}node-master"]
+}
+
+resource "google_compute_firewall" "{{ openshift_gcp_prefix }}master-skydns" {
+  name = "{{ openshift_gcp_prefix }}master-skydns"
+  network = "{{ t_network_name }}"
+  allow {
+    protocol = "tcp"
+    ports = ["8053"]
+  }
+  source_tags = ["{{ openshift_gcp_prefix }}node"]
+  target_tags = ["{{ openshift_gcp_prefix }}node-master"]
+}
+
+resource "google_compute_firewall" "{{ openshift_gcp_prefix }}node-kublet" {
+  name = "{{ openshift_gcp_prefix }}node-kublet"
+  network = "{{ t_network_name }}"
+  allow {
+    protocol = "tcp"
+    ports = ["10250"]
+  }
+  source_tags = ["{{ openshift_gcp_prefix }}node-master"]
+  target_tags = ["{{ openshift_gcp_prefix }}node"]
+}
+
+resource "google_compute_firewall" "{{ openshift_gcp_prefix }}node-kubeproxy" {
+  name = "{{ openshift_gcp_prefix }}node-kubeproxy"
+  network = "{{ t_network_name }}"
+  allow {
+    protocol = "tcp"
+    ports = ["10256"]
+  }
+  source_ranges = ["35.191.0.0/16", "130.211.0.0/22", "209.85.152.0/22", "209.85.204.0/22"]
+  target_tags = ["{{ openshift_gcp_prefix }}node"]
+}
+
+resource "google_compute_firewall" "{{ openshift_gcp_prefix }}node-sdn" {
+  name = "{{ openshift_gcp_prefix }}node-sdn"
+  network = "{{ t_network_name }}"
+  allow {
+    protocol = "udp"
+    ports = ["4789"]
+  }
+  source_tags = ["{{ openshift_gcp_prefix }}node"]
+  target_tags = ["{{ openshift_gcp_prefix }}node"]
+}
+
+{% if management_source_ip_range and not use_controller %}
+# Only setup direct ssh access to nodes from management subnet when
+# management_source_ip_range is set and not using controller.
+resource "google_compute_firewall" "{{ openshift_gcp_prefix }}mangement-to-node-ssh" {
+  name = "{{ openshift_gcp_prefix }}mangement-to-node-ssh"
+  network = "{{ t_network_name }}"
+
+  allow {
+    protocol = "tcp"
+    ports = ["22"]
+  }
+  source_ranges = ["{{ management_source_ip_range }}"]
+  target_tags = ["{{ openshift_gcp_prefix }}node"]
+}
+{% endif %}

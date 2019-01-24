@@ -1,3 +1,7 @@
+#
+# Terraform state GCS bucket
+#
+
 resource "google_storage_bucket" "{{ openshift_gcp_prefix }}terraform-state" {
   name = "{{ openshift_provision_gcp_terraform_state_bucket }}"
   project = "{{ openshift_gcp_project }}"

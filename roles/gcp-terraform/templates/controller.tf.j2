@@ -1,16 +1,6 @@
-{% set t_gcp_zone = gcp_zones[0] %}
-
-terraform {
-  backend "gcs" {
-    bucket  = "{{ openshift_provision_gcp_terraform_state_bucket }}"
-    prefix  = "controller"
-  }
-}
-
-provider "google" {
-  project = "{{ openshift_gcp_project }}"
-  region = "{{ openshift_gcp_region }}"
-}
+#
+# Controller
+#
 
 data "google_compute_network" "{{ openshift_gcp_network_name }}" {
   name = "{{ cluster_subnetwork_name }}"
@@ -68,7 +58,7 @@ resource "google_compute_firewall" "{{ openshift_gcp_prefix }}mangement-to-contr
 resource "google_compute_instance" "{{ openshift_gcp_prefix }}controller" {
   name = "{{ openshift_gcp_prefix }}controller"
   machine_type = "{{ controller_machine_type }}"
-  zone = "{{ t_gcp_zone }}"
+  zone = "{{ gcp_zones[0] }}"
 
   tags = ["{{ openshift_gcp_prefix }}controller"]
 
@@ -120,7 +110,3 @@ resource "google_dns_record_set" "{{ openshift_gcp_prefix }}controller" {
   rrdatas = ["${google_compute_instance.{{ openshift_gcp_prefix }}controller.network_interface.0.access_config.0.nat_ip}"]
 }
 {% endif %}
-
-output "controller_ip" {
-  value = "${google_compute_instance.{{ openshift_gcp_prefix }}controller.network_interface.0.access_config.0.nat_ip}"
-}
