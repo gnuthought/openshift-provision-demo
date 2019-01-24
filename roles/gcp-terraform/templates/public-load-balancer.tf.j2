@@ -1,6 +1,6 @@
 terraform {
   backend "gcs" {
-    bucket  = "{{ openshift_gcp_prefix }}terraform-state"
+    bucket  = "{{ openshift_provision_gcp_terraform_state_bucket }}"
     prefix  = "public-load-balancer"
   }
 }
