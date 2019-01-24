@@ -286,8 +286,10 @@ class OpenShiftGCP:
         self.instance_add_ansible_vars(instance, hostvars)
 
         if instance.get('labels',{}).get('openshift-cluster-controller', 'false') != 'true':
-            hostvars['openshift_node_group_name'] = 'node-config-' + self.instance_openshift_node_group_name(instance)
-            hostvars['openshift_node_labels'] = self.instance_openshift_node_labels(instance)
+            hostvars['openshift_node_group_name'] = \
+                'node-config-' + self.instance_openshift_node_group_name(instance)
+            hostvars['openshift_provision_node_labels'] = \
+                self.instance_openshift_node_labels(instance)
             self.instance_add_host_storage_devices(instance, hostvars)
 
         self.instance_add_ansible_vars(instance, hostvars)
@@ -307,7 +309,7 @@ class OpenShiftGCP:
             return True
         for role in os.environ['OPENSHIFT_ROLE_FILTER'].split(','):
             kuberole = 'node-role.kubernetes.io/' + role
-            if kuberole in hostvars.get('openshift_node_labels', {}):
+            if kuberole in hostvars.get('openshift_provision_node_labels', {}):
                 return True
         return False
 

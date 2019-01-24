@@ -18,7 +18,10 @@
   changed_when: false
 
 - name: Run terraform import for state bucket
-  command: terraform import google_storage_bucket.{{ openshift_gcp_prefix }}terraform-state {{ openshift_gcp_prefix }}terraform-state
+  command: >-
+    terraform import
+    google_storage_bucket.{{ openshift_gcp_prefix }}terraform-state
+    {{ openshift_provision_gcp_terraform_state_bucket }}
   args:
     chdir: "{{ terraform_dir }}/state-bucket"
   changed_when: false

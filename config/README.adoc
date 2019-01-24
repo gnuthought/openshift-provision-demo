@@ -244,6 +244,9 @@ List of node groups, described in detail below.
 
 | openshift_provision_node_kube_reserved_memory | "500Mi" |
 
+| openshift_provision_node_labels | ... |
+Node labels applied to the instance.
+
 | openshift_provision_openshift_ansible_git_branch | ... |
 
 | openshift_provision_openshift_ansible_git_repo | ... |
