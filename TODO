@@ -1,12 +1,11 @@
-Handle static ip not being deleted by terraform destroy
+Need to have random unique cluster names
+- Do we really? Or just unique registry bucket names?
 
 Need to activate various APIs, document on automate:
 - Google Compute Engine
 - IAM
 - Cloud Resource Manager
 - DNS (if openshift_provision_use_cloud_dns)
-
-Need to have random unique cluster names
 
 Deploy gitlab in new cluster with provision
 

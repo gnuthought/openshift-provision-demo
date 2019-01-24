@@ -146,5 +146,8 @@ class OpenShiftInventory:
     def create_node_image(self):
         self.cloud_provider.create_node_image()
 
+    def cleanup(self):
+        self.cloud_provider.cleanup()
+
     def scaleup(self):
         self.cloud_provider.scaleup()

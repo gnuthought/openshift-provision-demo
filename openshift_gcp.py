@@ -420,6 +420,50 @@ class OpenShiftGCP:
                 break
         self.delete_instance(instance)
 
+    def cleanup(self):
+        self.cleanup_global_addresses()
+        self.cleanup_images()
+
+    def cleanup_global_addresses(self):
+        cluster_prefix = self.ocpinv().cluster_var('openshift_gcp_prefix')
+        req = self.computeAPI.globalAddresses().list(
+            project = self.ocpinv().cluster_var('openshift_gcp_project')
+        )
+        while req:
+            resp = req.execute()
+            for address in resp.get('items', []):
+                if address.get('name', '').startswith(cluster_prefix):
+                    print("Releasing address {}".format(address['name']))
+                    self.computeAPI.globalAddresses().delete(
+                        project = self.ocpinv().cluster_var('openshift_gcp_project'),
+                        address = address['id']
+                    ).execute()
+            req = self.computeAPI.instances().list_next(
+                previous_request = req,
+                previous_response = resp
+            )
+
+    def cleanup_images(self):
+        cluster_prefix = self.ocpinv().cluster_var('openshift_gcp_prefix')
+        req = self.computeAPI.images().list(
+            project = self.ocpinv().cluster_var('openshift_gcp_project'),
+            filter = '(family="{}")'.format(
+                self.ocpinv().cluster_var('openshift_provision_gcp_node_image_family')
+            )
+        )
+        while req:
+            resp = req.execute()
+            for image in resp.get('items', []):
+                print("Deleting address {}".format(image['name']))
+                self.computeAPI.images().delete(
+                    project = self.ocpinv().cluster_var('openshift_gcp_project'),
+                    image = image['id']
+                ).execute()
+            req = self.computeAPI.instances().list_next(
+                previous_request = req,
+                previous_response = resp
+            )
+
     def scaleup(self):
         node_groups = self.ocpinv().cluster_config.get('openshift_provision_node_groups', {})
         for node_group_name, node_group in node_groups.items():

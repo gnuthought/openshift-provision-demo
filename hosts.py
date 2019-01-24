@@ -16,6 +16,7 @@ Usage: hosts.py --create-node-image
    Or: hosts.py --scaleup
    Or: hosts.py --wait <TIMEOUT_SECONDS>
 
+  --cleanup            Cleanup resources left by terraform destroy
   --create-node-image  Create cluster image from image instance
   --host               Ansible inventory host facts
   --list               Ansible inventory host list
@@ -41,7 +42,9 @@ def main():
     # FIXME - allow debug level to be set for logger
     #logging.basicConfig(level=logging.INFO)
 
-    if len(sys.argv) == 2 and sys.argv[1] == '--create-node-image':
+    if len(sys.argv) == 2 and sys.argv[1] == '--cleanup':
+        ocpinv.cleanup()
+    elif len(sys.argv) == 2 and sys.argv[1] == '--create-node-image':
         ocpinv.create_node_image()
     elif len(sys.argv) == 3 and sys.argv[1] == '--host':
         ocpinv.print_host_json(sys.argv[2])

@@ -14,3 +14,4 @@ errexit () {
 
 cd provision-cluster
 ./ansible-playbook.sh terraform-destroy.yml $1
+./hosts.py --cleanup
