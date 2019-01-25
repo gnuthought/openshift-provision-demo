@@ -60,10 +60,9 @@ class OpenShiftGCP:
             headers = { "Metadata-Flavor": "Google" }
             req = urllib2.Request(url, None, headers)
             resp = urllib2.urlopen(req)
-            p = resp.read()
-            self.ocpinv().set_dynamic_cluster_var('openshift_gcp_project', p.text)
+            self.ocpinv().set_dynamic_cluster_var('openshift_gcp_project', resp.read())
         except:
-            traceback.print_exec()
+            traceback.print_exc()
             raise Exception("Unable to determine openshift_gcp_project from GOOGLE_APPLICATION_CREDENTIALS")
 
     def set_cluster_domain_dns_servers(self):
