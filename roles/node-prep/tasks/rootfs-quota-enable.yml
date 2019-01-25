@@ -1,0 +1,46 @@
+---
+- name: Get GRUB_CMDLINE_LINUX from /etc/default/grub
+  command: >-
+    sed -nre 's/GRUB_CMDLINE_LINUX="(.*)"/\1/p' /etc/default/grub
+  args:
+    warn: false
+  changed_when: false
+  register: get_grub_cmdline_linux
+
+- name: Set grpquota in rootflags with /etc/default/grub
+  lineinfile:
+    path: /etc/default/grub
+    regexp: '^GRUB_CMDLINE_LINUX='
+    line: 'GRUB_CMDLINE_LINUX="{{ other_opts }} rootflags={{ rootflags }}"'
+  vars:
+    other_opts: >-
+      {{ get_grub_cmdline_linux.stdout | regex_replace('\s*rootflags=(\S*)','') }}
+    found_rootflags: >-
+      {% if get_grub_cmdline_linux.stdout is search('rootflags=') -%}
+      {{ get_grub_cmdline_linux.stdout | regex_replace('.*rootflags=(\S*).*', '\1') }}
+      {%- endif %}
+    rootflags: >-
+      {% if found_rootflags -%}
+      {{ found_rootflags }},grpquota
+      {%- else -%}
+      grpquota
+      {%- endif %}
+  when: >-
+    'grpquota' not in found_rootflags.split(',')
+  register: set_grpquota_in_rootflags
+
+- name: Update grub2 config
+  when: set_grpquota_in_rootflags.changed
+  command: grub2-mkconfig -o /boot/grub2/grub.cfg
+
+- name: Reboot to enable quota on rootfs
+  shell: sleep 5 && reboot
+  async: 1
+  poll: 0
+
+- name: Wait for system after reboot
+  wait_for_connection:
+    connect_timeout: 20
+    sleep: 5
+    delay: 5
+    timeout: 300
