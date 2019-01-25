@@ -8,11 +8,11 @@ import json
 import logging
 import os
 import re
-import requests
 import socket
 import sys
 import time
 import traceback
+import urllib2
 import weakref
 import yaml
 
@@ -56,14 +56,13 @@ class OpenShiftGCP:
 
     def set_openshift_gcp_project_from_metadata(self):
         try:
-            r = requests.get(
-                'http://metadata.google.internal/computeMetadata/v1/project/project-id',
-                headers = { "Metadata-Flavor": "Google" }
-            )
-            r.raise_for_status()
-            self.ocpinv().set_dynamic_cluster_var('openshift_gcp_project', r.text)
+            url = 'http://metadata.google.internal/computeMetadata/v1/project/project-id'
+            headers = { "Metadata-Flavor": "Google" }
+            req = urllib2.Request(url, None, headers)
+            resp = urllib2.urlopen(req)
+            self.ocpinv().set_dynamic_cluster_var('openshift_gcp_project', resp.read())
         except:
-            traceback.print_exec()
+            traceback.print_exc()
             raise Exception("Unable to determine openshift_gcp_project from GOOGLE_APPLICATION_CREDENTIALS")
 
     def set_cluster_domain_dns_servers(self):
