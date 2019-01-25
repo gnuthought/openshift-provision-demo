@@ -7,5 +7,8 @@
 - name: Install and uninstall packages
   include_tasks: packages.yml
 
+- name: Enable quotas for root filesystem
+  include_tasks: rootfs-quota.yml
+
 - name: Configure for cloud provider
   include_tasks: cloud-provider-{{ openshift_provision_cloud_provider }}.yml
