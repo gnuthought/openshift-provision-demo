@@ -9,9 +9,10 @@ import time
 import yaml
 
 class OpenShiftInventory:
-    def __init__(self, cluster_name, config_dir='config'):
+    def __init__(self, cluster_name, config_dir='config', init_mode=False):
         self.config_dir = config_dir
         self.cluster_name = cluster_name
+        self.init_mode = init_mode
         self.load_cluster_config()
 
     def load_cluster_config(self):
@@ -148,6 +149,9 @@ class OpenShiftInventory:
 
     def cleanup(self):
         self.cloud_provider.cleanup()
+
+    def init(self):
+        self.cloud_provider.init()
 
     def scaleup(self):
         self.cloud_provider.scaleup()

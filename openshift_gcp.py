@@ -25,13 +25,17 @@ socket.setdefaulttimeout(120)
 class OpenShiftGCP:
     def __init__(self, ocpinv):
         self.ocpinv = weakref.ref(ocpinv)
+        self.cloudresourcemanagerAPI = googleapiclient.discovery.build('cloudresourcemanager', 'v1')
         self.computeAPI = googleapiclient.discovery.build('compute', 'v1')
         self.dnsAPI = googleapiclient.discovery.build('dns', 'v1')
+        self.serviceusageAPI = googleapiclient.discovery.build('serviceusage', 'v1')
         self.set_dynamic_cloud_vars()
 
     def set_dynamic_cloud_vars(self):
         if not self.ocpinv().cluster_var('openshift_gcp_project'):
             self.set_openshift_gcp_project()
+        if self.ocpinv().init_mode:
+            return
         if self.ocpinv().cluster_var('openshift_provision_use_cloud_dns'):
             self.set_cluster_domain_dns_servers()
         if not self.ocpinv().cluster_var('openshift_master_cluster_hostname'):
@@ -464,6 +468,60 @@ class OpenShiftGCP:
                 previous_request = req,
                 previous_response = resp
             )
+
+    def init(self):
+        self.init_gcp_services()
+
+    def init_gcp_services(self):
+        print("Enabling GCP APIs")
+        project_number = self.get_project_number()
+
+        service_ids = [
+            'cloudresourcemanager.googleapis.com',
+            'compute.googleapis.com',
+            'iam.googleapis.com',
+            'serviceusage.googleapis.com'
+        ]
+        if self.ocpinv().cluster_var('openshift_provision_use_cloud_dns'):
+            service_ids.append('dns.googleapis.com')
+
+        self.serviceusageAPI \
+            .services() \
+            .batchEnable(
+                parent = 'projects/{}'.format(project_number),
+                body = {
+                    "serviceIds": service_ids
+                }
+            ).execute()
+        print("Waiting for API availability...")
+        for i in range(30):
+            try:
+                self.get_gcp_project()
+                print("Ready!")
+                return
+            except googleapiclient.errors.HttpError:
+                time.sleep(10)
+
+    def get_gcp_project(self):
+        return self.cloudresourcemanagerAPI \
+            .projects() \
+            .get(projectId=self.ocpinv().cluster_var('openshift_gcp_project')) \
+            .execute()
+
+    def get_project_number(self):
+        try:
+            project = self.get_gcp_project()
+            return project['projectNumber']
+        except googleapiclient.errors.HttpError as e:
+            err_content = json.loads(e.content)
+            m = re.search(
+                r'project=(\d+)',
+                err_content.get('error',{}).get('message','')
+            )
+            if m:
+                return m.group(1)
+            else:
+                raise e
 
     def scaleup(self):
         node_groups = self.ocpinv().cluster_config.get('openshift_provision_node_groups', {})

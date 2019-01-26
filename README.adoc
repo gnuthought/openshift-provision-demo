@@ -51,6 +51,9 @@ at:
 https://cloud.google.com/iam/docs/creating-managing-service-accounts
 https://cloud.google.com/iam/docs/creating-managing-service-account-keys
 
+This demo is designed so that it can be run on a GCP free trial account. This
+will require activating your free trial to complete demo setup.
+
 We include both support for OKD and OCP. If you are using the OCP demo then
 you will need to have an OpenShift subscription and set the following
 environment variables before configuring your control host:
@@ -80,6 +83,12 @@ There is a sample environement file at `gcp-demo.env.example` which can for
 reference when setting your environment.
 
 == Controller Setup
+
+Initialize your cloud provider to ensure all required API features are enabled:
+
+```
+./init.sh gcp-demo-sbx-okd3
+```
 
 With your environment set, you can run the `configure-controller.sh` script
 to deploy and configure the controller instance for a cluster.
