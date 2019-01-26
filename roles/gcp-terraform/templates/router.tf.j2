@@ -1,14 +1,6 @@
-terraform {
-  backend "gcs" {
-    bucket  = "{{ openshift_provision_gcp_terraform_state_bucket }}"
-    prefix  = "router"
-  }
-}
-
-provider "google" {
-  project = "{{ openshift_gcp_project }}"
-  region = "{{ openshift_gcp_region }}"
-}
+#
+# Router
+#
 
 data "google_compute_network" "{{ openshift_gcp_network_name }}" {
   name = "{{ openshift_gcp_network_name }}"

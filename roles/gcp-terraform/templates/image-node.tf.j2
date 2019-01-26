@@ -1,16 +1,6 @@
-{% set t_gcp_zone = gcp_zones[0] %}
-
-terraform {
-  backend "gcs" {
-    bucket  = "{{ openshift_provision_gcp_terraform_state_bucket }}"
-    prefix  = "image-node"
-  }
-}
-
-provider "google" {
-  project = "{{ openshift_gcp_project }}"
-  region = "{{ openshift_gcp_region }}"
-}
+#
+# Image Node
+#
 
 data "google_service_account" "{{ node_service_account }}" {
   account_id = "{{ node_service_account }}"
@@ -24,7 +14,7 @@ data "google_compute_subnetwork" "{{ cluster_subnetwork_name }}" {
 resource "google_compute_instance" "{{ openshift_gcp_prefix }}image" {
   name = "{{ openshift_gcp_prefix }}image"
   machine_type = "{{ image_node_machine_type }}"
-  zone = "{{ t_gcp_zone }}"
+  zone = "{{ gcp_zones[0] }}"
 
   tags = ["{{ openshift_gcp_prefix }}node"]
 

@@ -1,0 +1,88 @@
+#
+# Shared public load balancer
+#
+
+data "google_compute_global_address" "{{ openshift_gcp_prefix }}public" {
+  name = "{{ openshift_gcp_prefix }}public"
+}
+
+data "google_compute_backend_service" "{{ openshift_gcp_prefix }}master-https" {
+  name = "{{ openshift_gcp_prefix }}master-https"
+}
+
+data "google_compute_backend_service" "{{ openshift_gcp_prefix }}router-https" {
+  name = "{{ openshift_gcp_prefix }}router-https"
+}
+
+data "google_compute_backend_service" "{{ openshift_gcp_prefix }}router-http" {
+  name = "{{ openshift_gcp_prefix }}router-http"
+}
+
+resource "google_compute_global_forwarding_rule" "{{ openshift_gcp_prefix }}router-http" {
+  name = "{{ openshift_gcp_prefix }}router-http"
+  ip_protocol = "TCP"
+  ip_address = "${data.google_compute_global_address.{{ openshift_gcp_prefix }}public.address}"
+  labels = {
+    openshift-cluster = "{{ cluster_name }}"
+  }
+  port_range = "80"
+  target = "${google_compute_target_http_proxy.{{ openshift_gcp_prefix }}router-http.self_link}"
+}
+
+resource "google_compute_global_forwarding_rule" "{{ openshift_gcp_prefix }}public" {
+  name = "{{ openshift_gcp_prefix }}public"
+  ip_protocol = "TCP"
+  ip_address = "${data.google_compute_global_address.{{ openshift_gcp_prefix }}public.address}"
+  labels = {
+    openshift-cluster = "{{ cluster_name }}"
+  }
+  port_range = "443"
+  target = "${google_compute_target_https_proxy.{{ openshift_gcp_prefix }}public.self_link}"
+}
+
+resource "google_compute_target_http_proxy" "{{ openshift_gcp_prefix }}router-http" {
+  name = "{{ openshift_gcp_prefix }}router-http"
+  url_map = "${google_compute_url_map.{{ openshift_gcp_prefix }}router-http.self_link}"
+}
+
+resource "google_compute_target_https_proxy" "{{ openshift_gcp_prefix }}public" {
+  name = "{{ openshift_gcp_prefix }}public"
+  # Currently GCP with terraform only supports a single master certificate. We
+  # choose to use the router certificate because it is a wildcard.
+  ssl_certificates = [
+    "${google_compute_ssl_certificate.{{ openshift_gcp_prefix }}router.self_link}"
+  ]
+  url_map = "${google_compute_url_map.{{ openshift_gcp_prefix }}public.self_link}"
+}
+
+resource "google_compute_ssl_certificate" "{{ openshift_gcp_prefix }}router" {
+  name = "{{ openshift_gcp_prefix }}router"
+  certificate = {{ lookup('file', openshift_hosted_router_certificate.certfile) | to_json }}
+  private_key = {{ lookup('file', openshift_hosted_router_certificate.keyfile) | to_json }}
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "google_compute_url_map" "{{ openshift_gcp_prefix }}router-http" {
+  name = "{{ openshift_gcp_prefix }}router-http"
+  description = "Router HTTP {{ cluster_name }}"
+  default_service = "${data.google_compute_backend_service.{{ openshift_gcp_prefix }}router-http.self_link}"
+}
+
+resource "google_compute_url_map" "{{ openshift_gcp_prefix }}public" {
+  name = "{{ openshift_gcp_prefix }}master"
+  description = "Masters for {{ cluster_name }}"
+  default_service = "${data.google_compute_backend_service.{{ openshift_gcp_prefix }}router-https.self_link}"
+
+  host_rule {
+    hosts = ["{{ openshift_master_cluster_public_hostname }}"]
+    path_matcher = "master"
+  }
+
+  path_matcher {
+    name = "master"
+    default_service = "${data.google_compute_backend_service.{{ openshift_gcp_prefix }}master-https.self_link}"
+  }
+}

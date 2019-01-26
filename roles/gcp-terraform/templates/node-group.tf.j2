@@ -1,14 +1,6 @@
-terraform {
-  backend "gcs" {
-    bucket  = "{{ openshift_provision_gcp_terraform_state_bucket }}"
-    prefix  = "node-{{ node_group_name }}"
-  }
-}
-
-provider "google" {
-  project = "{{ openshift_gcp_project }}"
-  region = "{{ openshift_gcp_region }}"
-}
+#
+# Node Group
+#
 
 data "google_service_account" "{{ node_service_account }}" {
   account_id = "{{ node_service_account }}"
@@ -85,9 +77,7 @@ resource "google_compute_instance_template" "{{ instance_template_name }}" {
   }
 }
 
-# FIXME - what's with the "i"?
-{% for i in range(gcp_zones|length) %}
-{%   set t_gcp_zone = gcp_zones[i] %}
+{% for t_gcp_zone in gcp_zones %}
 {%   set t_instance_group_name = openshift_gcp_prefix ~ node_group_name ~ t_gcp_zone[-2:] %}
 
 resource "google_compute_instance_group_manager" "{{ t_instance_group_name }}" {

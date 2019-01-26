@@ -22,6 +22,12 @@
     state: link
   changed_when: false
 
+- name: Process terraform provider template for {{ terraform_template_dir }}
+  template:
+    src: "provider.tf.j2"
+    dest: "{{ terraform_template_dir }}/provider.tf"
+  changed_when: false
+
 - name: Process terraform template for {{ terraform_template_dir }}
   template:
     src: "{{ terraform_template }}.tf.j2"

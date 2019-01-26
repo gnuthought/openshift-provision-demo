@@ -17,3 +17,6 @@
       - service-accounts
       - registry-storage
       terraform_dir: "{{ playbook_dir }}/terraform/{{ openshift_provision_cluster_name }}"
+
+  - name: Refresh inventory
+    meta: refresh_inventory

@@ -1,0 +1,7 @@
+#
+# Shared master and router public static ip reservation
+#
+
+resource "google_compute_global_address" "{{ openshift_gcp_prefix }}public" {
+  name = "{{ openshift_gcp_prefix }}public"
+}

@@ -1,0 +1,16 @@
+#
+# Network resource creation
+#
+
+resource "google_compute_network" "{{ openshift_gcp_network_name }}" {
+  name = "{{ openshift_gcp_network_name }}"
+  project = "{{ openshift_gcp_network_project }}"
+  auto_create_subnetworks = false
+}
+
+resource "google_compute_subnetwork" "{{ cluster_subnetwork_name }}" {
+  name = "{{ cluster_subnetwork_name }}"
+  project = "{{ openshift_gcp_network_project }}"
+  ip_cidr_range = "{{ cluster_subnetwork_ip_cidr_range }}"
+  network = "${google_compute_network.{{ openshift_gcp_network_name }}.self_link}"
+}

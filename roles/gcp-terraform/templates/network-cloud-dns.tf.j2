@@ -1,0 +1,41 @@
+#
+# Network cloud DNS
+#
+
+resource "google_dns_managed_zone" "{{ cluster_dns_zone_name }}" {
+  name        = "{{ cluster_dns_zone_name }}"
+  dns_name    = "{{ cluster_dns_domain }}."
+  description = "{{ cluster_name }} managed by terraform"
+}
+
+{% if not openshift_provision_wildcard_dns %}
+resource "google_dns_record_set" "{{ openshift_gcp_prefix }}master-public" {
+  name = "{{ openshift_master_cluster_public_hostname }}."
+  type = "A"
+  ttl  = 300
+  managed_zone = "${google_dns_managed_zone.{{ cluster_dns_zone_name }}.name}"
+  rrdatas = ["{{ t_master_public_address }}"]
+}
+
+resource "google_dns_record_set" "{{ openshift_gcp_prefix }}router" {
+  name = "*.{{ openshift_master_default_subdomain }}."
+  type = "A"
+  ttl  = 300
+  managed_zone = "${data.google_dns_managed_zone.{{ cluster_dns_zone_name }}.name}"
+  rrdatas = ["{{ t_router_address }}"]
+}
+{% endif %}
+
+{% if handle_dns_delegation %}
+data "google_dns_managed_zone" "{{ delegation_dns_zone_name }}" {
+  name = "{{ delegation_dns_zone_name }}"
+}
+
+resource "google_dns_record_set" "{{ openshift_gcp_prefix }}delegation" {
+  name = "{{ cluster_dns_domain }}."
+  type = "NS"
+  ttl  = 300
+  managed_zone = "${data.google_dns_managed_zone.{{ delegation_dns_zone_name }}.name}"
+  rrdatas = ["${google_dns_managed_zone.{{ cluster_dns_zone_name }}.name_servers}"]
+}
+{% endif %}

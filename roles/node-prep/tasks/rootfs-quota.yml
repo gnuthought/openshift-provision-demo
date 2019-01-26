@@ -1,0 +1,12 @@
+---
+- name: Get rootfs mount options
+  shell: >-
+    mount | sed -nre 's|.* on / .*\((.*)\)|\1|p'
+  args:
+    warn: false
+  changed_when: false
+  register: get_rootfs_mount_options
+
+- when: >-
+    'noquota' in get_rootfs_mount_options.stdout.split(',')
+  include_tasks: rootfs-quota-enable.yml
