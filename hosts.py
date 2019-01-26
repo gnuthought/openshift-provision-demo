@@ -19,6 +19,7 @@ Usage: hosts.py --create-node-image
   --cleanup            Cleanup resources left by terraform destroy
   --create-node-image  Create cluster image from image instance
   --host               Ansible inventory host facts
+  --init               Perform any needed operations to initialize for install
   --list               Ansible inventory host list
   --scaleup            Scale up dynamic components to minimum
   --wait               Wait for vms to start
@@ -36,7 +37,8 @@ def main():
 
     ocpinv = OpenShiftInventory(
         cluster_name = os.environ['OPENSHIFT_PROVISION_CLUSTER_NAME'],
-        config_dir = os.environ.get('OPENSHIFT_PROVISION_CONFIG_PATH', 'config')
+        config_dir = os.environ.get('OPENSHIFT_PROVISION_CONFIG_PATH', 'config'),
+        init_mode = len(sys.argv) == 2 and sys.argv[1] == '--init'
     )
 
     # FIXME - allow debug level to be set for logger
@@ -48,6 +50,8 @@ def main():
         ocpinv.create_node_image()
     elif len(sys.argv) == 3 and sys.argv[1] == '--host':
         ocpinv.print_host_json(sys.argv[2])
+    elif len(sys.argv) == 2 and sys.argv[1] == '--init':
+        ocpinv.init()
     elif len(sys.argv) == 2 and sys.argv[1] == '--list':
         ocpinv.print_host_list_json()
     elif len(sys.argv) == 2 and sys.argv[1] == '--scaleup':
