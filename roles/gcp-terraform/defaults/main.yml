@@ -10,6 +10,9 @@ openshift_provision_gcp_subnetwork_ip_cidr_range: '10.0.0.0/24'
 openshift_provision_handle_dns_delegation: false
 openshift_provision_use_cloud_dns: false
 openshift_provision_wildcard_dns: false
+
+openshift_master_cluster_hostname: ''
+openshift_master_cluster_public_hostname: ''
 openshift_master_default_subdomain: ''
 
 openshift_provision_use_controller: true

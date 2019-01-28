@@ -79,14 +79,18 @@ User for SSH access to cluster nodes from controller or management host if
 controller is not used. This variable is used for for host access and provision
 access with terraform.
 
-| openshift_provision_cloud_zones | varies by region |
-List of availability zones used for the cluster.
-
 | openshift_provision_cluster_autoscaler_image | ... |
 
 | openshift_provision_cluster_autoscaler_image_pull_policy | "Always" |
 
 | openshift_provision_cluster_name | ... |
+
+| openshift_provision_cluster_vars | ... |
+List of cluster vars stored in the configuration map "cluster-vars" in the
+"kube-public" namespace. These include settings dynamically determined during
+installation and which are immediately available with the dynamic inventory
+and fetched from the "cluster-vars" configmap by the openshift-provision
+ansible role.
 
 | openshift_provision_config_path | ... |
 
@@ -215,6 +219,9 @@ Key name for GPG generation.
 
 | openshift_provision_gpg_key_passphrase | "redhat" |
 Password for GPG generation.
+
+| openshift_provision_gcp_zones | varies by region |
+List of availability zones used for the cluster.
 
 | openshift_provision_handle_dns_delegation | false |
 Boolean to indicate whether the terraform automation should attempt to

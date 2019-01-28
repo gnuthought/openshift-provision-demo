@@ -1,6 +1,6 @@
 ---
 openshift_gcp_create_registry_bucket: true
-openshift_gcp_registry_bucket_name: "{{ openshift_gcp_project }}-{{ openshift_gcp_prefix }}registry"
+openshift_gcp_registry_bucket_name: "{{ openshift_provision_cluster_vars.gcp_project }}-{{ openshift_gcp_prefix }}registry"
 openshift_gcp_registry_bucket_keyfile: "{{ openshift_provision_config_path }}/cluster/{{ openshift_provision_cluster_name }}/registry-gcs.key"
 
 # Passthrough routs to the registry do not work properly with GCP load

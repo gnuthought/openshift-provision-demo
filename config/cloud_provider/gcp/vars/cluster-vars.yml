@@ -1,0 +1,5 @@
+---
+openshift_provision_cloud_provider_cluster_vars:
+  gcp_project: "{{ openshift_gcp_project }}"
+  gcp_region: "{{ openshift_gcp_region }}"
+  gcp_zones: "{{ openshift_provision_gcp_zones | join(',') }}"

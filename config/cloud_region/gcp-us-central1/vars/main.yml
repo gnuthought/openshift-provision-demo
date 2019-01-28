@@ -3,7 +3,7 @@ openshift_gcp_region: us-central1
 
 # Explicitly set zone list so that it is available when not using the dynamic
 # inventory.
-openshift_provision_cloud_zones:
+openshift_provision_gcp_zones:
 - us-central1-f
 - us-central1-c
 - us-central1-b

@@ -44,7 +44,7 @@ use_cloud_dns: >-
   {{ openshift_provision_use_cloud_dns }}
 
 gcp_zones: >-
-  {{ openshift_provision_cloud_zones }}
+  {{ openshift_provision_gcp_zones }}
 
 image_node_group: >-
   {{ openshift_provision_node_groups.image }}

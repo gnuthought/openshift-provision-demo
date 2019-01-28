@@ -32,43 +32,35 @@
       kind: ConfigMap
       metadata:
         name: cluster-vars
-      data:
-        cloud_provider: "{{ openshift_provision_cloud_provider }}"
-        cloud_region: "{{ openshift_provision_cloud_region }}"
-        cloud_zones: "{{ openshift_provision_cloud_zones | join(',') }}"
-        cluster_name: "{{ openshift_provision_cluster_name }}"
-        environment_level: "{{ openshift_provision_environment_level }}"
-        is_sandbox: "{{ 'true' if is_sandbox else 'false' }}"
-        openshift_deployment_type: "{{ openshift_deployment_type }}"
-        openshift_release: "{{ openshift_release }}"
+      data: "{{ openshift_provision_cluster_vars }}"
   when: >-
     get_cluster_vars.rc != 0 or
     current_vars.data != cluster_vars.data
 
-- name: Get view-cluster-vars role
-  command: oc get role -n kube-public view-cluster-vars -o json
-  register: get_view_cluster_vars
+- name: Get view-config-maps role
+  command: oc get role -n kube-public view-config-maps -o json
+  register: get_view_config_maps_role
   changed_when: false
   failed_when: >-
-    get_cluster_vars.rc != 0 and
-    '(NotFound)' not in get_cluster_vars.stderr
+    get_view_config_maps_role.rc != 0 and
+    '(NotFound)' not in get_view_config_maps_role.stderr
 
-- name: Define view-cluster-vars role
+- name: Define view-config-maps role
   command: >-
     oc {{ action }} -n kube-public -f -
   args:
-    stdin: "{{ view_cluster_vars | to_json }}"
+    stdin: "{{ view_config_maps | to_json }}"
   vars:
-    action: "{{ 'replace' if get_view_cluster_vars.rc == 0 else 'create' }}"
+    action: "{{ 'replace' if get_view_config_maps_role.rc == 0 else 'create' }}"
     current_role: >-
       {{ (
-        get_view_cluster_vars.stdout if get_view_cluster_vars.rc == 0 else '{}'
+        get_view_config_maps_role.stdout if get_view_config_maps_role.rc == 0 else '{}'
       ) | from_json }}
-    view_cluster_vars:
+    view_config_maps:
       apiVersion: authorization.openshift.io/v1
       kind: Role
       metadata:
-        name: view-cluster-vars
+        name: view-config-maps
       rules:
       - apiGroups:
         - ""
@@ -80,42 +72,42 @@
         - list
         - watch
   when: >-
-    get_view_cluster_vars.rc != 0 or
-    current_role.rules != view_cluster_vars.rules
+    get_view_config_maps_role.rc != 0 or
+    current_role.rules != view_config_maps.rules
 
-- name: Get view-cluster-vars rolebinding
-  command: oc get rolebinding -n kube-public view-cluster-vars -o json
-  register: get_view_cluster_vars_rolebinding
+- name: Get view-config-maps rolebinding
+  command: oc get rolebinding -n kube-public view-config-maps -o json
+  register: get_view_config_maps_rolebinding
   changed_when: false
   failed_when: >-
-    get_view_cluster_vars_rolebinding.rc != 0 and
-    '(NotFound)' not in get_view_cluster_vars_rolebinding.stderr
+    get_view_config_maps_rolebinding.rc != 0 and
+    '(NotFound)' not in get_view_config_maps_rolebinding.stderr
 
-- name: Define view-cluster-vars rolebinding
+- name: Define view-config-maps rolebinding
   command: >-
     oc {{ action }} -n kube-public -f -
   args:
-    stdin: "{{ view_cluster_vars_rolebinding | to_json }}"
+    stdin: "{{ view_config_maps_rolebinding | to_json }}"
   vars:
-    action: "{{ 'replace' if get_view_cluster_vars_rolebinding.rc == 0 else 'create' }}"
+    action: "{{ 'replace' if get_view_config_maps_rolebinding.rc == 0 else 'create' }}"
     current_rolebinding: >-
       {{ (
-        get_view_cluster_vars_rolebinding.stdout if get_view_cluster_vars_rolebinding.rc == 0 else '{}'
+        get_view_config_maps_rolebinding.stdout if get_view_config_maps_rolebinding.rc == 0 else '{}'
       ) | from_json }}
-    view_cluster_vars_rolebinding:
+    view_config_maps_rolebinding:
       apiVersion: authorization.openshift.io/v1
       kind: RoleBinding
       metadata:
-        name: view-cluster-vars
+        name: view-config-maps
       groupNames:
       - system:authenticated
       roleRef:
-        name: view-cluster-vars
+        name: view-config-maps
         namespace: kube-public
       subjects:
       - kind: SystemGroup
         name: system:authenticated
       userNames: null
   when: >-
-    get_view_cluster_vars_rolebinding.rc != 0 or
-    current_rolebinding.subjects != view_cluster_vars_rolebinding.subjects
+    get_view_config_maps_rolebinding.rc != 0 or
+    current_rolebinding.subjects != view_config_maps_rolebinding.subjects

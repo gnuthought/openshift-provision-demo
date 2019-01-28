@@ -13,4 +13,4 @@ openshift_provision_gcp_node_image_family: "{{ openshift_gcp_prefix }}node"
 
 openshift_provision_gcp_use_fqdn: false
 
-openshift_provision_gcp_terraform_state_bucket: "{{ openshift_gcp_project }}-{{ openshift_gcp_prefix }}terraform-state"
+openshift_provision_gcp_terraform_state_bucket: "{{ openshift_provision_cluster_vars.gcp_project }}-{{ openshift_gcp_prefix }}terraform-state"
