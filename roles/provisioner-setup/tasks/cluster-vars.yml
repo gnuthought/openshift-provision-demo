@@ -1,0 +1,121 @@
+---
+- name: Create kube-public namespace
+  command: oc adm new-project kube-public
+  register: create_kube_public_namespace
+  changed_when: >-
+    create_kube_public_namespace.rc == 0
+  failed_when: >-
+    create_kube_public_namespace.rc != 0 and
+    'already exists' not in create_kube_public_namespace.stderr
+
+- name: Get cluster-vars configmap
+  command: oc get configmap -n kube-public cluster-vars -o json
+  register: get_cluster_vars
+  changed_when: false
+  failed_when: >-
+    get_cluster_vars.rc != 0 and
+    '(NotFound)' not in get_cluster_vars.stderr
+
+- name: Set vars in cluster-vars configmap
+  command: >-
+    oc {{ action }} -n kube-public -f -
+  args:
+    stdin: "{{ cluster_vars | to_json }}"
+  vars:
+    action: "{{ 'replace' if get_cluster_vars.rc == 0 else 'create' }}"
+    current_vars: >-
+      {{ (
+        get_cluster_vars.stdout if get_cluster_vars.rc == 0 else '{}'
+      ) | from_json }}
+    cluster_vars:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: cluster-vars
+      data:
+        cloud_provider: "{{ openshift_provision_cloud_provider }}"
+        cloud_region: "{{ openshift_provision_cloud_region }}"
+        cloud_zones: "{{ openshift_provision_cloud_zones | join(',') }}"
+        cluster_name: "{{ openshift_provision_cluster_name }}"
+        environment_level: "{{ openshift_provision_environment_level }}"
+        is_sandbox: "{{ 'true' if is_sandbox else 'false' }}"
+        openshift_deployment_type: "{{ openshift_deployment_type }}"
+        openshift_release: "{{ openshift_release }}"
+  when: >-
+    get_cluster_vars.rc != 0 or
+    current_vars.data != cluster_vars.data
+
+- name: Get view-cluster-vars role
+  command: oc get role -n kube-public view-cluster-vars -o json
+  register: get_view_cluster_vars
+  changed_when: false
+  failed_when: >-
+    get_cluster_vars.rc != 0 and
+    '(NotFound)' not in get_cluster_vars.stderr
+
+- name: Define view-cluster-vars role
+  command: >-
+    oc {{ action }} -n kube-public -f -
+  args:
+    stdin: "{{ view_cluster_vars | to_json }}"
+  vars:
+    action: "{{ 'replace' if get_view_cluster_vars.rc == 0 else 'create' }}"
+    current_role: >-
+      {{ (
+        get_view_cluster_vars.stdout if get_view_cluster_vars.rc == 0 else '{}'
+      ) | from_json }}
+    view_cluster_vars:
+      apiVersion: authorization.openshift.io/v1
+      kind: Role
+      metadata:
+        name: view-cluster-vars
+      rules:
+      - apiGroups:
+        - ""
+        attributeRestrictions: null
+        resources:
+        - configmaps
+        verbs:
+        - get
+        - list
+        - watch
+  when: >-
+    get_view_cluster_vars.rc != 0 or
+    current_role.rules != view_cluster_vars.rules
+
+- name: Get view-cluster-vars rolebinding
+  command: oc get rolebinding -n kube-public view-cluster-vars -o json
+  register: get_view_cluster_vars_rolebinding
+  changed_when: false
+  failed_when: >-
+    get_view_cluster_vars_rolebinding.rc != 0 and
+    '(NotFound)' not in get_view_cluster_vars_rolebinding.stderr
+
+- name: Define view-cluster-vars rolebinding
+  command: >-
+    oc {{ action }} -n kube-public -f -
+  args:
+    stdin: "{{ view_cluster_vars_rolebinding | to_json }}"
+  vars:
+    action: "{{ 'replace' if get_view_cluster_vars_rolebinding.rc == 0 else 'create' }}"
+    current_rolebinding: >-
+      {{ (
+        get_view_cluster_vars_rolebinding.stdout if get_view_cluster_vars_rolebinding.rc == 0 else '{}'
+      ) | from_json }}
+    view_cluster_vars_rolebinding:
+      apiVersion: authorization.openshift.io/v1
+      kind: RoleBinding
+      metadata:
+        name: view-cluster-vars
+      groupNames:
+      - system:authenticated
+      roleRef:
+        name: view-cluster-vars
+        namespace: kube-public
+      subjects:
+      - kind: SystemGroup
+        name: system:authenticated
+      userNames: null
+  when: >-
+    get_view_cluster_vars_rolebinding.rc != 0 or
+    current_rolebinding.subjects != view_cluster_vars_rolebinding.subjects

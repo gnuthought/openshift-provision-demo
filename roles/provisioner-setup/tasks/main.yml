@@ -14,3 +14,6 @@
 
 - name: Record openshift connection settings
   include_tasks: configure-openshift-connection.yml
+
+- name: Set cluster vars in cluster-vars configmap
+  include_tasks: cluster-vars.yml

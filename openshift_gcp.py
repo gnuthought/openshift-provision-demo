@@ -20,7 +20,7 @@ inventory_class_name = 'OpenShiftGCP'
 
 # The call to create a disk image has been seen to timeout with the default
 # 60 second limit.
-socket.setdefaulttimeout(120) 
+socket.setdefaulttimeout(120)
 
 class OpenShiftGCP:
     def __init__(self, ocpinv):
@@ -152,13 +152,13 @@ class OpenShiftGCP:
         for the region.
         """
 
-        config_zones = self.ocpinv().cluster_var('openshift_provision_gcp_zones')
+        config_zones = self.ocpinv().cluster_var('openshift_provision_cloud_zones')
         if config_zones:
             return config_zones
 
         if not self.ocpinv().cluster_var('openshift_gcp_multizone'):
             gcp_zone = self.ocpinv().cluster_var('openshift_gcp_zone')
-            self.ocpinv().cluster_config['openshift_provision_gcp_zones'] = [gcp_zone]
+            self.ocpinv().cluster_config['openshift_provision_cloud_zones'] = [gcp_zone]
             return [gcp_zone]
 
         region = self.computeAPI.regions().get(
@@ -168,7 +168,7 @@ class OpenShiftGCP:
         gcp_zones = [
             zone_uri.rsplit('/',1)[-1] for zone_uri in region['zones']
         ]
-        self.ocpinv().cluster_config['openshift_provision_gcp_zones'] = gcp_zones
+        self.ocpinv().cluster_config['openshift_provision_cloud_zones'] = gcp_zones
         return gcp_zones
 
     def get_instance_in_zone(self, hostname, zone):

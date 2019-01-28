@@ -79,6 +79,9 @@ User for SSH access to cluster nodes from controller or management host if
 controller is not used. This variable is used for for host access and provision
 access with terraform.
 
+| openshift_provision_cloud_zones | varies by region |
+List of availability zones used for the cluster.
+
 | openshift_provision_cluster_autoscaler_image | ... |
 
 | openshift_provision_cluster_autoscaler_image_pull_policy | "Always" |
@@ -200,12 +203,6 @@ Name of GCP service account used on nodes.
 | openshift_provision_gcp_subnetwork_ip_cidr_range | '10.0.0.0/24' |
 
 | openshift_provision_gcp_use_fqdn | false |
-
-| openshift_provision_gcp_zones | varies by region |
-List of availability zones used for the cluster. If `openshift_gcp_multizone`
-is false then this defaults to a list only containing `openshift_gcp_zone`.
-If `openshift_gcp_multizone` is true then this defaults to a dynamic list of
-availability zones within the region given by `openshift_gcp_region`.
 
 | openshift_provision_gpg_pubkey | required for gcp deployment |
 GPG public key to encrypt secrets stored in terraform state.
