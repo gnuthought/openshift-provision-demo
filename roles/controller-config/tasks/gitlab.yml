@@ -1,0 +1,14 @@
+---
+- name: Check if gitlab-ce is installed
+  command: rpm -q gitlab-ce
+  args:
+    warn: false
+  changed_when: false
+  register: check_gitlab_install
+  failed_when: >-
+    check_gitlab_install.rc != 0 and
+    "not installed" not in check_gitlab_install.stdout
+
+- name: Install gitlab-ce
+  include_tasks: gitlab-install.yml
+  when: check_gitlab_install.rc != 0

@@ -19,7 +19,8 @@ openshift_provision_use_controller: true
 openshift_provision_controller_ansible_port: 22
 openshift_provision_controller_ansible_ssh_pubkey: ''
 openshift_provision_controller_ansible_user: ansible
-openshift_provision_controller_hostname: controller.{{ openshift_provision_dns_cluster_domain }}
+openshift_provision_controller_hostname: >-
+  controller.{{ openshift_provision_dns_cluster_domain }}
 openshift_provision_gcp_controller_boot_disk_image: >-
   {{ openshift_gcp_image }}
 openshift_provision_gcp_controller_boot_disk_size_gb: 50

@@ -1,0 +1,33 @@
+---
+- name: Get gitlab-ce script.rpm.sh
+  become: true
+  get_url:
+    url: https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.rpm.sh
+    dest: /usr/local/bin/gitlab-ce-script.rpm.sh
+    mode: u=rwx,go=rx
+
+- name: Run gitlab-ce script.rpm.sh
+  become: true
+  command: /usr/local/bin/gitlab-ce-script.rpm.sh
+
+- name: Create /etc/gitlab
+  become: true
+  file:
+    path: /etc/gitlab
+    state: directory
+
+- name: Configure /etc/gitlab/gitlab.rb
+  become: true
+  copy:
+    dest: /etc/gitlab/gitlab.rb 
+    content: |
+      external_url 'http://{{ openshift_provision_controller_hostname }}/'
+      gitlab_rails['initial_root_password'] = "{{ openshift_provision_gitlab_root_password }}"
+
+- name: Install gitlab-ce RPM
+  become: true
+  command: yum install -y gitlab-ce
+  args:
+    warn: false
+  environment:
+    EXTERNAL_URL: "http://{{ openshift_provision_controller_hostname }}/"

@@ -9,3 +9,5 @@ openshift_provision_controller_cloud_python_packages: []
 
 openshift_provision_openshift_ansible_git_repo: https://github.com/openshift/openshift-ansible.git
 openshift_provision_openshift_ansible_git_branch: release-{{ openshift_release }}
+
+openshift_provision_gitlab_root_password: password

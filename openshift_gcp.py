@@ -116,6 +116,15 @@ class OpenShiftGCP:
                     wildcard_dns
                 )
             )
+        controller_ip = self.get_controller_ip()
+        if controller_ip:
+            self.ocpinv().set_dynamic_cluster_var(
+                'openshift_provision_controller_hostname',
+                "controller.{}.{}".format(
+                    controller_ip,
+                    wildcard_dns
+                )
+            )
 
     def get_master_and_router_ip(self):
         gcp_prefix = self.ocpinv().cluster_var('openshift_gcp_prefix')
@@ -126,6 +135,16 @@ class OpenShiftGCP:
             master_ip = self.get_globaladdress_ip(gcp_prefix + 'master')
             router_ip = self.get_globaladdress_ip(gcp_prefix + 'router')
             return master_ip, router_ip
+
+    def get_controller_ip(self):
+        gcp_prefix = self.ocpinv().cluster_var('openshift_gcp_prefix')
+        controller_hostname = gcp_prefix + 'controller'
+        instance = self.get_instance_in_zone(
+            controller_hostname,
+            self.get_cluster_zones()[0]
+        )
+        if instance:
+            return instance['networkInterfaces'][0]['accessConfigs'][0]['natIP']
 
     def get_globaladdress_ip(self, name):
         resp = self.computeAPI.globalAddresses().list(
@@ -253,12 +272,26 @@ class OpenShiftGCP:
         node_labels.update(node_group_labels)
         return node_labels
 
-    def instance_ansible_host_ip(self, instance):
+    def instance_add_ansible_vars(self, instance, hostvars):
+        for item in instance['metadata']['items']:
+            if item['key'].startswith('ansible-var-'):
+                try:
+                    value = json.loads(item['value'])
+                except:
+                    value = item['value']
+                hostvars[item['key'][12:]] = value
+
+    def instance_add_ip_vars(self, instance, hostvars):
         primary_network_interface = instance['networkInterfaces'][0]
-        if os.environ.get('GCP_ANSIBLE_INVENTORY_USE_NAT_IP', 'false') == 'true':
-            return primary_network_interface['accessConfigs'][0]['natIP']
+        primary_network_ip = primary_network_interface['networkIP']
+        hostvars['gcp_network_ip'] = primary_network_ip
+        if primary_network_interface['accessConfigs'][0].get('natIP', None):
+            nat_ip = primary_network_interface['accessConfigs'][0]['natIP']
+            hostvars['gcp_nat_ip'] = nat_ip
+            if os.environ.get('GCP_ANSIBLE_INVENTORY_USE_NAT_IP', 'false') == 'true':
+                hostvars['ansible_host'] = nat_ip
         else:
-            return primary_network_interface['networkIP']
+            hostvars['ansible_host'] = primary_network_ip
 
     def instance_add_host_storage_devices(self, instance, hostvars):
         glusterfs_devices = []
@@ -271,21 +304,9 @@ class OpenShiftGCP:
         if len(glusterfs_devices) > 0:
             hostvars['glusterfs_devices'] = glusterfs_devices
 
-    def instance_add_ansible_vars(self, instance, hostvars):
-        for item in instance['metadata']['items']:
-            if item['key'].startswith('ansible-var-'):
-                try:
-                    value = json.loads(item['value'])
-                except:
-                    value = item['value']
-                hostvars[item['key'][12:]] = value
-
-        return hostvars
-
     def instance_host_vars(self, instance):
-        hostvars = {
-            'ansible_host': self.instance_ansible_host_ip(instance)
-        }
+        hostvars = {}
+        self.instance_add_ip_vars(instance, hostvars)
         self.instance_add_ansible_vars(instance, hostvars)
 
         if instance.get('labels',{}).get('openshift-cluster-controller', 'false') != 'true':
@@ -295,7 +316,6 @@ class OpenShiftGCP:
                 self.instance_openshift_node_labels(instance)
             self.instance_add_host_storage_devices(instance, hostvars)
 
-        self.instance_add_ansible_vars(instance, hostvars)
         return hostvars
 
     def ansible_group_filter(self, instance):

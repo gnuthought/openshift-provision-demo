@@ -17,8 +17,7 @@ cd provision-controller
 cd ..
 
 HOSTS_JSON=$(./hosts.py --list)
-CONTROLLER_NAME=$(echo $HOSTS_JSON | jq -r '.controller.hosts[0]')
-CONTROLLER_IP=$(echo $HOSTS_JSON | jq -r "._meta.hostvars.\"$CONTROLLER_NAME\".ansible_host")
+CONTROLLER_HOSTNAME=$(echo $HOSTS_JSON | jq -r '.all.vars.openshift_provision_controller_hostname')
 CONTROLLER_PORT=$(echo $HOSTS_JSON | jq -r '.all.vars.openshift_provision_controller_ansible_port')
 CONTROLLER_USER=$(echo $HOSTS_JSON | jq -r '.all.vars.openshift_provision_controller_ansible_user')
 
@@ -27,6 +26,10 @@ cat <<EOF
 Controller setup complete for $OPENSHIFT_PROVISION_CLUSTER_NAME.
 Use ssh to connect to controller to continue provisioning your OpenShift cluster.
 
-ssh -p$CONTROLLER_PORT $CONTROLLER_USER@$CONTROLLER_IP
+ssh -p$CONTROLLER_PORT $CONTROLLER_USER@$CONTROLLER_HOSTNAME
+
+A gitlab server has been configured at:
+
+http://$CONTROLLER_HOSTNAME/
 
 EOF

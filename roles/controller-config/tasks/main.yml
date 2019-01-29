@@ -46,3 +46,6 @@
 
 - name: Setup user environment
   include_tasks: user-env.yml
+
+- name: Setup gitlab
+  include_tasks: gitlab.yml
