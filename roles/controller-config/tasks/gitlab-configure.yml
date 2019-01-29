@@ -1,0 +1,14 @@
+---
+- name: Configure /etc/gitlab/gitlab.rb
+  become: true
+  copy:
+    dest: /etc/gitlab/gitlab.rb 
+    content: |
+      external_url 'http://{{ openshift_provision_controller_hostname }}/'
+      gitlab_rails['initial_root_password'] = "{{ openshift_provision_gitlab_root_password }}"
+  register: configure_gitlab
+
+- name: Run gitlab-ctl reconfigure
+  become: true
+  command: sudo gitlab-ctl reconfigure
+  when: configure_gitlab.changed
