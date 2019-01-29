@@ -1,0 +1,49 @@
+---
+- name: Get gitlab oauth token
+  uri:
+    url: http://localhost/oauth/token
+    method: POST
+    body_format: form-urlencoded
+    body:
+      grant_type: password
+      username: root
+      password: "{{ openshift_provision_gitlab_root_password }}"
+  register: get_oauth_token
+
+- name: Create demo project
+  uri:
+    url: http://localhost/api/v4/projects
+    method: POST
+    body_format: form-urlencoded
+    body:
+      name: openshift-provision-demo
+      description: OpenShift Provision Demo
+      issues_enabled: yes
+      merge_requests_enabled: yes
+    headers:
+      Authorization: Bearer {{ get_oauth_token.json.access_token }}
+  register: create_demo_project
+  changed_when: create_demo_project.status == 201
+  failed_when:
+  - create_demo_project.status != 201
+  - not create_demo_project.json
+  - create_demo_project.json.message.name != ["has already been taken"]
+
+- name: Add remote for local gitlab for openshift-provision-demo
+  command: >-
+    git remote add gitlab
+    http://root:{{ openshift_provision_gitlab_root_password }}@localhost/root/openshift-provision-demo.git
+  args:
+    chdir: ~/openshift-provision-demo
+  register: add_gitlab_remote
+  changed_when: add_gitlab_remote.rc == 0
+  failed_when: >-
+    add_gitlab_remote.rc != 0 and
+    "already exists" not in add_gitlab_remote.stderr
+
+- name: Push openshift-provision-demo to gitlab
+  command: git push gitlab --all
+  args:
+    chdir: ~/openshift-provision-demo
+  register: git_push
+  changed_when: git_push.stderr != "Everything up-to-date"

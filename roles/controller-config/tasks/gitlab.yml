@@ -12,3 +12,6 @@
 - name: Install gitlab-ce
   include_tasks: gitlab-install.yml
   when: check_gitlab_install.rc != 0
+
+- name: Populate gitlab
+  include_tasks: gitlab-populate.yml
