@@ -16,4 +16,4 @@ errexit () {
 export OPENSHIFT_ROLE_FILTER=master,image
 
 cd provision-cluster
-./ansible-playbook.sh update-node-image.yml $1
+./ansible-playbook.sh update.yml $1
