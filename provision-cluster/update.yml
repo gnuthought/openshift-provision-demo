@@ -1,5 +1,2 @@
 ---
-- import_playbook: terraform-image-node.yml
-- import_playbook: image-node-install.yml
-- import_playbook: create-node-image.yml
-- import_playbook: terraform-deploy.yml
+- import_playbook: update-node-image.yml
