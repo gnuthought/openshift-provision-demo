@@ -1,4 +1,39 @@
 ---
+- name: Get router.crt subject
+  command: >-
+    openssl x509 -subject -noout
+    -in {{ openshift_provision_cluster_tls_dir }}/router.crt
+  changed_when: false
+  failed_when: false
+  register: get_router_crt_subject
+
+- name: Check if router.crt is self-signed
+  command: >-
+    diff -q
+    {{ openshift_provision_cluster_tls_dir }}/router.crt
+    {{ openshift_provision_cluster_tls_dir }}/router-ca.crt
+  changed_when: false
+  failed_when: false
+  register: check_router_crt_self_signed
+
+- name: Remove self-signed router certs and key
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+  - "{{ openshift_provision_cluster_tls_dir }}/router.key"
+  - "{{ openshift_provision_cluster_tls_dir }}/router.crt"
+  - "{{ openshift_provision_cluster_tls_dir }}/router-ca.crt"
+  vars:
+    router_subject: >-
+      {{ get_router_crt_subject.stdout
+       | default('')
+       | regex_replace('.*CN=', '')
+      }}
+  when:
+  - check_router_crt_self_signed.rc == 0
+  - router_subject != '*.' ~ openshift_master_default_subdomain
+
 - name: Create self-signed router cert
   command: >-
     openssl req -new -nodes -x509
