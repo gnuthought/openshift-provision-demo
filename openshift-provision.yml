@@ -5,9 +5,3 @@
   - include_tasks: load-config.yml
   roles:
   - role: openshift-provision
-    openshift_connection_server: "https://{{ openshift_master_cluster_public_hostname }}/"
-    openshift_clusters:
-    - cluster_resources: "{{ openshift_provision_aggregate_cluster_resources }}"
-      cluster_role_bindings: "{{ openshift_provision_aggregate_cluster_role_bindings }}"
-      projects: "{{ openshift_provision_aggregate_projects }}"
-      resource_path: "{{ openshift_provision_resource_path }}"

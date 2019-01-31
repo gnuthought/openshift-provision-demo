@@ -17,24 +17,29 @@ class OpenShiftInventory:
 
     def load_cluster_config(self):
         self.cluster_config = {}
-        cluster_main = self.load_cluster_main()
-        self.load_cluster_vars('default')
-        self.load_cluster_vars('openshift_release', cluster_main['openshift_release'])
-        self.load_cluster_vars('openshift_deployment_type', cluster_main['openshift_deployment_type'])
-        self.load_cluster_vars('cloud_provider', cluster_main['openshift_provision_cloud_provider'])
-        self.load_cluster_vars('cloud_region', cluster_main['openshift_provision_cloud_region'])
-        self.load_cluster_vars('environment_level', cluster_main['openshift_provision_environment_level'])
-        if cluster_main.get('openshift_provision_sandbox', False):
-            self.load_cluster_vars('sandbox')
-        self.load_cluster_vars('cluster', self.cluster_name)
+
+        # Load default main cluster main configs to determine config load
+        # hierarchy
+        conf_bootstrap = self.read_default_main()
+        conf_bootstrap.update(self.read_cluster_main())
+        conf_hierarchy = yaml.load(
+            self.value_expand(
+                conf_bootstrap['openshift_provision_config_hierarchy'],
+                jinja_vars = conf_bootstrap
+            )
+        )
+        for item in conf_hierarchy[::-1]:
+            self.load_cluster_vars(item)
         self.cluster_config['openshift_provision_dynamic_vars'] = {}
-        self.cloud_provider_class = __import__('openshift_' + cluster_main['openshift_provision_cloud_provider'])
+        self.cloud_provider_class = __import__(
+            'openshift_' + self.cluster_config['openshift_provision_cloud_provider']
+        )
         self.cloud_provider = getattr(
             self.cloud_provider_class,
             self.cloud_provider_class.inventory_class_name
         )(self)
 
-    def load_cluster_main(self):
+    def read_cluster_main(self):
         for file_extension in ['yaml','yml','json']:
             mainconf = '/'.join([
                 self.config_dir,
@@ -47,14 +52,30 @@ class OpenShiftInventory:
             except IOError:
                 pass
         raise Exception(
-            "Unable to load main cluster configuration file in {}/cluster/{}/vars/".format(
+            "Unable to read main cluster configuration file in {}/cluster/{}/vars/".format(
                 self.config_dir,
                 self.cluster_name
             )
         )
 
-    def load_cluster_vars(self, subdir, entry='.'):
-        vardir = '/'.join([self.config_dir, subdir, entry, 'vars'])
+    def read_default_main(self):
+        for file_extension in ['yaml','yml','json']:
+            mainconf = '/'.join([
+                self.config_dir,
+                'default/vars/main.' + file_extension
+            ])
+            try:
+                return yaml.load(file(mainconf, 'r'))
+            except IOError:
+                pass
+        raise Exception(
+            "Unable to read main default configuration file in {}/default/vars/".format(
+                self.config_dir
+            )
+        )
+
+    def load_cluster_vars(self, path):
+        vardir = '/'.join([self.config_dir, path, 'vars'])
         for varfile in os.listdir(vardir):
             if not re.match(r'\w.*\.(ya?ml|json)$', varfile):
                 continue
@@ -82,12 +103,18 @@ class OpenShiftInventory:
         self.cluster_config[varname] = value
         self.cluster_config['openshift_provision_dynamic_vars'][varname] = value
 
-    def value_expand(self, value, depth=0):
+    def value_expand(self, value, depth=0, jinja_vars=None):
         if depth > 10:
             raise Exception("Variable expansion depth limit exceeded")
         elif isinstance(value, six.string_types) and '{{' in value:
             t = jinja2.Template(value)
-            return self.value_expand(t.render(self.cluster_config), depth + 1)
+            if not jinja_vars:
+                jinja_vars = self.cluster_config
+            return self.value_expand(
+                t.render(jinja_vars),
+                depth = depth + 1,
+                jinja_vars = jinja_vars
+            )
         else:
             return value
 

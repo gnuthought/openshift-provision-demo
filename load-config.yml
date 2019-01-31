@@ -4,51 +4,24 @@
     msg: openshift_provision_cluster_name must be defined
   when: openshift_provision_cluster_name is not defined
 
-- name: Load cluster main vars
-  include_vars:
-    file: "{{ openshift_provision_config_path }}/cluster/{{ openshift_provision_cluster_name }}/vars/main.yml"
-    name: _config_main
-
-- name: Load default vars
+- name: Load default main vars
   include_vars:
     dir: "{{ openshift_provision_config_path }}/default/vars"
-    files_matching: '[a-z0-9].*\.(json|ya?ml)$'
+    files_matching: 'main\.(json|ya?ml)$'
 
-- name: Load openshift_deployment_type vars
-  include_vars:
-    dir: "{{ openshift_provision_config_path }}/openshift_deployment_type/{{ _config_main.openshift_deployment_type }}/vars"
-    files_matching: '[a-z0-9].*\.(json|ya?ml)$'
-
-- name: Load openshift_release vars
-  include_vars:
-    dir: "{{ openshift_provision_config_path }}/openshift_release/{{ _config_main.openshift_release }}/vars"
-    files_matching: '[a-z0-9].*\.(json|ya?ml)$'
-
-- name: Load cloud provider vars
-  include_vars:
-    dir: "{{ openshift_provision_config_path }}/cloud_provider/{{ _config_main.openshift_provision_cloud_provider }}/vars"
-    files_matching: '[a-z0-9].*\.(json|ya?ml)$'
-
-- name: Load cloud region vars
-  include_vars:
-    dir: "{{ openshift_provision_config_path }}/cloud_region/{{ _config_main.openshift_provision_cloud_region }}/vars"
-    files_matching: '[a-z0-9].*\.(json|ya?ml)$'
-
-- name: Load environment level vars
-  include_vars:
-    dir: "{{ openshift_provision_config_path }}/environment_level/{{ _config_main.openshift_provision_environment_level }}/vars"
-    files_matching: '[a-z0-9].*\.(json|ya?ml)$'
-
-- name: Load sandbox vars
-  include_vars:
-    dir: "{{ openshift_provision_config_path }}/sandbox/vars"
-    files_matching: '[a-z0-9].*\.(json|ya?ml)$'
-  when: _config_main.openshift_provision_sandbox | default(False) | bool
-
-- name: Load cluster vars
+- name: Load cluster main vars
   include_vars:
     dir: "{{ openshift_provision_config_path }}/cluster/{{ openshift_provision_cluster_name }}/vars"
-    files_matching: '^[a-zA-Z0-9].*\.(json|ya?ml)$'
+    files_matching: 'main\.(json|ya?ml)$'
+
+- name: Load vars in hierarchy order
+  include_vars:
+    dir: "{{ vars_dir }}"
+    files_matching: '[a-z0-9].*\.(json|ya?ml)$'
+  with_items: "{{ openshift_provision_config_hierarchy[::-1] }}"
+  vars:
+    vars_dir: "{{ openshift_provision_config_path }}/{{ item }}/vars"
+  when: vars_dir is directory
 
 - name: Load dynamic vars
   include_tasks: "{{ dynamic_vars_file.src }}"

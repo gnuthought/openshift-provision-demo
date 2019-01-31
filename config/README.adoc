@@ -65,12 +65,6 @@ Master named certificates are required for GCP
 | openshift_master_cluster_public_hostname | required |
 Required
 
-| openshift_provision_aggregate_cluster_resources | ... |
-
-| openshift_provision_aggregate_cluster_role_bindings | ... |
-
-| openshift_provision_aggregate_projects | ... |
-
 | openshift_provision_ansible_ssh_pubkey | content of "\~/.ssh/id_rsa.pub" |
 SSH public key to configure for remote access into instances.
 
@@ -84,6 +78,10 @@ access with terraform.
 | openshift_provision_cluster_autoscaler_image_pull_policy | "Always" |
 
 | openshift_provision_cluster_name | ... |
+
+| openshift_provision_cluster_resources | ... |
+
+| openshift_provision_cluster_role_bindings | ... |
 
 | openshift_provision_cluster_vars | ... |
 List of cluster vars stored in the configuration map "cluster-vars" in the
@@ -265,6 +263,8 @@ Definition of default project for openshift-provision ansible role.
 | openshift_provision_project_kube_cluster_autoscaler | ... |
 Definition of kube-cluster-autoscaler project for openshift-provision ansible
 role.
+
+| openshift_provision_projects | ... |
 
 | openshift_provision_replace_passthrough_routes | False (True for GCP) |
 Boolean flag to indicate whether passthrough routes should be reconfigured to

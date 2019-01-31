@@ -8,3 +8,21 @@ openshift_provision_sandbox: false
 # Default ansible user for OCP systems
 openshift_provision_ansible_user: ansible
 openshift_provision_ansible_ssh_pubkey: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+
+openshift_provision_config_hierarchy: >-
+  {{ openshift_provision_default_config_hierarchy }}
+
+openshift_provision_default_config_hierarchy:
+- cluster/{{ openshift_provision_cluster_name }}
+- openshift_deployment_type/{{ openshift_deployment_type }}
+- openshift_release/{{ openshift_release }}
+- cloud_provider/{{ openshift_provision_cloud_provider }}
+- cloud_region/{{ openshift_provision_cloud_region }}
+- environment_level/{{ openshift_provision_environment_level }}
+- default
+
+openshift_provision:
+  cluster_resources: "{{ openshift_provision_cluster_resources }}"
+  cluster_role_bindings: "{{ openshift_provision_cluster_role_bindings }}"
+  projects: "{{ openshift_provision_projects }}"
+  resource_path: "{{ openshift_provision_resource_path }}"

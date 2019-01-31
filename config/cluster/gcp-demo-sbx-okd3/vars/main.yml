@@ -6,3 +6,10 @@ openshift_provision_cloud_region: gcp-us-east4
 openshift_provision_cloud_provider: gcp
 openshift_release: "3.11"
 openshift_deployment_type: origin
+
+# Insert sandbox into config hierarchy
+openshift_provision_config_hierarchy: >-
+  {{ [openshift_provision_default_config_hierarchy[0]]
+   + ['sandbox']
+   + openshift_provision_default_config_hierarchy[1:]
+  }}
