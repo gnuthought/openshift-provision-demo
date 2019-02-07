@@ -1,6 +1,20 @@
 ---
+- name: Read controller generated config
+  slurp:
+    src: "{{ controller_generate_config_path }}"
+  failed_when: false
+  register: read_controller_generated_config
+
+- name: Set openshift_provision_cluster_webhook_key
+  set_fact:
+    openshift_provision_cluster_webhook_key: >-
+      {{ read_controller_generated_config.content
+       | default({{ 999999999999999 | random | to_uuid)
+      }}
+
 - name: Controller generated config yaml
   copy:
-    dest: ~/openshift-provision-demo/config/default/vars/controller-generated.yml
+    dest: "{{ controller_generate_config_path }}"
     content: |
       openshift_provision_is_running_from_controller: true
+      openshift_provision_cluster_webhook_key: "{{ openshift_provision_cluster_webhook_key }}

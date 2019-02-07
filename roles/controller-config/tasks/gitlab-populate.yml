@@ -47,3 +47,5 @@
     chdir: ~/openshift-provision-demo
   register: git_push
   changed_when: git_push.stderr != "Everything up-to-date"
+
+# FIXME - Setup webhooks on repository
