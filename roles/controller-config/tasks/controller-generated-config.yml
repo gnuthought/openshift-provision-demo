@@ -8,13 +8,20 @@
 - name: Set openshift_provision_cluster_webhook_key
   set_fact:
     openshift_provision_cluster_webhook_key: >-
+      {% if read_controller_generated_config.content -%}
       {{ read_controller_generated_config.content
-       | default({{ 999999999999999 | random | to_uuid)
+       | b64decode
+       | from_yaml
+       | json_query('openshift_provision_cluster_webhook_key')
+       | default(999999999999999 | random | to_uuid, true)
       }}
+      {%- else -%}
+      {{ default(999999999999999 | random | to_uuid) }}
+      {%- endif %}
 
 - name: Controller generated config yaml
   copy:
     dest: "{{ controller_generate_config_path }}"
     content: |
       openshift_provision_is_running_from_controller: true
-      openshift_provision_cluster_webhook_key: "{{ openshift_provision_cluster_webhook_key }}
+      openshift_provision_cluster_webhook_key: {{ openshift_provision_cluster_webhook_key | to_json }}

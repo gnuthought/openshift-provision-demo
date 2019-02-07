@@ -12,6 +12,6 @@
     register: export_gpg_key
     changed_when: false
 
-  - name: Set openshift_provision_management_source_ip_range
+  - name: Set openshift_provision_gpg_pubkey
     set_fact:
       openshift_provision_gpg_pubkey: "{{ export_gpg_key.stdout }}"
