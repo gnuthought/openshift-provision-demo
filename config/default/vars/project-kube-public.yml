@@ -1,0 +1,6 @@
+---
+openshift_provision_project_kube_public:
+  admin_create: true
+  resources:
+  - kube-public/Role/view-config-maps.yml
+  - kube-public/RoleBinding/view-config-maps.yml

@@ -21,7 +21,7 @@
   copy:
     dest: /etc/gitlab/gitlab.rb 
     content: |
-      external_url 'http://{{ openshift_provision_controller_hostname }}/'
+      external_url 'http://{{ openshift_provision_controller_public_hostname }}/'
       gitlab_rails['initial_root_password'] = "{{ openshift_provision_gitlab_root_password }}"
 
 - name: Install gitlab-ce RPM
@@ -30,4 +30,4 @@
   args:
     warn: false
   environment:
-    EXTERNAL_URL: "http://{{ openshift_provision_controller_hostname }}/"
+    EXTERNAL_URL: "http://{{ openshift_provision_controller_public_hostname }}/"

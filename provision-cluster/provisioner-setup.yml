@@ -1,5 +1,0 @@
----
-- name: Setup provisioner
-  hosts: masters[0]
-  roles:
-  - provisioner-setup

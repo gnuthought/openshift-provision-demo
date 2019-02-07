@@ -1,7 +1,9 @@
+---
 - name: OpenShift Provision
-  hosts: localhost
+  hosts: masters[0]
   gather_facts: false
   pre_tasks:
-  - include_tasks: load-config.yml
+  - name: Load dynamic config
+    import_tasks: ../load-dynamic-config.yml
   roles:
   - role: openshift-provision

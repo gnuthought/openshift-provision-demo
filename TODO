@@ -1,13 +1,3 @@
-Need to activate various APIs, document on automate:
-- Google Compute Engine
-- IAM
-- Cloud Resource Manager
-- DNS (if openshift_provision_use_cloud_dns)
-
-Deploy gitlab in new cluster with provision
-
-Populate openshift-provision-demo into gitlab
-
 Configuration Documentation
 
 Add git branch process and protections
@@ -19,8 +9,6 @@ Create GCP node manager operator to roll out new images on autoscaling nodes
 Functionality to detect new base image and automatically create new disk image
 
 Support openshift_gcp_iam_service_account_keyfile to point to GCP service account keyfile?
-
-Git2Namespace?
 
 Immutable master replacement
 - reserve n+1 master network ips

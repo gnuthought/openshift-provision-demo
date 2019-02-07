@@ -10,6 +10,8 @@ openshift_provision_default_cluster_vars:
   cloud_provider: "{{ openshift_provision_cloud_provider }}"
   cloud_region: "{{ openshift_provision_cloud_region }}"
   cluster_name: "{{ openshift_provision_cluster_name }}"
+  controller_hostname: "{{ openshift_provision_controller_hostname }}"
+  controller_public_hostname: "{{ openshift_provision_controller_public_hostname }}"
   default_subdomain: "{{ openshift_master_default_subdomain }}"
   deployment_type: "{{ openshift_deployment_type }}"
   environment_level: "{{ openshift_provision_environment_level }}"

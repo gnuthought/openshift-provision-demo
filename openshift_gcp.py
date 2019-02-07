@@ -116,12 +116,19 @@ class OpenShiftGCP:
                     wildcard_dns
                 )
             )
-        controller_ip = self.get_controller_ip()
+        controller_ip, controller_public_ip = self.get_controller_ips()
         if controller_ip:
             self.ocpinv().set_dynamic_cluster_var(
                 'openshift_provision_controller_hostname',
                 "controller.{}.{}".format(
                     controller_ip,
+                    wildcard_dns
+                )
+            )
+            self.ocpinv().set_dynamic_cluster_var(
+                'openshift_provision_controller_public_hostname',
+                "controller.{}.{}".format(
+                    controller_public_ip,
                     wildcard_dns
                 )
             )
@@ -136,7 +143,7 @@ class OpenShiftGCP:
             router_ip = self.get_globaladdress_ip(gcp_prefix + 'router')
             return master_ip, router_ip
 
-    def get_controller_ip(self):
+    def get_controller_ips(self):
         gcp_prefix = self.ocpinv().cluster_var('openshift_gcp_prefix')
         controller_hostname = gcp_prefix + 'controller'
         instance = self.get_instance_in_zone(
@@ -144,7 +151,11 @@ class OpenShiftGCP:
             self.get_cluster_zones()[0]
         )
         if instance:
-            return instance['networkInterfaces'][0]['accessConfigs'][0]['natIP']
+            primary_network_interface = instance['networkInterfaces'][0]
+            return(
+                 primary_network_interface['networkIP'],
+                 primary_network_interface['accessConfigs'][0]['natIP']
+            )
 
     def get_globaladdress_ip(self, name):
         resp = self.computeAPI.globalAddresses().list(

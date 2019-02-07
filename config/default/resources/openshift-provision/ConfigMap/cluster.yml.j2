@@ -1,0 +1,12 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster
+  labels:
+    openshift-provision.gnuthought.com/config: "true"
+data:
+  git_uri: http://{{ openshift_provision_cluster_vars.controller_hostname }}/root/openshift-provision-demo.git
+  check_mode: "true"
+  config_dir: config
+  service_account: manager

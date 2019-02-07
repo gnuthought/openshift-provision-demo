@@ -1,0 +1,44 @@
+---
+- name: Define cluster-vars
+  hosts: masters[0]
+  tasks:
+  - name: Load dynamic config
+    import_tasks: ../load-dynamic-config.yml
+
+  - name: Create kube-public namespace
+    command: oc adm new-project kube-public
+    register: create_kube_public_namespace
+    changed_when: >-
+      create_kube_public_namespace.rc == 0
+    failed_when: >-
+      create_kube_public_namespace.rc != 0 and
+      'already exists' not in create_kube_public_namespace.stderr
+
+  - name: Get cluster-vars configmap
+    command: oc get configmap -n kube-public cluster-vars -o json
+    register: get_cluster_vars
+    changed_when: false
+    failed_when: >-
+      get_cluster_vars.rc != 0 and
+      '(NotFound)' not in get_cluster_vars.stderr
+
+  - name: Set vars in cluster-vars configmap
+    command: >-
+      oc {{ action }} -n kube-public -f -
+    args:
+      stdin: "{{ cluster_vars | to_json }}"
+    vars:
+      action: "{{ 'replace' if get_cluster_vars.rc == 0 else 'create' }}"
+      current_vars: >-
+        {{ (
+          get_cluster_vars.stdout if get_cluster_vars.rc == 0 else '{}'
+        ) | from_json }}
+      cluster_vars:
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: cluster-vars
+        data: "{{ openshift_provision_cluster_vars }}"
+    when: >-
+      get_cluster_vars.rc != 0 or
+      current_vars.data != cluster_vars.data

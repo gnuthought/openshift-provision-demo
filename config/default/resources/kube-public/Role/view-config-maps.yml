@@ -1,0 +1,15 @@
+---
+apiVersion: authorization.openshift.io/v1
+kind: Role
+metadata:
+  name: view-config-maps
+rules:
+- apiGroups:
+  - ""
+  attributeRestrictions: null
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch

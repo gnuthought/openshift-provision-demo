@@ -1,0 +1,79 @@
+#
+# Resource path to implement inheritance
+#
+openshift_provision_resource_path: >-
+  {{ openshift_provision_config_hierarchy
+   | map('regex_replace','^(.*)$', openshift_provision_config_path ~ '/\1/resources')
+   | list
+  }}
+
+#
+# Assemble cluster resources list using inheritance hierarchy
+#
+# The variables below are meant to be set within vars files in the hierarchy and
+# then used to roll-up into openshift_provision_cluster_resources.
+#
+openshift_provision_openshift_release_cluster_resources: []
+openshift_provision_openshift_deployment_type_cluster_resources: []
+openshift_provision_cloud_provider_cluster_resources: []
+openshift_provision_cloud_region_cluster_resources: []
+openshift_provision_environment_level_cluster_resources: []
+openshift_provision_sandbox_cluster_resources: []
+openshift_provision_cluster_cluster_resources: []
+
+openshift_provision_cluster_resources: >-
+  {{ openshift_provision_default_cluster_resources
+   | union(openshift_provision_openshift_release_cluster_resources)
+   | union(openshift_provision_openshift_deployment_type_cluster_resources)
+   | union(openshift_provision_cloud_provider_cluster_resources)
+   | union(openshift_provision_cloud_region_cluster_resources)
+   | union(openshift_provision_environment_level_cluster_resources)
+   | union(openshift_provision_sandbox_cluster_resources if openshift_provision_sandbox else [])
+   | union(openshift_provision_cluster_cluster_resources)
+  }}
+
+#
+# Assemble cluster role bindings list using inheritance hierarchy
+#
+openshift_provision_openshift_release_cluster_role_bindings: {}
+openshift_provision_openshift_deployment_type_cluster_role_bindings: {}
+openshift_provision_cloud_provider_cluster_role_bindings: {}
+openshift_provision_cloud_region_cluster_role_bindings: {}
+openshift_provision_environment_level_cluster_role_bindings: {}
+openshift_provision_sandbox_cluster_role_bindings: {}
+openshift_provision_cluster_cluster_role_bindings: {}
+
+openshift_provision_cluster_role_bindings: >-
+  {{ openshift_provision_default_cluster_role_bindings
+   | combine(openshift_provision_openshift_release_cluster_role_bindings)
+   | combine(openshift_provision_openshift_deployment_type_cluster_role_bindings)
+   | combine(openshift_provision_cloud_provider_cluster_role_bindings)
+   | combine(openshift_provision_cloud_region_cluster_role_bindings)
+   | combine(openshift_provision_environment_level_cluster_role_bindings)
+   | combine(openshift_provision_sandbox_cluster_role_bindings if openshift_provision_sandbox else {})
+   | combine(openshift_provision_cluster_cluster_role_bindings)
+   | dict_to_named_list(nameattr='role')
+  }}
+
+#
+# Assemble cluster projects list using inheritance hierarchy
+#
+openshift_provision_openshift_release_projects: {}
+openshift_provision_openshift_deployment_type_projects: {}
+openshift_provision_cloud_provider_projects: {}
+openshift_provision_cloud_region_projects: {}
+openshift_provision_environment_level_projects: {}
+openshift_provision_sandbox_projects: {}
+openshift_provision_cluster_projects: {}
+
+openshift_provision_projects: >-
+  {{ openshift_provision_default_projects
+   | combine(openshift_provision_openshift_release_projects)
+   | combine(openshift_provision_openshift_deployment_type_projects)
+   | combine(openshift_provision_cloud_provider_projects)
+   | combine(openshift_provision_cloud_region_projects)
+   | combine(openshift_provision_environment_level_projects)
+   | combine(openshift_provision_sandbox_projects if openshift_provision_sandbox else {})
+   | combine(openshift_provision_cluster_projects)
+   | dict_to_named_list(nameattr='name')
+  }}

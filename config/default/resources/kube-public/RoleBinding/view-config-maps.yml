@@ -1,0 +1,14 @@
+---
+apiVersion: authorization.openshift.io/v1
+kind: RoleBinding
+metadata:
+  name: view-config-maps
+groupNames:
+- system:authenticated
+roleRef:
+  name: view-config-maps
+  namespace: kube-public
+subjects:
+- kind: SystemGroup
+  name: system:authenticated
+userNames: null

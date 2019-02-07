@@ -6,4 +6,5 @@
 - import_playbook: create-node-image.yml
 - import_playbook: terraform-deploy.yml
 - import_playbook: cluster-config.yml
-- import_playbook: provisioner-setup.yml
+- import_playbook: cluster-vars.yml
+- import_playbook: openshift-provision.yml

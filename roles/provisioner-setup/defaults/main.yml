@@ -1,3 +1,0 @@
----
-openshift_provision_sandbox: false
-openshift_provision_wildcard_dns: false

@@ -1,0 +1,5 @@
+---
+openshift_provision_project_openshift:
+  resources:
+  - openshift/ImageStream/centos.yml
+  - openshift/ImageStream/openshift-provision-manager.yml

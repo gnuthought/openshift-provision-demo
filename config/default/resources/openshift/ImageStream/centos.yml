@@ -1,0 +1,25 @@
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  annotations:
+    openshift.io/display-name: CentOS
+  name: centos
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+  - annotations:
+      description: CentOS 7
+      iconClass: icon-centos
+      openshift.io/display-name: CentOS 7
+      supports: centos:7
+      tags: centos
+    from:
+      kind: DockerImage
+      name: docker.io/centos:7
+    importPolicy:
+      scheduled: true
+    name: "7"
+    referencePolicy:
+      type: Local
