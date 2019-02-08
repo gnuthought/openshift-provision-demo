@@ -4,6 +4,8 @@ kind: Route
 metadata:
   name: manager
 spec:
+  port:
+    targetPort: api
   tls:
     termination: edge
   to:
