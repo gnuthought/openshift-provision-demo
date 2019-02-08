@@ -8,7 +8,7 @@
 - name: Set openshift_provision_cluster_webhook_key
   set_fact:
     openshift_provision_cluster_webhook_key: >-
-      {% if read_controller_generated_config.content -%}
+      {% if read_controller_generated_config.content | default('') -%}
       {{ read_controller_generated_config.content
        | b64decode
        | from_yaml
@@ -16,7 +16,7 @@
        | default(999999999999999 | random | to_uuid, true)
       }}
       {%- else -%}
-      {{ default(999999999999999 | random | to_uuid) }}
+      {{ 999999999999999 | random | to_uuid }}
       {%- endif %}
 
 - name: Controller generated config yaml
