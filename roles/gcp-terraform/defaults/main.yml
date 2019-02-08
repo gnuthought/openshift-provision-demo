@@ -14,6 +14,8 @@ openshift_provision_wildcard_dns: false
 openshift_master_cluster_hostname: ''
 openshift_master_cluster_public_hostname: ''
 openshift_master_default_subdomain: ''
+openshift_provision_controller_hostname: ''
+openshift_provision_controller_public_hostname: ''
 
 openshift_provision_use_controller: true
 openshift_provision_controller_ansible_port: 22

@@ -6,6 +6,14 @@
   - name: Load dynamic config
     import_tasks: ../load-dynamic-config.yml
 
+  - name: Create openshift-provision namespace
+    command: >-
+      oc adm new-project openshift-provision
+    register: create_project
+    failed_when: >-
+      create_project.rc != 0 and
+      "already exists" not in create_project.stderr
+
   - name: Get openshift-provision cluster api secret
     command: >-
       oc get secret cluster-api -n openshift-provision

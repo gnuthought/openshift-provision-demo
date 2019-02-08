@@ -156,6 +156,8 @@ class OpenShiftGCP:
                  primary_network_interface['networkIP'],
                  primary_network_interface['accessConfigs'][0]['natIP']
             )
+        else:
+            return None, None
 
     def get_globaladdress_ip(self, name):
         resp = self.computeAPI.globalAddresses().list(
@@ -166,9 +168,13 @@ class OpenShiftGCP:
             return address['address']
 
     def instance_fqdn(self, instance):
-        return '%s.c.%s.internal' % (
+        zoneinfo = instance['zone'].rsplit('/', 3)
+        project = zoneinfo[1]
+        zonename = zoneinfo[3]
+        return '%s.%s.c.%s.internal' % (
             instance['name'],
-            self.ocpinv().cluster_var('openshift_gcp_project')
+            zonename,
+            project
         )
 
     def instance_belongs_to_cluster(self, instance):
@@ -301,6 +307,8 @@ class OpenShiftGCP:
             hostvars['gcp_nat_ip'] = nat_ip
             if os.environ.get('GCP_ANSIBLE_INVENTORY_USE_NAT_IP', 'false') == 'true':
                 hostvars['ansible_host'] = nat_ip
+            else:
+                hostvars['ansible_host'] = primary_network_ip
         else:
             hostvars['ansible_host'] = primary_network_ip
 
