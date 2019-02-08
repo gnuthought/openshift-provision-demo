@@ -48,4 +48,37 @@
   register: git_push
   changed_when: git_push.stderr != "Everything up-to-date"
 
-# FIXME - Setup webhooks on repository
+- name: Get webhooks for openshift-provision-demo
+  uri:
+    url: http://localhost/api/v4/projects/root%2Fopenshift-provision-demo/hooks
+    method: GET
+    headers:
+      Authorization: Bearer {{ get_oauth_token.json.access_token }}
+  register: get_webhooks
+
+- name: Add webhook for openshift-provision-demo
+  uri:
+    url: http://localhost/api/v4/projects/root%2Fopenshift-provision-demo/hooks
+    method: POST
+    body_format: json
+    body:
+      id: cluster
+      url: "{{ webhook_url }}"
+      push_events: true
+      push_events_branch_filter: "master"
+      enable_ssl_verification: false
+    headers:
+      Authorization: Bearer {{ get_oauth_token.json.access_token }}
+  vars:
+    webhook_url: >-
+     {{ 'https://manager-openshift-provision.'
+      ~ openshift_master_default_subdomain
+      ~ '/provision/cluster/'
+      ~ openshift_provision_cluster_webhook_key
+     }}
+  when: >-
+    0 == get_webhooks.json | json_query("[?url=='" ~ webhook_url ~ "']") | length
+  register: create_webhook
+  changed_when: create_webhook.status == 201
+  failed_when:
+  - create_webhook.status != 201

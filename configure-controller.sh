@@ -17,7 +17,7 @@ cd provision-controller
 cd ..
 
 HOSTS_JSON=$(./hosts.py --list)
-CONTROLLER_HOSTNAME=$(echo $HOSTS_JSON | jq -r '.all.vars.openshift_provision_controller_hostname')
+CONTROLLER_HOSTNAME=$(echo $HOSTS_JSON | jq -r '.all.vars.openshift_provision_controller_public_hostname')
 CONTROLLER_PORT=$(echo $HOSTS_JSON | jq -r '.all.vars.openshift_provision_controller_ansible_port')
 CONTROLLER_USER=$(echo $HOSTS_JSON | jq -r '.all.vars.openshift_provision_controller_ansible_user')
 
