@@ -10,6 +10,8 @@
     command: >-
       oc adm new-project openshift-provision
     register: create_project
+    changed_when: >-
+      create_project.rc == 0
     failed_when: >-
       create_project.rc != 0 and
       "already exists" not in create_project.stderr
