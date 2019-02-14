@@ -1,0 +1,75 @@
+---
+openshift_provision:
+  projects:
+  - name: example-one
+
+    resources:
+    - apiVersion: v1
+      kind: ResourceQuota
+      metadata:
+        name: compute
+      spec:
+        hard:
+          requests.cpu: "4"
+          requests.memory: 8Gi
+          limits.memory: 8Gi
+
+    - apiVersion: v1
+      kind: LimitRange
+      metadata:
+        name: compute
+      spec:
+        limits:
+        - type: Pod
+          max:
+            cpu: "4"
+            memory: "8Gi"
+          min:
+            cpu: "100m"
+            memory: "2Mi"
+        - type: Container
+          max:
+            cpu: "4"
+            memory: "8Gi"
+          min:
+            cpu: "100m"
+            memory: "2Mi"
+          default:
+            cpu: "1"
+            memory: "512Mi"
+          defaultRequest:
+            cpu: "500m"
+            memory: "512Mi"
+          maxLimitRequestRatio:
+            cpu: "10"
+            memory: "2"
+
+    - apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: allow-same-namespace
+      spec:
+        podSelector: {}
+        ingress:
+        - from:
+          - podSelector: {}
+
+    - apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: allow-global-namespaces
+      spec:
+        podSelector: {}
+        ingress:
+        - from:
+          - namespaceSelector:
+              matchLabels:
+                network-policy-global: "true"
+
+    role_bindings:
+    - role: admin
+      users:
+      - alice
+    - role: edit
+      groups:
+      - example-dev
