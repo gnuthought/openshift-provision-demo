@@ -8,6 +8,6 @@ metadata:
 data:
   git_uri: http://{{ openshift_provision_cluster_vars.controller_hostname }}/root/openshift-provision-demo.git
   check_mode: "true"
-  config_path: config
-  service_account: manager
-  webhook_secret: cluster-api
+  config_path: example-apps/example-one/provision.yaml
+  service_account: example-one
+  webhook_secret: example-one-api

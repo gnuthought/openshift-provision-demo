@@ -3,11 +3,16 @@ openshift_provision_project_openshift_provision:
   admin_create: true
   resources:
   - openshift-provision/ConfigMap/cluster.yml.j2
+  - openshift-provision/ConfigMap/example-one.yml.j2
   - openshift-provision/Deployment/manager.yml
   - openshift-provision/Service/manager.yml
   - openshift-provision/Route/manager.yml
   service_accounts:
   - manager
+  - example-one
+  - example-two
+  - example-three
+  - example-four
   role_bindings:
   - role: edit
     users:

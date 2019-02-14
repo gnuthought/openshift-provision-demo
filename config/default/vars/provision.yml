@@ -15,6 +15,12 @@ openshift_provision_default_cluster_role_bindings:
     users:
     - system:serviceaccount:kube-cluster-autoscaler:default
     remove_unlisted: true
+  self-provisioner:
+    users:
+    - system:serviceaccount:management-infra:management-admin
+    groups:
+    - system:serviceaccounts:openshift-provision
+    remove_unlisted: false
 
 openshift_provision_default_projects:
   default: "{{ openshift_provision_project_default }}"

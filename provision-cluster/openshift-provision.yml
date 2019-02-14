@@ -16,6 +16,7 @@
       create_project.rc != 0 and
       "already exists" not in create_project.stderr
 
+   # FIXME - Generalize api secret setup for examplo apps
   - name: Get openshift-provision cluster api secret
     command: >-
       oc get secret cluster-api -n openshift-provision
