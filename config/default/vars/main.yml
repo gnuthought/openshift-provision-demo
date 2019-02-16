@@ -24,5 +24,9 @@ openshift_provision_default_config_hierarchy:
 openshift_provision:
   cluster_resources: "{{ openshift_provision_cluster_resources }}"
   cluster_role_bindings: "{{ openshift_provision_cluster_role_bindings }}"
+  process_templates:
+  - file: https://raw.githubusercontent.com/gnuthought/openshift-provision-manager/master/install-template-admin.yaml
+  - file: https://raw.githubusercontent.com/gnuthought/openshift-provision-example-1/master/install-template-admin.yaml
+  - file: https://raw.githubusercontent.com/gnuthought/openshift-provision-example-2/master/install-template-admin.yaml
   projects: "{{ openshift_provision_projects }}"
   resource_path: "{{ openshift_provision_resource_path }}"

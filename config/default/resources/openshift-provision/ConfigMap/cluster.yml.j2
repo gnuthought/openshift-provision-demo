@@ -6,8 +6,11 @@ metadata:
   labels:
     openshift-provision.gnuthought.com/config: "true"
 data:
-  git_uri: http://{{ openshift_provision_cluster_vars.controller_hostname }}/root/openshift-provision-demo.git
   check_mode: "true"
-  config_path: config
-  service_account: manager
+  config_path: |-
+    config/cluster/{{ openshift_provision_cluster_vars.cluster_name }}/vars/main.yml
+    config/default/vars/main.yml
+  git_uri: >-
+    http://{{ openshift_provision_cluster_vars.controller_hostname }}/root/openshift-provision-demo.git
+  service_account: cluster
   webhook_secret: cluster-api
