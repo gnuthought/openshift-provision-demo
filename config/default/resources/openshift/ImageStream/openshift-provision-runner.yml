@@ -1,0 +1,23 @@
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  annotations:
+    openshift.io/display-name: openshift-provision-runner
+  name: openshift-provision-runner
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+  - annotations:
+      description: openshift-provision-runner
+      openshift.io/display-name: openshift-provision-runner
+      tags: openshift-provision-runner
+    from:
+      kind: DockerImage
+      name: docker.io/gnuthought/openshift-provision-runner:latest
+    importPolicy:
+      scheduled: true
+    name: latest
+    referencePolicy:
+      type: Local
