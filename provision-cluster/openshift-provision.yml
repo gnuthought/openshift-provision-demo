@@ -6,41 +6,6 @@
   - name: Load dynamic config
     import_tasks: ../load-dynamic-config.yml
 
-  - name: Create openshift-provision namespace
-    command: >-
-      oc adm new-project openshift-provision
-    register: create_project
-    changed_when: >-
-      create_project.rc == 0
-    failed_when: >-
-      create_project.rc != 0 and
-      "already exists" not in create_project.stderr
-
-   # FIXME - Generalize api secret setup for examplo apps
-  - name: Get openshift-provision cluster api secret
-    command: >-
-      oc get secret cluster-api -n openshift-provision
-      -o jsonpath='{.data.key}'
-    check_mode: false
-    changed_when: false
-    failed_when: false
-    register: get_cluster_api_secret
-
-  - name: Delete old cluster api secret
-    command: >-
-      oc delete secret cluster-api -n openshift-provision
-    when: >-
-      get_cluster_api_secret.rc == 0 and
-      demo_cluster_webhook_key != get_cluster_api_secret.stdout | b64decode
-    register: delete_old_cluster_api_secret
-
-  - name: Create openshift-provision cluster api secret
-    command: >-
-      oc create secret generic cluster-api -n openshift-provision
-      --from-literal=key={{ demo_cluster_webhook_key | quote }}
-    when: >-
-      get_cluster_api_secret.rc != 0 or
-      delete_old_cluster_api_secret.changed
-
   roles:
   - role: openshift-provision
+  - role: controller-webhook-setup

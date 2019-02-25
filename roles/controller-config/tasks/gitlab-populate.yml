@@ -10,76 +10,22 @@
       password: "{{ demo_gitlab_root_password }}"
   register: get_oauth_token
 
-- name: Create demo project
-  uri:
-    url: http://localhost/api/v4/projects
-    method: POST
-    body_format: form-urlencoded
-    body:
-      name: openshift-provision-demo
-      description: OpenShift Provision Demo
-      issues_enabled: yes
-      merge_requests_enabled: yes
-    headers:
-      Authorization: Bearer {{ get_oauth_token.json.access_token }}
-  register: create_demo_project
-  changed_when: create_demo_project.status == 201
-  failed_when:
-  - create_demo_project.status != 201
-  - not create_demo_project.json
-  - create_demo_project.json.message.name != ["has already been taken"]
-
-- name: Add remote for local gitlab for openshift-provision-demo
-  command: >-
-    git remote add gitlab
-    http://root:{{ demo_gitlab_root_password }}@localhost/root/openshift-provision-demo.git
-  args:
-    chdir: ~/openshift-provision-demo
-  register: add_gitlab_remote
-  changed_when: add_gitlab_remote.rc == 0
-  failed_when: >-
-    add_gitlab_remote.rc != 0 and
-    "already exists" not in add_gitlab_remote.stderr
-
-- name: Push openshift-provision-demo to gitlab
-  command: git push gitlab --all
-  args:
-    chdir: ~/openshift-provision-demo
-  register: git_push
-  changed_when: git_push.stderr != "Everything up-to-date"
-
-- name: Get webhooks for openshift-provision-demo
-  uri:
-    url: http://localhost/api/v4/projects/root%2Fopenshift-provision-demo/hooks
-    method: GET
-    headers:
-      Authorization: Bearer {{ get_oauth_token.json.access_token }}
-  register: get_webhooks
-
-# FIXME - Add webhook after initial install
-- name: Add webhook for openshift-provision-demo
-  uri:
-    url: http://localhost/api/v4/projects/root%2Fopenshift-provision-demo/hooks
-    method: POST
-    body_format: json
-    body:
-      id: cluster
-      url: "{{ webhook_url }}"
-      push_events: true
-      push_events_branch_filter: "master"
-      enable_ssl_verification: false
-    headers:
-      Authorization: Bearer {{ get_oauth_token.json.access_token }}
+- name: Create projects in gitlab
+  include_tasks: gitlab-project-create.yml
+  with_items:
+  - name: openshift-provision-demo
+    description: OpenShift Provision Demo
+    origin_url: https://github.com/gnuthought/openshift-provision-demo.git
+  - name: openshift-provision-example-0
+    description: OpenShift Provision Example 0
+    origin_url: https://github.com/gnuthought/openshift-provision-example-0.git
+  - name: openshift-provision-example-1
+    description: OpenShift Provision Example 1
+    origin_url: https://github.com/gnuthought/openshift-provision-example-1.git
+  - name: openshift-provision-example-2
+    description: OpenShift Provision Example 2
+    origin_url: https://github.com/gnuthought/openshift-provision-example-2.git
+  loop_control:
+    loop_var: git_project
   vars:
-    webhook_url: >-
-     {{ 'https://manager-openshift-provision.'
-      ~ openshift_master_default_subdomain
-      ~ '/provision/cluster/'
-      ~ demo_cluster_webhook_key
-     }}
-  when: >-
-    0 == get_webhooks.json | json_query("[?url=='" ~ webhook_url ~ "']") | length
-  register: create_webhook
-  changed_when: create_webhook.status == 201
-  failed_when:
-  - create_webhook.status != 201
+    gitlab_access_token: "{{ get_oauth_token.json.access_token }}"

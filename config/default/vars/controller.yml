@@ -1,5 +1,6 @@
 ---
 demo_use_controller: true
+demo_gitlab_root_password: password
 
 # The ansible_user setting is used both for access with ansible dynamic inventory
 # and for provisioning access to instances with terraform.

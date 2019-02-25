@@ -10,7 +10,7 @@ data:
   config_path: |-
     config/cluster/{{ openshift_provision_cluster_vars.cluster_name }}/vars/main.yml
     config/default/vars/main.yml
-  git_uri: >-
+  git_url: >-
     http://{{ openshift_provision_cluster_vars.controller_hostname }}/root/openshift-provision-demo.git
   service_account: cluster
-  webhook_secret: cluster-api
+  webhook_secret: cluster-webhook

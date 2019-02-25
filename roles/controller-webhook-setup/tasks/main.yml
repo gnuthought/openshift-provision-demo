@@ -1,0 +1,26 @@
+---
+- name: Get gitlab oauth token
+  uri:
+    url: http://localhost/oauth/token
+    method: POST
+    body_format: form-urlencoded
+    body:
+      grant_type: password
+      username: root
+      password: "{{ demo_gitlab_root_password }}"
+  register: get_oauth_token
+  delegate_to: localhost
+
+- name: Setup webhooks
+  include_tasks: webhook.yml
+  with_items:
+  - config: cluster
+    repo: openshift-provision-demo
+  - config: provision-example-1
+    repo: openshift-provision-example-1
+  - config: provision-example-2
+    repo: openshift-provision-example-2
+  loop_control:
+    loop_var: project
+  vars:
+    gitlab_access_token: "{{ get_oauth_token.json.access_token }}"
