@@ -1,7 +1,7 @@
 ---
-- name: Create openshift_provision_cluster_tls_dir
+- name: Create demo_cluster_tls_dir
   file:
-    path: "{{ openshift_provision_cluster_tls_dir }}"
+    path: "{{ demo_cluster_tls_dir }}"
     state: directory
 
 - name: Create self-signed router cert

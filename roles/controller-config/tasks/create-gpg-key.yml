@@ -9,11 +9,11 @@
     content: |-
       Key-Type: default
       Subkey-Type: default
-      Name-Real: {{ openshift_provision_gpg_key_name }}
+      Name-Real: {{ demo_gpg_key_name }}
       Name-Comment: with stupid passphrase
-      Name-Email: {{ openshift_provision_gpg_key_email }}
+      Name-Email: {{ demo_gpg_key_email }}
       Expire-Date: 0
-      Passphrase: {{ openshift_provision_gpg_key_passphrase }}
+      Passphrase: {{ demo_gpg_key_passphrase }}
       %commit
       %echo done
     dest: "{{ temp_gpg_gen_conf.path }}"

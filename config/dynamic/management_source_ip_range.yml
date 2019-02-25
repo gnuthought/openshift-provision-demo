@@ -1,12 +1,12 @@
 ---
 #
-# If openshift_provision_management_source_ip_range is not defined then set
-# it based on the current systems apparent public ip address.
+# If demo_management_source_ip_range is not defined then it is set based on the
+# current host's apparent public ip address.
 #
 
 - when:
-  - openshift_provision_management_source_ip_range is not defined
-  - not openshift_provision_is_running_from_controller|default(False)
+  - demo_management_source_ip_range is not defined
+  - not demo_is_running_from_controller|default(False)
   block:
   - name: Determine public ip address
     uri:
@@ -14,6 +14,6 @@
       return_content: true
     register: get_whatismyipaddress
 
-  - name: Set openshift_provision_management_source_ip_range
+  - name: Set demo_management_source_ip_range
     set_fact:
-      openshift_provision_management_source_ip_range: "{{ get_whatismyipaddress.content }}/32"
+      demo_management_source_ip_range: "{{ get_whatismyipaddress.content }}/32"

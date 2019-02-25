@@ -8,9 +8,9 @@
 - name: Register controller with subscription-manager
   become: true
   redhat_subscription:
-    username: "{{ openshift_provision_rhsub_user }}"
-    password: "{{ openshift_provision_rhsub_pass }}"
-    pool_ids: "{{ openshift_provision_rhsub_pool }}"
+    username: "{{ demo_rhsub_user }}"
+    password: "{{ demo_rhsub_pass }}"
+    pool_ids: "{{ demo_rhsub_pool }}"
   register: redhat_subscribe_system
 
 - name: Set yum repositories

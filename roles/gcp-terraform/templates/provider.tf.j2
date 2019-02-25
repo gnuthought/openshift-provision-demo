@@ -4,7 +4,7 @@
 
 terraform {
   backend "gcs" {
-    bucket  = "{{ openshift_provision_gcp_terraform_state_bucket }}"
+    bucket  = "{{ demo_gcp_terraform_state_bucket }}"
     prefix  = "{{ component_name }}"
   }
 }

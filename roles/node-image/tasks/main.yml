@@ -40,7 +40,7 @@
 
   - name: Create /usr/local/bin/{{ node_service }}-bootstrap-conf
     template:
-      src: "{{ openshift_provision_cloud_provider }}-node-bootstrap-conf.py.j2"
+      src: "{{ demo_cloud_provider }}-node-bootstrap-conf.py.j2"
       dest: /usr/local/bin/{{ node_service }}-bootstrap-conf
       mode: u=rwx,go=rx
 

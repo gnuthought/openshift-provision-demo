@@ -1,16 +1,18 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
-USAGE="Usage: $0 <OPENSHIFT_PROVISION_CLUSTER_NAME>"
+[[ -e demo.env ]] && . demo.env
 
-export OPENSHIFT_PROVISION_CLUSTER_NAME=${1:-$OPENSHIFT_PROVISION_CLUSTER_NAME}
+USAGE="Usage: $0 <DEMO_CLUSTER_NAME>"
+
+export DEMO_CLUSTER_NAME=${1:-$DEMO_CLUSTER_NAME}
 
 errexit () {
   echo -e "$1\n$USAGE" >&2
   exit 1
 }
 
-[[ -z "$OPENSHIFT_PROVISION_CLUSTER_NAME" ]] && errexit "No OPENSHIFT_PROVISION_CLUSTER_NAME provided."
+[[ -z "$DEMO_CLUSTER_NAME" ]] && errexit "No DEMO_CLUSTER_NAME provided."
 
 cd provision-cluster
 ./ansible-playbook.sh terraform-destroy.yml $1

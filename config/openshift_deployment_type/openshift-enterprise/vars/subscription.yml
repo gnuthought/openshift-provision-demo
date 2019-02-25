@@ -10,6 +10,6 @@ oreg_auth_user: "{{ lookup('env', 'OREG_AUTH_USER') }}"
 oreg_auth_password: "{{ lookup('env', 'OREG_AUTH_PASSWORD') }}"
 
 # Values used to subscribe system to Red Hat for software installation and updates
-openshift_provision_rhsub_user: "{{ lookup('env', 'REDHAT_SUBSCRIPTION_USERNAME') }}"
-openshift_provision_rhsub_pass: "{{ lookup('env', 'REDHAT_SUBSCRIPTION_PASSWORD') }}"
-openshift_provision_rhsub_pool: "{{ lookup('env', 'REDHAT_SUBSCRIPTION_POOLS') }}"
+demo_rhsub_user: "{{ lookup('env', 'REDHAT_SUBSCRIPTION_USERNAME') }}"
+demo_rhsub_pass: "{{ lookup('env', 'REDHAT_SUBSCRIPTION_PASSWORD') }}"
+demo_rhsub_pool: "{{ lookup('env', 'REDHAT_SUBSCRIPTION_POOLS') }}"

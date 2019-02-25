@@ -2,7 +2,7 @@
 - name: Get router.crt subject
   command: >-
     openssl x509 -subject -noout
-    -in {{ openshift_provision_cluster_tls_dir }}/router.crt
+    -in {{ demo_cluster_tls_dir }}/router.crt
   changed_when: false
   failed_when: false
   register: get_router_crt_subject
@@ -10,8 +10,8 @@
 - name: Check if router.crt is self-signed
   command: >-
     diff -q
-    {{ openshift_provision_cluster_tls_dir }}/router.crt
-    {{ openshift_provision_cluster_tls_dir }}/router-ca.crt
+    {{ demo_cluster_tls_dir }}/router.crt
+    {{ demo_cluster_tls_dir }}/router-ca.crt
   changed_when: false
   failed_when: false
   register: check_router_crt_self_signed
@@ -21,9 +21,9 @@
     path: "{{ item }}"
     state: absent
   with_items:
-  - "{{ openshift_provision_cluster_tls_dir }}/router.key"
-  - "{{ openshift_provision_cluster_tls_dir }}/router.crt"
-  - "{{ openshift_provision_cluster_tls_dir }}/router-ca.crt"
+  - "{{ demo_cluster_tls_dir }}/router.key"
+  - "{{ demo_cluster_tls_dir }}/router.crt"
+  - "{{ demo_cluster_tls_dir }}/router-ca.crt"
   vars:
     router_subject: >-
       {{ get_router_crt_subject.stdout
@@ -39,26 +39,26 @@
     openssl req -new -nodes -x509
     -newkey rsa:2048
     -days 365
-    -keyout {{ openshift_provision_cluster_tls_dir }}/router.key
-    -out {{ openshift_provision_cluster_tls_dir }}/router.crt
+    -keyout {{ demo_cluster_tls_dir }}/router.key
+    -out {{ demo_cluster_tls_dir }}/router.crt
     -subj '/CN=*.{{ openshift_master_default_subdomain }}'
   args:
-    creates: "{{ openshift_provision_cluster_tls_dir }}/router.crt"
+    creates: "{{ demo_cluster_tls_dir }}/router.crt"
   register: create_router_certificate
 
 - name: Copy router self signed sert to router-ca.crt
   when: create_router_certificate.changed
   copy:
     remote_src: true
-    src: "{{ openshift_provision_cluster_tls_dir }}/router.crt"
-    dest: "{{ openshift_provision_cluster_tls_dir }}/router-ca.crt"
+    src: "{{ demo_cluster_tls_dir }}/router.crt"
+    dest: "{{ demo_cluster_tls_dir }}/router-ca.crt"
 
 - name: Copy router ca cert to /etc/pki/ca-trust/source/anchors
   become: true
   copy:
     remote_src: true
-    src: "{{ openshift_provision_cluster_tls_dir }}/router-ca.crt"
-    dest: /etc/pki/ca-trust/source/anchors/{{ openshift_provision_cluster_name }}-router-ca.crt
+    src: "{{ demo_cluster_tls_dir }}/router-ca.crt"
+    dest: /etc/pki/ca-trust/source/anchors/{{ demo_cluster_name }}-router-ca.crt
   register: copy_router_ca_cert_to_anchors
   notify: update-ca-trust
 
@@ -67,15 +67,15 @@
   - name: Copy router self signed key to master
     copy:
       remote_src: true
-      src: "{{ openshift_provision_cluster_tls_dir }}/router.key"
-      dest: "{{ openshift_provision_cluster_tls_dir }}/master.key"
+      src: "{{ demo_cluster_tls_dir }}/router.key"
+      dest: "{{ demo_cluster_tls_dir }}/master.key"
   - name: Copy router self signed cert to master
     copy:
       remote_src: true
-      src: "{{ openshift_provision_cluster_tls_dir }}/router.crt"
-      dest: "{{ openshift_provision_cluster_tls_dir }}/master.crt"
+      src: "{{ demo_cluster_tls_dir }}/router.crt"
+      dest: "{{ demo_cluster_tls_dir }}/master.crt"
   - name: Copy router self signed ca cert to master
     copy:
       remote_src: true
-      src: "{{ openshift_provision_cluster_tls_dir }}/router-ca.crt"
-      dest: "{{ openshift_provision_cluster_tls_dir }}/master-ca.crt"
+      src: "{{ demo_cluster_tls_dir }}/router-ca.crt"
+      dest: "{{ demo_cluster_tls_dir }}/master-ca.crt"

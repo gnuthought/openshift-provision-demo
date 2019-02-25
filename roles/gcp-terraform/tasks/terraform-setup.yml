@@ -23,7 +23,7 @@
     component_name in terraform_components
 
 - include_tasks: terraform-setup-template.yml
-  with_dict: "{{ openshift_provision_node_groups }}"
+  with_dict: "{{ demo_openshift_node_groups }}"
   loop_control:
     loop_var: node_group_item
   vars:
@@ -53,11 +53,11 @@
       }}
     kube_reserved_cpu: >-
       {{ node_group_gcp.kube_reserved_cpu
-       | default(openshift_provision_node_kube_reserved_cpu)
+       | default(demo_node_kube_reserved_cpu)
       }}
     kube_reserved_memory: >-
       {{ node_group_gcp.kube_reserved_memory
-       | default(openshift_provision_node_kube_reserved_memory)
+       | default(demo_node_kube_reserved_memory)
       }}
     machine_type: >-
       {{ node_group_gcp.machine_type

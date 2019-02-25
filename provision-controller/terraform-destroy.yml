@@ -8,11 +8,11 @@
 
   - name: Include terraform role to destroy controller
     include_role:
-      name: "{{ openshift_provision_cloud_provider }}-terraform"
+      name: "{{ demo_cloud_provider }}-terraform"
       allow_duplicates: true
     vars:
       terraform_action: destroy
       terraform_components:
       - controller
       - network
-      terraform_dir: "{{ playbook_dir }}/terraform/{{ openshift_provision_cluster_name }}"
+      terraform_dir: "{{ playbook_dir }}/terraform/{{ demo_cluster_name }}"

@@ -14,9 +14,6 @@ resource "google_compute_global_forwarding_rule" "{{ openshift_gcp_prefix }}mast
   name = "{{ openshift_gcp_prefix }}master"
   ip_protocol = "TCP"
   ip_address = "${data.google_compute_global_address.{{ openshift_gcp_prefix }}master.address}"
-  labels = {
-    openshift-cluster = "{{ cluster_name }}"
-  }
   port_range = "443"
   target = "${google_compute_target_https_proxy.{{ openshift_gcp_prefix }}master.self_link}"
 }

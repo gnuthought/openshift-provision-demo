@@ -1,66 +1,67 @@
-#!/bin/sh
+#!/bin/bash
+set -e
 
-USAGE="Usage: $0 <PLAYBOOK> <OPENSHIFT_PROVISION_CLUSTER_NAME>"
+[[ -e ../demo.env ]] && . ../demo.env
+
+USAGE="Usage: $0 <PLAYBOOK> <DEMO_CLUSTER_NAME>"
 PLAYBOOK="$1"
-export OPENSHIFT_PROVISION_CLUSTER_NAME="${2:-$OPENSHIFT_PROVISION_CLUSTER_NAME}"
+export DEMO_CLUSTER_NAME="${2:-$DEMO_CLUSTER_NAME}"
 
 errexit () {
   echo -e "$1\n$USAGE" >&2
   exit 1
 }
 
-find_cluster_main () {
+find_main_vars () {
+  DIR="$1"
+  CHECKED_PATHS=()
   for EXT in json yaml yml; do
-    CONF="$OPENSHIFT_PROVISION_CONFIG_PATH/cluster/$OPENSHIFT_PROVISION_CLUSTER_NAME/vars/main.$EXT"
-    if [[ -f "$CONF" ]]; then
+    CONF="$DIR/vars/main.$EXT"
+    if [[ -f "$OPENSHIFT_PROVISION_PROJECT_DIR/$CONF" ]]; then
       echo "$CONF"
       return
+    else
+      CHECKED_PATHS+=($CONF)
     fi
   done
-  errexit "Unable to find cluster main config at any of" \
-    "$OPENSHIFT_PROVISION_CONFIG_PATH/cluster/$OPENSHIFT_PROVISION_CLUSTER_NAME/vars/main.json" \
-    "$OPENSHIFT_PROVISION_CONFIG_PATH/cluster/$OPENSHIFT_PROVISION_CLUSTER_NAME/vars/main.yaml" \
-    "$OPENSHIFT_PROVISION_CONFIG_PATH/cluster/$OPENSHIFT_PROVISION_CLUSTER_NAME/vars/main.yml"
+  errexit "Unable to find main vars at any of ${CHECKED_PATHS[@]}"
 }
 
 [[ -z "$PLAYBOOK" ]] && errexit "No PLAYBOOK provided."
-[[ -z "$OPENSHIFT_PROVISION_CLUSTER_NAME" ]] && errexit "No OPENSHIFT_PROVISION_CLUSTER_NAME provided."
+[[ -z "$DEMO_CLUSTER_NAME" ]] && errexit "No DEMO_CLUSTER_NAME provided."
 
 # Location of openshift-ansible
 OPENSHIFT_ANSIBLE_PATH=${OPENSHIFT_ANSIBLE_PATH:-/usr/share/ansible/openshift-ansible}
 
-# Path to the cluster config
-export OPENSHIFT_PROVISION_CONFIG_PATH=${OPENSHIFT_PROVISION_CONFIG_PATH:-$PWD/../config}
-
-# Directory within OPENSHIFT_PROVISION_CONFIG_PATH of the cluster config directoriy
-OPENSHIFT_PROVISION_CLUSTER_DIR=${OPENSHIFT_PROVISION_CONFIG_PATH}/cluster/${OPENSHIFT_PROVISION_CLUSTER_NAME}
-
-# Location of openshift-provision-demo to copy over to controller instance
-OPENSHFIT_PROVISION_DEMO_DIR=$(dirname $PWD)
+# Location of openshift-provision-demo
+OPENSHIFT_PROVISION_PROJECT_DIR=${OPENSHIFT_PROVISION_PROJECT_DIR:-$(dirname $PWD)}
 
 # Vault password file to protect any sensitive configuration
 VAULT_PASSWORD_FILE=${VAULT_PASSWORD_FILE:-~/.vaultpw}
 
 [[ -d "$OPENSHIFT_ANSIBLE_PATH" ]] || \
   errexit "OPENSHIFT_ANSIBLE_PATH not found at $OPENSHIFT_ANSIBLE_PATH"
-[[ -d "$OPENSHIFT_PROVISION_CONFIG_PATH" ]] || \
-  errexit "OPENSHIFT_PROVISION_CONFIG_PATH not found at $OPENSHIFT_PROVISION_CONFIG_PATH"
-[[ -d "$OPENSHIFT_PROVISION_CLUSTER_DIR" ]] || \
-  errexit "Cluster subdirectory not found at $OPENSHIFT_PROVISION_CLUSTER_DIR"
+[[ -d "$OPENSHIFT_PROVISION_PROJECT_DIR" ]] || \
+  errexit "OPENSHIFT_PROVISION_PROJECT_DIR not found at $OPENSHIFT_PROVISION_PROJECT_DIR"
 [[ -f "$VAULT_PASSWORD_FILE" ]] || \
   errexit "VAULT_PASSWORD_FILE not found at $VAULT_PASSWORD_FILE"
 
-CLUSTER_MAIN_CONF="$(find_cluster_main)"
+CLUSTER_MAIN_VARS="$(find_main_vars "config/cluster/$DEMO_CLUSTER_NAME")"
+DEFAULT_MAIN_VARS="$(find_main_vars "config/default")"
 
-ANSIBLE_VARS="\
---inventory=../hosts.py \
---vault-password-file=$VAULT_PASSWORD_FILE \
--e openshift_provision_cluster_name=$OPENSHIFT_PROVISION_CLUSTER_NAME \
--e openshift_ansible_path=$OPENSHIFT_ANSIBLE_PATH \
--e openshift_provision_config_path=$OPENSHIFT_PROVISION_CONFIG_PATH \
--e vault_password_file=$VAULT_PASSWORD_FILE \
--e @$CLUSTER_MAIN_CONF"
 
-export ANSIBLE_ROLES_PATH=$OPENSHFIT_PROVISION_DEMO_DIR/roles
+# Export OPENSHIFT_PROVISION_PROJECT_DIR for use by the dynamic inventory
+export OPENSHIFT_PROVISION_PROJECT_DIR
 
-ansible-playbook $ANSIBLE_VARS $PLAYBOOK
+ANSIBLE_VARS=(
+  '--inventory=../hosts.py'
+  "--vault-password-file=$VAULT_PASSWORD_FILE"
+  '-e' "demo_openshift_ansible_path=$OPENSHIFT_ANSIBLE_PATH"
+  '-e' "openshift_provision_project_dir='$OPENSHIFT_PROVISION_PROJECT_DIR'"
+  '-e' "vault_password_file=$VAULT_PASSWORD_FILE"
+  '-e' "@$OPENSHIFT_PROVISION_PROJECT_DIR/$CLUSTER_MAIN_VARS"
+)
+
+export ANSIBLE_ROLES_PATH="$OPENSHIFT_PROVISION_PROJECT_DIR/roles"
+
+ansible-playbook "${ANSIBLE_VARS[@]}" $PLAYBOOK

@@ -15,7 +15,7 @@
 
 - name: Configure dnsmasq on controller for cloud DNS
   include_tasks: cluster-domain-dns.yml
-  when: openshift_provision_cluster_domain_dns_servers is defined
+  when: demo_cluster_domain_dns_servers is defined
 
 - name: Copy openshift-provision-demo to controller
   include_tasks: openshift-provision-demo-init.yml
@@ -23,7 +23,7 @@
 - name: Install terraform on controller
   include_tasks: install-terraform.yml
 
-- name: Run rngd to feed entroy to the kernel
+- name: Run rngd to feed entropy to the kernel
   include_tasks: rngd.yml
 
 - name: Create SSH controller ansible keypair
@@ -42,10 +42,10 @@
   include_tasks: openshift-ansible-git.yml
 
 - name: Include cloud provider specific configuration
-  include_tasks: cloud-provider-{{ openshift_provision_cloud_provider }}.yml
+  include_tasks: cloud-provider-{{ demo_cloud_provider }}.yml
 
-- name: Setup user environment
-  include_tasks: user-env.yml
+- name: Setup demo environment
+  include_tasks: demo-env.yml
 
 - name: Setup gitlab
   include_tasks: gitlab.yml

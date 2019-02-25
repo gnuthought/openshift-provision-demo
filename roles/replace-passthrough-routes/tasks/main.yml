@@ -1,5 +1,5 @@
 ---
-- when: openshift_provision_replace_passthrough_routes
+- when: demo_replace_passthrough_routes
   block:
   - name: Replace docker-registry passthrough route
     include: docker-registry.yml

@@ -1,4 +1,4 @@
 ---
 # Default values in config/default/vars/controller.yml
-ansible_user: "{{ openshift_provision_controller_ansible_user }}"
-ansible_port: "{{ openshift_provision_controller_ansible_port }}"
+ansible_user: "{{ demo_controller_ansible_user }}"
+ansible_port: "{{ demo_controller_ansible_port }}"

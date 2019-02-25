@@ -10,7 +10,7 @@
 {%   set t_network_name = "${data.google_compute_network." ~ openshift_gcp_network_name ~ ".name}" %}
 {% endif %}
 
-{% if openshift_provision_gcp_manage_firewall | bool %}
+{% if demo_gcp_manage_firewall | bool %}
 {%   include 'network-firewall.tf.j2' %}
 {% endif %}
 

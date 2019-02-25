@@ -1,2 +1,2 @@
 ---
-openshift_provision_cluster_autoscaler_image: docker.io/openshift/origin-cluster-autoscaler:v{{ openshift_release }}
+demo_cluster_autoscaler_image: docker.io/openshift/origin-cluster-autoscaler:v{{ openshift_release }}

@@ -31,13 +31,13 @@
       oc delete secret cluster-api -n openshift-provision
     when: >-
       get_cluster_api_secret.rc == 0 and
-      openshift_provision_cluster_webhook_key != get_cluster_api_secret.stdout | b64decode
+      demo_cluster_webhook_key != get_cluster_api_secret.stdout | b64decode
     register: delete_old_cluster_api_secret
 
   - name: Create openshift-provision cluster api secret
     command: >-
       oc create secret generic cluster-api -n openshift-provision
-      --from-literal=key={{ openshift_provision_cluster_webhook_key | quote }}
+      --from-literal=key={{ demo_cluster_webhook_key | quote }}
     when: >-
       get_cluster_api_secret.rc != 0 or
       delete_old_cluster_api_secret.changed

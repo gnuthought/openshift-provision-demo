@@ -80,7 +80,7 @@ def main():
     node_labels = get_node_labels(metadata_attributes)
     set_node_labels(node_labels)
     set_bootstrap_config_name(node_group)
-{% if openshift_provision_gcp_use_fqdn | default(False) %}
+{% if demo_gcp_use_fqdn | default(False) %}
     set_fqdn_gcp_hostname()
 {% endif %}
 

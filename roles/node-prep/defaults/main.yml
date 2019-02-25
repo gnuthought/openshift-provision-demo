@@ -1,9 +1,9 @@
 ---
-openshift_provision_prerequisite_packages:
+demo_prerequisite_packages:
 - bind-utils
 - docker
 - dnsmasq
 - firewalld
 
-openshift_provision_prerequisite_remove_packages:
+demo_prerequisite_remove_packages:
 - yum-cron

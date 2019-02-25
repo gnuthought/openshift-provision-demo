@@ -1,13 +1,13 @@
 ---
-openshift_provision_use_controller: true
+demo_use_controller: true
 
 # The ansible_user setting is used both for access with ansible dynamic inventory
 # and for provisioning access to instances with terraform.
-openshift_provision_controller_ansible_port: 443
-openshift_provision_controller_ansible_user: ansible
-openshift_provision_controller_ansible_ssh_pubkey: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+demo_controller_ansible_port: 443
+demo_controller_ansible_user: ansible
+demo_controller_ansible_ssh_pubkey: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
 
-openshift_provision_controller_packages:
+demo_controller_packages:
 - ansible
 - bash-completion
 - bind-utils
@@ -32,7 +32,7 @@ openshift_provision_controller_packages:
 - yajl
 - yum-utils
 
-openshift_provision_controller_remove_packages:
+demo_controller_remove_packages:
 - yum-cron
 
-openshift_provision_controller_terraform_release: "0.11.11"
+demo_controller_terraform_release: "0.11.11"

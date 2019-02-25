@@ -2,11 +2,11 @@
 
 == Main Variables
 
-* openshift_provision_cluster_name
-* openshift_provision_sandbox
-* openshift_provision_environment_level
-* openshift_provision_cloud_region
-* openshift_provision_cloud_provider
+* demo_cluster_name
+* demo_sandbox
+* demo_environment_level
+* demo_cloud_region
+* demo_cloud_provider
 * openshift_release
 * openshift_deployment_type
 
@@ -16,7 +16,7 @@
 |=======================
 | Variable | Default | Description
 
-| openshift_ansible_path | ... |
+| demo_openshift_ansible_path | ... |
 
 | openshift_gcp_create_network | true |
 Configure terraform to manage the cluster network.
@@ -30,12 +30,12 @@ Base image used for building cluster node images.
 Boolean to indicate if multiple zones should be used. If set to false then
 `openshift_gcp_zone` must be set.
 
-| openshift_gcp_network_name | "{{ openshift_provision_cluster_name }}" |
+| openshift_gcp_network_name | "{{ demo_cluster_name }}" |
 
 | openshift_gcp_network_project | "{{ openshift_gcp_project }}" |
 GCP project in which the cluster network should be defined.
 
-| openshift_gcp_prefix | "{{ openshift_provision_cluster_name }}-" |
+| openshift_gcp_prefix | "{{ demo_cluster_name }}-" |
 Prefix used for GCP resource names.
 
 | openshift_gcp_project | automatic detection |
@@ -47,17 +47,17 @@ GCP project in which to provision all resources.
 
 | openshift_gcp_registry_bucket_name | ... |
 
-| openshift_gcp_subnetwork_name | "{{ openshift_provision_cluster_name }}" |
+| openshift_gcp_subnetwork_name | "{{ demo_cluster_name }}" |
 GCP subnetwork name.
 
 | openshift_gcp_zone | required if `openshift_gcp_multizone` is false |
 GCP zone for cluster if not using multiple zones.
 
-| openshift_master_cluster_hostname | "master-internal.{{ openshift_provision_dns_cluster_domain }}" |
+| openshift_master_cluster_hostname | "master-internal.{{ demo_dns_cluster_domain }}" |
 
-| openshift_master_cluster_public_hostname | "master.{{ openshift_provision_dns_cluster_domain }}" |
+| openshift_master_cluster_public_hostname | "master.{{ demo_dns_cluster_domain }}" |
 
-| openshift_master_default_subdomain | "app.{{ openshift_provision_dns_cluster_domain }}" |
+| openshift_master_default_subdomain | "app.{{ demo_dns_cluster_domain }}" |
 
 | openshift_master_named_certificates | required |
 Master named certificates are required for GCP
@@ -65,23 +65,23 @@ Master named certificates are required for GCP
 | openshift_master_cluster_public_hostname | required |
 Required
 
-| openshift_provision_ansible_ssh_pubkey | content of "\~/.ssh/id_rsa.pub" |
+| demo_ansible_ssh_pubkey | content of "\~/.ssh/id_rsa.pub" |
 SSH public key to configure for remote access into instances.
 
-| openshift_provision_ansible_user | "ansible" |
+| demo_ansible_user | "ansible" |
 User for SSH access to cluster nodes from controller or management host if
 controller is not used. This variable is used for for host access and provision
 access with terraform.
 
-| openshift_provision_cluster_autoscaler_image | ... |
+| demo_cluster_autoscaler_image | ... |
 
-| openshift_provision_cluster_autoscaler_image_pull_policy | "Always" |
+| demo_cluster_autoscaler_image_pull_policy | "Always" |
 
-| openshift_provision_cluster_name | ... |
+| demo_cluster_name | ... |
 
-| openshift_provision_cluster_resources | ... |
+| demo_cluster_resources | ... |
 
-| openshift_provision_cluster_role_bindings | ... |
+| demo_cluster_role_bindings | ... |
 
 | openshift_provision_cluster_vars | ... |
 List of cluster vars stored in the configuration map "cluster-vars" in the
@@ -92,212 +92,212 @@ ansible role.
 
 | openshift_provision_config_path | ... |
 
-| openshift_provision_controller_ansible_port | 22 |
+| openshift_provision_project_dir | ... |
+
+| demo_controller_ansible_port | 22 |
 SSH port for reaching the controller. This may need to be set to a non-standard
 port, such as 443 to allow SSH when firewalls block port 22.
 
-| openshift_provision_controller_ansible_ssh_pubkey | content of "\~/.ssh/id_rsa.pub" |
+| demo_controller_ansible_ssh_pubkey | content of "\~/.ssh/id_rsa.pub" |
 SSH public key to configure for remote access to controller.
 
-| openshift_provision_controller_ansible_user | "ansible" |
+| demo_controller_ansible_user | "ansible" |
 User for SSH access to controller from management host.  This variable is
 used for for host access and provision access with terraform.
 
-| openshift_provision_controller_cloud_packages | varies by cloud |
+| demo_controller_cloud_packages | varies by cloud |
 
-| openshift_provision_controller_cloud_packages_enablerepo | varies by cloud |
+| demo_controller_cloud_packages_enablerepo | varies by cloud |
 
-| openshift_provision_controller_cloud_python_packages | varies by cloud |
+| demo_controller_cloud_python_packages | varies by cloud |
 
-| openshift_provision_controller_hostname | "controller.{{ openshift_provision_dns_cluster_domain }}" |
+| demo_controller_hostname | "controller.{{ demo_dns_cluster_domain }}" |
 
-| openshift_provision_controller_packages | list in roles/controller-config/default/main.yml |
+| demo_controller_packages | list in roles/controller-config/default/main.yml |
 
-| openshift_provision_controller_packages_enablerepo | [] |
+| demo_controller_packages_enablerepo | [] |
 
-| openshift_provision_controller_remove_packages | [] |
+| demo_controller_remove_packages | [] |
 
-| openshift_provision_controller_terraform_release | "0.11.11" |
+| demo_controller_terraform_release | "0.11.11" |
 Version of terraform to install on controller.
 
-| openshift_provision_default_cluster_resources | ... |
+| demo_default_cluster_role_bindings | ... |
 
-| openshift_provision_default_cluster_role_bindings | ... |
+| demo_default_prerequisite_packages | ... |
 
-| openshift_provision_default_prerequisite_packages | ... |
+| demo_default_projects | ... |
 
-| openshift_provision_default_projects | ... |
-
-| openshift_provision_dns_cluster_domain | "{{ openshift_provision_dns_subdomain }}.{{ openshift_provision_dns_parent_domain }}" |
+| demo_dns_cluster_domain | "{{ demo_dns_subdomain }}.{{ demo_dns_parent_domain }}" |
 Top level domain domain for DNS records in the cluster. This should ordinarily
 not be set directly, but rather assembled from setting
-`openshift_provision_dns_subdomain` and
-`openshift_provision_dns_parent_domain`.
+`demo_dns_subdomain` and
+`demo_dns_parent_domain`.
 
-| openshift_provision_dns_parent_domain | "openshift.gnuthought.com" |
+| demo_dns_parent_domain | "openshift.gnuthought.com" |
 Parent domain from which the cluster domain is delegated through cloud DNS.
 For sake of this demo it is set to `openshift.gnuthought.com`, but should
 be customized to match a valid domain for other applications of this config
 architecture.
 
-| openshift_provision_dns_subdomain | "{{ openshift_provision_cluster_name }}" |
-The name of the subdomain under `openshift_provision_dns_parent_domain`, which
-together defines openshift_provision_dns_cluster_domain`.
+| demo_dns_subdomain | "{{ demo_cluster_name }}" |
+The name of the subdomain under `demo_dns_parent_domain`, which
+together defines demo_dns_cluster_domain`.
 
-| openshift_provision_gcp_controller_boot_disk_image | "{{ openshift_gcp_image }}" |
+| demo_gcp_controller_boot_disk_image | "{{ openshift_gcp_image }}" |
 Base image for the controller nodes
 
-| openshift_provision_gcp_controller_boot_disk_size_gb | 50 |
+| demo_gcp_controller_boot_disk_size_gb | 50 |
 
-| openshift_provision_gcp_controller_iam_roles | ["editor"] |
+| demo_gcp_controller_iam_roles | ["editor"] |
 The editor role is required to use the full functionality included in this demo.
 If more restrictive roles are desired then specific functionality such as IAM
 user and role binding would need to be handled in another manner.
 
-| openshift_provision_gcp_controller_machine_type | n1-standard-1 |
+| demo_gcp_controller_machine_type | n1-standard-1 |
 
-| openshift_provision_gcp_controller_service_account | "{{ openshift_gcp_prefix }}controller" |
+| demo_gcp_controller_service_account | "{{ openshift_gcp_prefix }}controller" |
 
-| openshift_provision_gcp_dns_delegation_zone_name | "" |
+| demo_gcp_dns_delegation_zone_name | "" |
 GCP name of cloud dns zone name for domain given by
-`openshift_provision_dns_parent_domain`. This is used to create delegation NS
-records for domain listed in `openshift_provision_dns_cluster_domain`. If unset
+`demo_dns_parent_domain`. This is used to create delegation NS
+records for domain listed in `demo_dns_cluster_domain`. If unset
 then DNS delegation will be skipped.
 
-| openshift_provision_gcp_dns_zone_name | "{{ openshift_provision_cluster_name }}" |
+| demo_gcp_dns_zone_name | "{{ demo_cluster_name }}" |
 Name of the cluster zone in Google Cloud DNS service. Note, this is not the
 domain name of the zone but rather the Cloud DNS zone name.
 
-| openshift_provision_gcp_master_boot_disk_image | "{{ openshift_gcp_image }}" |
+| demo_gcp_master_boot_disk_image | "{{ openshift_gcp_image }}" |
 Base image for the master nodes.
 
-| openshift_provision_gcp_master_boot_disk_size_gb | ??? |
+| demo_gcp_master_boot_disk_size_gb | ??? |
 
-| openshift_provision_gcp_master_docker_vg_disk_size_gb | ??? |
+| demo_gcp_master_docker_vg_disk_size_gb | ??? |
 
-| openshift_provision_gcp_master_docker_vg_disk_type | ??? |
+| demo_gcp_master_docker_vg_disk_type | ??? |
 
-| openshift_provision_gcp_master_machine_type | ??? |
+| demo_gcp_master_machine_type | ??? |
 
-| openshift_provision_gcp_master_service_account | ??? |
+| demo_gcp_master_service_account | ??? |
 
-| openshift_provision_gcp_node_boot_disk_size_gb | 50 |
+| demo_gcp_node_boot_disk_size_gb | 50 |
 Default size of node boot disk. May be overridden within
-`openshift_provision_node_groups`.
+`demo_openshift_node_groups`.
 
-| openshift_provision_gcp_node_boot_disk_type | "pd-standard" |
+| demo_gcp_node_boot_disk_type | "pd-standard" |
 Default disk type used for node boot disks. Values may be "pd-standard" or
-"pd-ssd". This value may be overridden within `openshift_provision_node_groups`.
+"pd-ssd". This value may be overridden within `demo_openshift_node_groups`.
 
-| openshift_provision_gcp_node_image_family | "{{ openshift_gcp_prefix }}node" |
+| demo_gcp_node_image_family | "{{ openshift_gcp_prefix }}node" |
 Name of GCE image family used for image builds and for deploying dynamic node
 types.
 
-| openshift_provision_gcp_node_machine_type | "n1-standard-4" |
+| demo_gcp_node_machine_type | "n1-standard-4" |
 Default GCE machine type used for nodes. May be overridden within
-`openshift_provision_node_groups`.
+`demo_openshift_node_groups`.
 
-| openshift_provision_gcp_node_service_account | "{{ openshift_gcp_prefix }}node" |
+| demo_gcp_node_service_account | "{{ openshift_gcp_prefix }}node" |
 Name of GCP service account used on nodes.
 
-| openshift_provision_gcp_registry_service_account_id | "{{ openshift_gcp_prefix }}registry" |
+| demo_gcp_registry_service_account_id | "{{ openshift_gcp_prefix }}registry" |
 
-| openshift_provision_gcp_subnetwork_ip_cidr_range | '10.0.0.0/24' |
+| demo_gcp_subnetwork_ip_cidr_range | '10.0.0.0/24' |
 
-| openshift_provision_gcp_use_fqdn | false |
+| demo_gcp_use_fqdn | false |
 
-| openshift_provision_gpg_pubkey | required for gcp deployment |
+| demo_gpg_pubkey | required for gcp deployment |
 GPG public key to encrypt secrets stored in terraform state.
 
-| openshift_provision_gpg_key_email | "openshift-provision-demo@gnuthought.com" |
+| demo_gpg_key_email | "openshift-provision-demo@gnuthought.com" |
 Email identifier to store and retrieve GPG key.
 
-| openshift_provision_gpg_key_name | "OpenShift Provision Demo" |
+| demo_gpg_key_name | "OpenShift Provision Demo" |
 Key name for GPG generation.
 
-| openshift_provision_gpg_key_passphrase | "redhat" |
+| demo_gpg_key_passphrase | "redhat" |
 Password for GPG generation.
 
-| openshift_provision_gcp_zones | varies by region |
+| demo_gcp_zones | varies by region |
 List of availability zones used for the cluster.
 
-| openshift_provision_handle_dns_delegation | false |
+| demo_handle_dns_delegation | false |
 Boolean to indicate whether the terraform automation should attempt to
-configure DNS delegation for `openshift_provision_dns_cluster_domain`
-from `openshift_provision_dns_parent_domain`. If this feature is not
+configure DNS delegation for `demo_dns_cluster_domain`
+from `demo_dns_parent_domain`. If this feature is not
 used then DNS delegation will need to be handled manually or use a wildcard
-DNS service with `openshift_provision_wildcard_dns`.
+DNS service with `demo_wildcard_dns`.
 
-| openshift_provision_management_source_ip_range | dynamic ip of host |
+| demo_management_source_ip_range | dynamic ip of host |
 The IP range used to manage the cluster. If not set then the default
 configuration will attempt to dynamically determine the IP address of the
 host from which the ansible playbooks are run.
 
-| openshift_provision_master_cluster_public_cafile | ${OPENSHIFT_PROVISION_CONFIG_PATH}/cluster/${OPENSHIFT_PROVISION_CLUSTER_NAME}/tls/master.ca |
+| demo_master_cluster_public_cafile | ${OPENSHIFT_PROVISION_CONFIG_PATH}/cluster/${OPENSHIFT_PROVISION_CLUSTER_NAME}/tls/master.ca |
 
-| openshift_provision_master_cluster_public_certfile | ${OPENSHIFT_PROVISION_CONFIG_PATH}/cluster/${OPENSHIFT_PROVISION_CLUSTER_NAME}/tls/master.cert |
+| demo_master_cluster_public_certfile | ${OPENSHIFT_PROVISION_CONFIG_PATH}/cluster/${OPENSHIFT_PROVISION_CLUSTER_NAME}/tls/master.cert |
 
-| openshift_provision_master_cluster_public_keyfile | ${OPENSHIFT_PROVISION_CONFIG_PATH}/cluster/${OPENSHIFT_PROVISION_CLUSTER_NAME}/tls/master.key |
+| demo_master_cluster_public_keyfile | ${OPENSHIFT_PROVISION_CONFIG_PATH}/cluster/${OPENSHIFT_PROVISION_CLUSTER_NAME}/tls/master.key |
 
-| openshift_provision_node_groups | required |
+| demo_openshift_node_groups | required |
 List of node groups, described in detail below.
 
-| openshift_provision_node_kube_reserved_cpu | "500m" |
+| demo_node_kube_reserved_cpu | "500m" |
 
-| openshift_provision_node_kube_reserved_memory | "500Mi" |
+| demo_node_kube_reserved_memory | "500Mi" |
 
-| openshift_provision_node_labels | ... |
+| demo_node_labels | ... |
 Node labels applied to the instance.
 
-| openshift_provision_openshift_ansible_git_branch | ... |
+| demo_openshift_ansible_git_branch | ... |
 
-| openshift_provision_openshift_ansible_git_repo | ... |
+| demo_openshift_ansible_git_repo | ... |
 
-| openshift_provision_prerequisite_packages | ... |
+| demo_prerequisite_packages | ... |
 
-| openshift_provision_prerequisite_remove_packages | ... |
+| demo_prerequisite_remove_packages | ... |
 
-| openshift_provision_project_default | ... |
+| demo_project_default | ... |
 Definition of default project for openshift-provision ansible role.
 
-| openshift_provision_project_kube_cluster_autoscaler | ... |
+| demo_project_kube_cluster_autoscaler | ... |
 Definition of kube-cluster-autoscaler project for openshift-provision ansible
 role.
 
-| openshift_provision_projects | ... |
+| demo_projects | ... |
 
-| openshift_provision_replace_passthrough_routes | False (True for GCP) |
+| demo_replace_passthrough_routes | False (True for GCP) |
 Boolean flag to indicate whether passthrough routes should be reconfigured to
 reencrypt.
 
-| openshift_provision_rhsub_pass | value of environment variable "REDHAT_SUBSCRIPTION_PASSWORD" |
+| demo_rhsub_pass | value of environment variable "REDHAT_SUBSCRIPTION_PASSWORD" |
 Password to use to register the system with Red Hat.
 
-| openshift_provision_rhsub_pool | value of environment variable "REDHAT_SUBSCRIPTION_POOLS" |
+| demo_rhsub_pool | value of environment variable "REDHAT_SUBSCRIPTION_POOLS" |
 Red Hat subscriptino pool id.
 
-| openshift_provision_rhsub_user | value of environment variable  "REDHAT_SUBSCRIPTION_USERNAME" |
+| demo_rhsub_user | value of environment variable  "REDHAT_SUBSCRIPTION_USERNAME" |
 Username to use to register the system with Red Hat.
 
 We do not use `rhsub_user` as the standard ansible playbooks are too
 opinionated about yum repositiories, disabling repositories that we may wish to
 have enabled.
 
-| openshift_provision_shared_public_load_balancer | True |
+| demo_shared_public_load_balancer | True |
 Boolean flag to indicate whether a common address should be used for router
 and master public access.
 
-| openshift_provision_use_controller | True |
+| demo_use_controller | True |
 Indicates whether the cluster is managed with a controller instance. If this
 is set to false then the cluster is managed directly from wherever the ansible
 playbooks are run.
 
-| openshift_provision_wildcard_dns | "xip.io" |
+| demo_wildcard_dns | "xip.io" |
 Wildcard DNS service such as xip.io or nip.io to use for
 `openshift_master_cluster_public_hostname` and `openshift_master_default_subdomain`.
 This is useful when DNS delegation is not available.
 
-| openshift_provision_yum_pkg_release_openshift_origin | "centos-release-openshift-origin{{ openshift_release | replace('.','') }}" |
+| demo_centos_release_openshift_origin_pkg | "centos-release-openshift-origin{{ openshift_release | replace('.','') }}" |
 Yum package to setup yum repositories for origin installation.
 
 | openshift_service_type | "origin" or "atomic-openshift" |
@@ -309,7 +309,7 @@ Set by value of openshift_deployment_type, "origin" or "openshift-enterprise".
 
 |=======================
 
-The variable `openshift_provision_node_groups` should be a dictionary with
+The variable `demo_openshift_node_groups` should be a dictionary with
 keys for each node group name. Values should include:
 
 [cols="1,1,4",options="header"]
@@ -336,9 +336,9 @@ Indication whether the node group is static or dynamically scaled.
 
 === TLS Cert Configuration
 
-`cluster/{{ openshift_provision_cluster_name }}/tls/master.ca.crt`
-`cluster/{{ openshift_provision_cluster_name }}/tls/master.crt`
-`cluster/{{ openshift_provision_cluster_name }}/tls/master.key`
-`cluster/{{ openshift_provision_cluster_name }}/tls/router.ca.crt`
-`cluster/{{ openshift_provision_cluster_name }}/tls/router.crt`
-`cluster/{{ openshift_provision_cluster_name }}/tls/router.key`
+`cluster/{{ demo_cluster_name }}/tls/master.ca.crt`
+`cluster/{{ demo_cluster_name }}/tls/master.crt`
+`cluster/{{ demo_cluster_name }}/tls/master.key`
+`cluster/{{ demo_cluster_name }}/tls/router.ca.crt`
+`cluster/{{ demo_cluster_name }}/tls/router.crt`
+`cluster/{{ demo_cluster_name }}/tls/router.key`

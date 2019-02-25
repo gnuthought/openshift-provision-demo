@@ -18,9 +18,6 @@ resource "google_compute_global_forwarding_rule" "{{ openshift_gcp_prefix }}rout
   name = "{{ openshift_gcp_prefix }}router-http"
   ip_protocol = "TCP"
   ip_address = "${data.google_compute_global_address.{{ openshift_gcp_prefix }}router.address}"
-  labels = {
-    openshift-cluster = "{{ cluster_name }}"
-  }
   port_range = "80"
   target = "${google_compute_target_http_proxy.{{ openshift_gcp_prefix }}router-http.self_link}"
 }
@@ -29,9 +26,6 @@ resource "google_compute_global_forwarding_rule" "{{ openshift_gcp_prefix }}rout
   name = "{{ openshift_gcp_prefix }}router-https"
   ip_protocol = "TCP"
   ip_address = "${data.google_compute_global_address.{{ openshift_gcp_prefix }}router.address}"
-  labels = {
-    openshift-cluster = "{{ cluster_name }}"
-  }
   port_range = "443"
   target = "${google_compute_target_https_proxy.{{ openshift_gcp_prefix }}router-https.self_link}"
 }

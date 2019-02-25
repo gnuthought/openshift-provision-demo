@@ -1,17 +1,17 @@
 ---
-openshift_provision_controller_cloud_packages:
+demo_controller_cloud_packages:
 - python2-google-api-client
 
-openshift_provision_controller_cloud_packages_enablerepo:
+demo_controller_cloud_packages_enablerepo:
 - epel
 
-openshift_provision_controller_cloud_python_packages: []
+demo_controller_cloud_python_packages: []
 
-openshift_provision_gcp_controller_iam_roles:
+demo_gcp_controller_iam_roles:
 - owner
 
-#openshift_provision_gcp_controller_boot_disk_image: >-
+#demo_gcp_controller_boot_disk_image: >-
 #  {{ 'centos-7' if openshift_deployment_type == 'origin' else 'rhel-7' }}
-#openshift_provision_gcp_controller_boot_disk_size_gb: 50
-#openshift_provision_gcp_controller_machine_type: n1-standard-1
-#openshift_provision_gcp_controller_service_account: "{{ openshift_gcp_prefix }}controller"
+#demo_gcp_controller_boot_disk_size_gb: 50
+#demo_gcp_controller_machine_type: n1-standard-1
+#demo_gcp_controller_service_account: "{{ openshift_gcp_prefix }}controller"

@@ -1,21 +1,14 @@
 ---
-openshift_provision_cluster_vars: >-
-  {{ openshift_provision_default_cluster_vars
-   | combine(openshift_provision_cloud_provider_cluster_vars)
-  }}
-
-openshift_provision_cloud_provider_cluster_vars: {}
-
-openshift_provision_default_cluster_vars:
-  cloud_provider: "{{ openshift_provision_cloud_provider }}"
-  cloud_region: "{{ openshift_provision_cloud_region }}"
-  cluster_name: "{{ openshift_provision_cluster_name }}"
-  controller_hostname: "{{ openshift_provision_controller_hostname }}"
-  controller_public_hostname: "{{ openshift_provision_controller_public_hostname }}"
+demo_default_openshift_provision_cluster_vars:
+  cloud_provider: "{{ demo_cloud_provider }}"
+  cloud_region: "{{ demo_cloud_region }}"
+  cluster_name: "{{ demo_cluster_name }}"
+  controller_hostname: "{{ demo_controller_hostname }}"
+  controller_public_hostname: "{{ demo_controller_public_hostname }}"
   default_subdomain: "{{ openshift_master_default_subdomain }}"
   deployment_type: "{{ openshift_deployment_type }}"
-  environment_level: "{{ openshift_provision_environment_level }}"
-  is_sandbox: "{{ 'true' if openshift_provision_sandbox|default(False)|bool else 'false' }}"
+  environment_level: "{{ demo_environment_level }}"
+  is_sandbox: "{{ 'true' if demo_sandbox|default(False)|bool else 'false' }}"
   master_public_hostname: "{{ openshift_master_cluster_public_hostname }}"
   master_hostname: "{{ openshift_master_cluster_hostname }}"
   openshift_release: "{{ openshift_release }}"

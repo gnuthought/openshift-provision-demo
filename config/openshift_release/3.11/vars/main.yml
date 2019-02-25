@@ -1,2 +1,2 @@
 ---
-openshift_provision_release_prerequisite_packages: []
+demo_openshift_release_prerequisite_packages: []

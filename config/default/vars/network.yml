@@ -23,4 +23,4 @@ openshift_portal_net: 100.78.0.0/18
 os_firewall_use_firewalld: true
 
 # Use single load balancer for router and master
-openshift_provision_shared_public_load_balancer: true
+demo_shared_public_load_balancer: true

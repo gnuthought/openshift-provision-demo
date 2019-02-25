@@ -2,6 +2,6 @@
 - name: Git clone openshift-ansible
   git:
     dest: ~/openshift-ansible
-    repo: "{{ openshift_provision_openshift_ansible_git_repo }}"
+    repo: "{{ demo_openshift_ansible_git_repo }}"
     update: false
-    version: "{{ openshift_provision_openshift_ansible_git_branch }}"
+    version: "{{ demo_openshift_ansible_git_branch }}"

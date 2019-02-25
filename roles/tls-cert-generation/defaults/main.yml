@@ -1,2 +1,2 @@
 ---
-openshift_provision_shared_public_load_balancer: true
+demo_shared_public_load_balancer: true

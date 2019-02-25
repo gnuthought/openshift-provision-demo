@@ -9,19 +9,31 @@ import time
 import yaml
 
 class OpenShiftInventory:
-    def __init__(self, cluster_name, config_dir='config', init_mode=False):
-        self.config_dir = config_dir
+    def __init__(
+        self,
+        openshift_provision_project_dir,
+        cluster_name,
+        init_mode=False
+    ):
+        self.openshift_provision_project_dir = openshift_provision_project_dir
         self.cluster_name = cluster_name
         self.init_mode = init_mode
         self.load_cluster_config()
 
     def load_cluster_config(self):
-        self.cluster_config = {}
+        openshift_provision_config_path = [
+            'config/cluster/' + self.cluster_name + '/vars/main.yml',
+            'config/default/vars/main.yml'
+        ]
+        self.cluster_config = {
+            'openshift_provision_config_path': openshift_provision_config_path
+        }
+        conf_bootstrap = {}
 
-        # Load default main cluster main configs to determine config load
-        # hierarchy
-        conf_bootstrap = self.read_default_main()
-        conf_bootstrap.update(self.read_cluster_main())
+        # Load config path in reverse order so that earlier entries override later ones
+        for path in openshift_provision_config_path[::-1]:
+            conf_bootstrap.update(self.load_vars_file(path))
+
         conf_hierarchy = yaml.load(
             self.value_expand(
                 conf_bootstrap['openshift_provision_config_hierarchy'],
@@ -30,57 +42,35 @@ class OpenShiftInventory:
         )
         for item in conf_hierarchy[::-1]:
             self.load_cluster_vars(item)
-        self.cluster_config['openshift_provision_dynamic_vars'] = {}
+
+        self.cluster_config['demo_dynamic_vars'] = {}
         self.cloud_provider_class = __import__(
-            'openshift_' + self.cluster_config['openshift_provision_cloud_provider']
+            'openshift_' + self.cluster_config['demo_cloud_provider']
         )
         self.cloud_provider = getattr(
             self.cloud_provider_class,
             self.cloud_provider_class.inventory_class_name
         )(self)
 
-    def read_cluster_main(self):
-        for file_extension in ['yaml','yml','json']:
-            mainconf = '/'.join([
-                self.config_dir,
-                'cluster',
-                self.cluster_name,
-                'vars/main.' + file_extension
-            ])
-            try:
-                return yaml.load(file(mainconf, 'r'))
-            except IOError:
-                pass
-        raise Exception(
-            "Unable to read main cluster configuration file in {}/cluster/{}/vars/".format(
-                self.config_dir,
-                self.cluster_name
+    def load_vars_file(self, path):
+        try:
+            return yaml.load(
+                open(self.openshift_provision_project_dir + '/' + path, 'r')
             )
-        )
-
-    def read_default_main(self):
-        for file_extension in ['yaml','yml','json']:
-            mainconf = '/'.join([
-                self.config_dir,
-                'default/vars/main.' + file_extension
-            ])
-            try:
-                return yaml.load(file(mainconf, 'r'))
-            except IOError:
-                pass
-        raise Exception(
-            "Unable to read main default configuration file in {}/default/vars/".format(
-                self.config_dir
+        except Exception as e:
+            raise Exception(
+                'Unable to read vars file {}: {}'.format(path, e)
             )
-        )
 
     def load_cluster_vars(self, path):
-        vardir = '/'.join([self.config_dir, path, 'vars'])
-        for varfile in os.listdir(vardir):
+        vardir = path + '/vars'
+        for varfile in os.listdir(self.openshift_provision_project_dir + '/' + vardir):
             if not re.match(r'\w.*\.(ya?ml|json)$', varfile):
                 continue
-            varpath = '/'.join([vardir, varfile])
-            self.cluster_config.update(yaml.load(file(varpath,'r')) or {})
+            varpath = vardir + '/' + varfile
+            self.cluster_config.update(
+                self.load_vars_file(varpath) or {}
+            )
 
     def cluster_var(self, varname):
         """
@@ -101,7 +91,7 @@ class OpenShiftInventory:
         Set the value of specified inventory variable.
         """
         self.cluster_config[varname] = value
-        self.cluster_config['openshift_provision_dynamic_vars'][varname] = value
+        self.cluster_config['demo_dynamic_vars'][varname] = value
 
     def value_expand(self, value, depth=0, jinja_vars=None):
         if depth > 10:
@@ -152,8 +142,8 @@ class OpenShiftInventory:
             }
         }
 
-        openshift_provision_node_groups = self.cluster_var('openshift_provision_node_groups')
-        for group_name, node_group in openshift_provision_node_groups.items():
+        demo_openshift_node_groups = self.cluster_var('demo_openshift_node_groups')
+        for group_name, node_group in demo_openshift_node_groups.items():
             if node_group.get('static_node_group', False) in [True, "true", "True", "yes"]:
                 ansible_group = 'masters' if group_name == 'master' else group_name
                 hosts['static-nodes']['children'].append(ansible_group)

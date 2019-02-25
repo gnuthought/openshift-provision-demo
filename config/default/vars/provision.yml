@@ -1,8 +1,8 @@
 ---
-openshift_provision_default_cluster_resources:
+demo_default_cluster_resources:
 - ClusterRole/kube-cluster-autoscaler.yml
 
-openshift_provision_default_cluster_role_bindings:
+demo_default_cluster_role_bindings:
   cluster-admin:
     users:
     - system:admin
@@ -22,9 +22,15 @@ openshift_provision_default_cluster_role_bindings:
     - system:serviceaccounts:openshift-provision
     remove_unlisted: false
 
-openshift_provision_default_projects:
-  default: "{{ openshift_provision_project_default }}"
-  kube-cluster-autoscaler: "{{ openshift_provision_project_kube_cluster_autoscaler }}"
-  kube-public: "{{ openshift_provision_project_kube_public }}"
-  openshift: "{{ openshift_provision_project_openshift }}"
-  openshift-provision: "{{ openshift_provision_project_openshift_provision }}"
+demo_default_process_templates:
+- file: https://raw.githubusercontent.com/gnuthought/openshift-provision-manager/master/install-template-admin.yaml
+- file: https://raw.githubusercontent.com/gnuthought/openshift-provision-example-0/master/install-template-admin.yaml
+- file: https://raw.githubusercontent.com/gnuthought/openshift-provision-example-1/master/install-template-admin.yaml
+- file: https://raw.githubusercontent.com/gnuthought/openshift-provision-example-2/master/install-template-admin.yaml
+
+demo_default_projects:
+  default: "{{ demo_project_default }}"
+  kube-cluster-autoscaler: "{{ demo_project_kube_cluster_autoscaler }}"
+  kube-public: "{{ demo_project_kube_public }}"
+  openshift: "{{ demo_project_openshift }}"
+  openshift-provision: "{{ demo_project_openshift_provision }}"

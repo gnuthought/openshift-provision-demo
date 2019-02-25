@@ -1,4 +1,6 @@
 ---
 openshift_service_type: origin
-openshift_provision_release_prerequisite_packages:
+demo_openshift_deployment_type_prerequisite_packages:
 - centos-release-openshift-origin{{ openshift_release | regex_replace('[^0-9]+','') }}
+demo_centos_release_openshift_origin_pkg: >-
+  centos-release-openshift-origin{{ openshift_release | replace('.','') }}

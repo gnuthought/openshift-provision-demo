@@ -1,4 +1,4 @@
 ---
 # Default value in config/default/vars/main.yml
-ansible_user: "{{ openshift_provision_ansible_user }}"
+ansible_user: "{{ demo_ansible_user }}"
 ansible_become: true

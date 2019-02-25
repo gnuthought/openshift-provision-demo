@@ -1,32 +1,173 @@
 ---
+#
+# openshift_provision is the main switchboard for the openshift-provision
+# ansible role. For this demo we reference some custom demo_* variables to
+# delegate these configuration items to make it more flexible to override
+# configuration. These variables are composites of other variables and are
+# defined in config/default/vars/provision-hierarchy.yml
+#
+openshift_provision:
+  cluster_resources: "{{ demo_cluster_resources }}"
+  cluster_role_bindings: "{{ demo_cluster_role_bindings }}"
+  process_templates: "{{ demo_process_templates }}"
+  projects: "{{ demo_projects }}"
+  # Resource search path corresponds to openshift_provision_config_hierarchy
+  resource_path: >-
+    {{ openshift_provision_config_hierarchy
+     | map('regex_replace','^(.*)$', openshift_provision_project_dir ~ '/\1/resources')
+     | list
+    }}
+
 # Debug level for all OpenShift components (Defaults to 2)
 debug_level: 2
 
-# Default sandbox setting to false
-openshift_provision_sandbox: false
+# Default indicate that cluster is not a sandbox
+demo_sandbox: false
 
 # Default ansible user for OCP systems
-openshift_provision_ansible_user: ansible
-openshift_provision_ansible_ssh_pubkey: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+demo_ansible_user: ansible
+demo_ansible_ssh_pubkey: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
 
-openshift_provision_config_hierarchy: >-
-  {{ openshift_provision_default_config_hierarchy }}
+#
+# The openshift_provision_config_hierarchy determines variable precedence and
+# default resource search path. The config hierarchy can be overridden at the
+# cluster level by setting it at:
+# config/cluster/{{ demo_cluster_name }}/vars/main.yml
+#
+# Notice that sandbox is not treated as an environment type, but as a boolean
+# flag that allows sandbox settings to override anything except cluster level
+# configuration.
+#
+demo_default_config_hierarchy_no_sandbox:
+- config/cluster/{{ demo_cluster_name }}
+- config/openshift_deployment_type/{{ openshift_deployment_type }}
+- config/openshift_release/{{ openshift_release }}
+- config/cloud_provider/{{ demo_cloud_provider }}
+- config/cloud_region/{{ demo_cloud_region }}
+- config/environment_level/{{ demo_environment_level }}
+- config/default
+demo_default_config_hierarchy: >-
+  {{ [demo_default_config_hierarchy_no_sandbox[0]]
+   + ( ['config/sandbox'] if demo_sandbox else [] )
+   + demo_default_config_hierarchy_no_sandbox[1:]
+  }}
+openshift_provision_config_hierarchy: '{{ demo_default_config_hierarchy }}'
 
-openshift_provision_default_config_hierarchy:
-- cluster/{{ openshift_provision_cluster_name }}
-- openshift_deployment_type/{{ openshift_deployment_type }}
-- openshift_release/{{ openshift_release }}
-- cloud_provider/{{ openshift_provision_cloud_provider }}
-- cloud_region/{{ openshift_provision_cloud_region }}
-- environment_level/{{ openshift_provision_environment_level }}
-- default
+#
+# Assemble cluster resources list using inheritance hierarchy
+#
+# The variables below are meant to be set within vars files in the hierarchy and
+# then used to roll-up into demo_cluster_resources, referenced by the variable
+# openshift_provision which is used by the openshift-provision ansible module.
+#
+demo_cluster_resources_for_openshift_release: []
+demo_cluster_resources_for_openshift_deployment_type: []
+demo_cluster_resources_for_cloud_provider: []
+demo_cluster_resources_for_cloud_region: []
+demo_cluster_resources_for_environment_level: []
+demo_cluster_resources_for_sandbox: []
+demo_cluster_resources_for_cluster: []
 
-openshift_provision:
-  cluster_resources: "{{ openshift_provision_cluster_resources }}"
-  cluster_role_bindings: "{{ openshift_provision_cluster_role_bindings }}"
-  process_templates:
-  - file: https://raw.githubusercontent.com/gnuthought/openshift-provision-manager/master/install-template-admin.yaml
-  - file: https://raw.githubusercontent.com/gnuthought/openshift-provision-example-1/master/install-template-admin.yaml
-  - file: https://raw.githubusercontent.com/gnuthought/openshift-provision-example-2/master/install-template-admin.yaml
-  projects: "{{ openshift_provision_projects }}"
-  resource_path: "{{ openshift_provision_resource_path }}"
+demo_cluster_resources: >-
+  {{ demo_default_cluster_resources
+   | union(demo_cluster_resources_for_openshift_release)
+   | union(demo_cluster_resources_for_openshift_deployment_type)
+   | union(demo_cluster_resources_for_cloud_provider)
+   | union(demo_cluster_resources_for_cloud_region)
+   | union(demo_cluster_resources_for_environment_level)
+   | union(demo_cluster_resources_for_sandbox if demo_sandbox else [])
+   | union(demo_cluster_resources_for_cluster)
+  }}
+
+#
+# Assemble cluster role bindings list using inheritance hierarchy
+#
+demo_cluster_role_bindings_for_openshift_release: {}
+demo_cluster_role_bindings_for_openshift_deployment_type: {}
+demo_cluster_role_bindings_for_cloud_provider: {}
+demo_cluster_role_bindings_for_cloud_region: {}
+demo_cluster_role_bindings_for_environment_level: {}
+demo_cluster_role_bindings_for_sandbox: {}
+demo_cluster_role_bindings_for_cluster: {}
+
+demo_cluster_role_bindings: >-
+  {{ demo_default_cluster_role_bindings
+   | combine(demo_cluster_role_bindings_for_openshift_release)
+   | combine(demo_cluster_role_bindings_for_openshift_deployment_type)
+   | combine(demo_cluster_role_bindings_for_cloud_provider)
+   | combine(demo_cluster_role_bindings_for_cloud_region)
+   | combine(demo_cluster_role_bindings_for_environment_level)
+   | combine(demo_cluster_role_bindings_for_sandbox if demo_sandbox else {})
+   | combine(demo_cluster_role_bindings_for_cluster)
+   | dict_to_named_list(nameattr='role')
+  }}
+
+#
+# Assemble openshift_provision_cluster_vars. This is used to bootstrap values
+# into the cluster-vars configmap in the kube-public namespace which is then
+# dynamically loaded by openshift-provision when these settings are not
+# immediately available through the dynamic inventory.
+#
+demo_openshift_provision_cluster_vars_for_openshift_release: {}
+demo_openshift_provision_cluster_vars_for_openshift_deployment_type: {}
+demo_openshift_provision_cluster_vars_for_cloud_provider: {}
+demo_openshift_provision_cluster_vars_for_cloud_region: {}
+demo_openshift_provision_cluster_vars_for_environment_level: {}
+demo_openshift_provision_cluster_vars_for_sandbox: {}
+demo_openshift_provision_cluster_vars_for_cluster: {}
+
+openshift_provision_cluster_vars: >-
+  {{ demo_default_openshift_provision_cluster_vars
+   | combine(demo_openshift_provision_cluster_vars_for_openshift_release)
+   | combine(demo_openshift_provision_cluster_vars_for_openshift_deployment_type)
+   | combine(demo_openshift_provision_cluster_vars_for_cloud_provider)
+   | combine(demo_openshift_provision_cluster_vars_for_cloud_region)
+   | combine(demo_openshift_provision_cluster_vars_for_environment_level)
+   | combine(demo_openshift_provision_cluster_vars_for_sandbox)
+   | combine(demo_openshift_provision_cluster_vars_for_cluster)
+  }}
+
+#
+# Assemble cluster templates list using inheritance hierarchy
+#
+demo_process_templates_for_openshift_release: []
+demo_process_templates_for_openshift_deployment_type: []
+demo_process_templates_for_cloud_provider: []
+demo_process_templates_for_cloud_region: []
+demo_process_templates_for_environment_level: []
+demo_process_templates_for_sandbox: []
+demo_process_templates_for_cluster: []
+
+demo_process_templates: >-
+  {{ demo_default_process_templates
+   | union(demo_process_templates_for_openshift_release)
+   | union(demo_process_templates_for_openshift_deployment_type)
+   | union(demo_process_templates_for_cloud_provider)
+   | union(demo_process_templates_for_cloud_region)
+   | union(demo_process_templates_for_environment_level)
+   | union(demo_process_templates_for_sandbox if demo_sandbox else [])
+   | union(demo_process_templates_for_cluster)
+  }}
+
+#
+# Assemble cluster projects list using inheritance hierarchy
+#
+demo_projects_for_openshift_release: {}
+demo_projects_for_openshift_deployment_type: {}
+demo_projects_for_cloud_provider: {}
+demo_projects_for_cloud_region: {}
+demo_projects_for_environment_level: {}
+demo_projects_for_sandbox: {}
+demo_projects_for_cluster: {}
+
+demo_projects: >-
+  {{ demo_default_projects
+   | combine(demo_projects_for_openshift_release)
+   | combine(demo_projects_for_openshift_deployment_type)
+   | combine(demo_projects_for_cloud_provider)
+   | combine(demo_projects_for_cloud_region)
+   | combine(demo_projects_for_environment_level)
+   | combine(demo_projects_for_sandbox if demo_sandbox else {})
+   | combine(demo_projects_for_cluster)
+   | dict_to_named_list(nameattr='name')
+  }}

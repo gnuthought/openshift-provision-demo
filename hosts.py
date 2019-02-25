@@ -25,19 +25,22 @@ Usage: hosts.py --create-node-image
   --wait               Wait for vms to start
 
 Environment Variables:
-OPENSHIFT_PROVISION_CONFIG_PATH - Location of cluster configuration
-OPENSHIFT_PROVISION_CLUSTER_NAME - Name of cluster in configuration
+DEMO_CLUSTER_NAME - Name of cluster in config path
+OPENSHIFT_PROVISION_PROJECT_DIR - Base path to config repo project
 """,
     file=sys.stderr)
     sys.exit(1)
 
 def main():
-    if( 'OPENSHIFT_PROVISION_CLUSTER_NAME' not in os.environ ):
-        exit_usage('OPENSHIFT_PROVISION_CLUSTER_NAME environment variable not set.')
+    if( 'DEMO_CLUSTER_NAME' not in os.environ ):
+        exit_usage('DEMO_CLUSTER_NAME environment variable not set.')
 
     ocpinv = OpenShiftInventory(
-        cluster_name = os.environ['OPENSHIFT_PROVISION_CLUSTER_NAME'],
-        config_dir = os.environ.get('OPENSHIFT_PROVISION_CONFIG_PATH', 'config'),
+        os.environ.get(
+            'OPENSHIFT_PROVISION_PROJECT_DIR',
+            os.path.dirname(os.path.realpath(__file__))
+        ),
+        os.environ['DEMO_CLUSTER_NAME'],
         init_mode = len(sys.argv) == 2 and sys.argv[1] == '--init'
     )
 

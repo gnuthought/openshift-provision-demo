@@ -1,7 +1,7 @@
 ---
 - name: Uninstall Packages
   yum:
-    name: "{{ openshift_provision_prerequisite_remove_packages }}"
+    name: "{{ demo_prerequisite_remove_packages }}"
     state: absent
 
 # The yum module should be preferable, but was found to frequently hang
@@ -9,7 +9,7 @@
   become: true
   command: >-
     yum install -y
-    {{ openshift_provision_prerequisite_packages | join(' ') }}
+    {{ demo_prerequisite_packages | join(' ') }}
   #'
   args:
     warn: false

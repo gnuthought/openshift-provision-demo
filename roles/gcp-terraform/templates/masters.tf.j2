@@ -159,9 +159,6 @@ resource "google_compute_backend_service" "{{ openshift_gcp_prefix }}master-http
 resource "google_compute_forwarding_rule" "{{ openshift_gcp_prefix }}master" {
   name = "{{ openshift_gcp_prefix }}master"
   backend_service = "${google_compute_region_backend_service.{{ openshift_gcp_prefix }}master.self_link}"
-  labels = {
-    openshift-cluster = "{{ cluster_name }}"
-  }
   load_balancing_scheme = "INTERNAL"
   ports = [443]
   subnetwork = "${data.google_compute_subnetwork.{{ cluster_subnetwork_name }}.self_link}"

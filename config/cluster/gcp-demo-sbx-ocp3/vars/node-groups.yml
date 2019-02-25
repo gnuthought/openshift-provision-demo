@@ -1,7 +1,7 @@
 ---
 openshift_disable_check: memory_availability,disk_availability
 
-openshift_provision_node_groups:
+demo_openshift_node_groups:
   master:
     instance_count: 1
     labels:

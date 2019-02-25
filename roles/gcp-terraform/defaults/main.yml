@@ -2,63 +2,62 @@
 openshift_gcp_create_network: true
 openshift_gcp_image: >-
   {{ 'centos-7' if openshift_deployment_type == 'origin' else 'rhel-7' }}
-openshift_gcp_network_name: "{{ openshift_provision_cluster_name }}"
-openshift_provision_ansible_ssh_pubkey: ''
-openshift_provision_ansible_user: ansible
-openshift_gcp_subnetwork_name: "{{ openshift_provision_cluster_name }}"
-openshift_provision_gcp_subnetwork_ip_cidr_range: '10.0.0.0/24'
-openshift_provision_handle_dns_delegation: false
-openshift_provision_use_cloud_dns: false
-openshift_provision_wildcard_dns: false
+openshift_gcp_network_name: "{{ demo_cluster_name }}"
+demo_ansible_ssh_pubkey: ''
+demo_ansible_user: ansible
+openshift_gcp_subnetwork_name: "{{ demo_cluster_name }}"
+demo_gcp_subnetwork_ip_cidr_range: '10.0.0.0/24'
+demo_handle_dns_delegation: false
+demo_use_cloud_dns: false
+demo_wildcard_dns: false
 
 openshift_master_cluster_hostname: ''
 openshift_master_cluster_public_hostname: ''
 openshift_master_default_subdomain: ''
-openshift_provision_controller_hostname: ''
-openshift_provision_controller_public_hostname: ''
+demo_controller_public_hostname: ''
 
-openshift_provision_use_controller: true
-openshift_provision_controller_ansible_port: 22
-openshift_provision_controller_ansible_ssh_pubkey: ''
-openshift_provision_controller_ansible_user: ansible
-openshift_provision_controller_hostname: >-
-  controller.{{ openshift_provision_dns_cluster_domain }}
-openshift_provision_gcp_controller_boot_disk_image: >-
+demo_use_controller: true
+demo_controller_ansible_port: 22
+demo_controller_ansible_ssh_pubkey: ''
+demo_controller_ansible_user: ansible
+demo_controller_hostname: >-
+  controller.{{ demo_dns_cluster_domain }}
+demo_gcp_controller_boot_disk_image: >-
   {{ openshift_gcp_image }}
-openshift_provision_gcp_controller_boot_disk_size_gb: 50
-openshift_provision_gcp_controller_iam_roles:
+demo_gcp_controller_boot_disk_size_gb: 50
+demo_gcp_controller_iam_roles:
 - owner
-openshift_provision_gcp_controller_machine_type: n1-standard-1
-openshift_provision_gcp_controller_service_account: "{{ openshift_gcp_prefix }}controller"
+demo_gcp_controller_machine_type: n1-standard-1
+demo_gcp_controller_service_account: "{{ openshift_gcp_prefix }}controller"
 
-openshift_provision_gcp_dns_delegation_zone_name: ''
+demo_gcp_dns_delegation_zone_name: ''
 
-openshift_provision_gcp_manage_firewall: true
+demo_gcp_manage_firewall: true
 
-openshift_provision_gcp_master_boot_disk_image: >-
+demo_gcp_master_boot_disk_image: >-
   {{ openshift_gcp_image }}
-openshift_provision_gcp_master_boot_disk_size_gb: 50
-openshift_provision_gcp_master_boot_disk_type: pd-standard
-openshift_provision_gcp_master_docker_vg_disk_size_gb: 50
-openshift_provision_gcp_master_docker_vg_disk_type: pd-standard
-openshift_provision_gcp_master_machine_type: n1-standard-4
-openshift_provision_gcp_master_service_account: "{{ openshift_gcp_prefix }}master"
+demo_gcp_master_boot_disk_size_gb: 50
+demo_gcp_master_boot_disk_type: pd-standard
+demo_gcp_master_docker_vg_disk_size_gb: 50
+demo_gcp_master_docker_vg_disk_type: pd-standard
+demo_gcp_master_machine_type: n1-standard-4
+demo_gcp_master_service_account: "{{ openshift_gcp_prefix }}master"
 
-openshift_provision_gcp_node_boot_disk_size_gb: 50
-openshift_provision_gcp_node_boot_disk_type: pd-standard
-openshift_provision_gcp_node_image_family: "{{ openshift_gcp_prefix }}node"
-openshift_provision_gcp_node_machine_type: n1-standard-4
-openshift_provision_gcp_node_service_account: "{{ openshift_gcp_prefix }}node"
+demo_gcp_node_boot_disk_size_gb: 50
+demo_gcp_node_boot_disk_type: pd-standard
+demo_gcp_node_image_family: "{{ openshift_gcp_prefix }}node"
+demo_gcp_node_machine_type: n1-standard-4
+demo_gcp_node_service_account: "{{ openshift_gcp_prefix }}node"
 
-openshift_provision_node_kube_reserved_cpu: 250m
-openshift_provision_node_kube_reserved_memory: 250Mi
+demo_node_kube_reserved_cpu: 250m
+demo_node_kube_reserved_memory: 250Mi
 
 openshift_gcp_create_registry_bucket: true
-openshift_gcp_registry_bucket_keyfile: "{{ openshift_provision_config_path }}/cluster/{{ openshift_provision_cluster_name }}/registry-gcs.key"
+openshift_gcp_registry_bucket_keyfile: "{{ openshift_provision_project_dir }}/config/cluster/{{ demo_cluster_name }}/registry-gcs.key"
 openshift_gcp_registry_bucket_name: "{{ openshift_gcp_prefix }}registry"
-openshift_provision_gcp_registry_service_account_id: "{{ openshift_gcp_prefix }}registry"
+demo_gcp_registry_service_account_id: "{{ openshift_gcp_prefix }}registry"
 
-openshift_provision_shared_public_load_balancer: true
+demo_shared_public_load_balancer: true
 
 terraform_action: none
 terraform_components:

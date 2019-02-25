@@ -1,8 +1,8 @@
 ---
-openshift_provision_cluster_name: gcp-demo-sbx-ocp3
-openshift_provision_sandbox: true
-openshift_provision_environment_level: nonprod
-openshift_provision_cloud_region: gcp-us-east4
-openshift_provision_cloud_provider: gcp
+demo_cluster_name: gcp-demo-sbx-ocp3
+demo_sandbox: true
+demo_environment_level: nonprod
+demo_cloud_region: gcp-us-east4
+demo_cloud_provider: gcp
 openshift_release: "3.11"
 openshift_deployment_type: openshift-enterprise

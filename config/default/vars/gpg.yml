@@ -1,4 +1,4 @@
 ---
-openshift_provision_gpg_key_email: "openshift-provision-demo@gnuthought.com"
-openshift_provision_gpg_key_name: OpenShift Provision Demo
-openshift_provision_gpg_key_passphrase: redhat
+demo_gpg_key_email: "openshift-provision-demo@gnuthought.com"
+demo_gpg_key_name: OpenShift Provision Demo
+demo_gpg_key_passphrase: redhat

@@ -12,20 +12,20 @@
     get_url:
       url: >-
         https://releases.hashicorp.com/terraform/{{
-          openshift_provision_controller_terraform_release
+          demo_controller_terraform_release
         }}/terraform_{{
-          openshift_provision_controller_terraform_release
+          demo_controller_terraform_release
         }}_linux_amd64.zip
       dest: >-
         /usr/local/src/terraform_{{
-          openshift_provision_controller_terraform_release
+          demo_controller_terraform_release
         }}_linux_amd64.zip
 
   - name: Unpack terraform
     become: true
     command: >-
       unzip /usr/local/src/terraform_{{
-        openshift_provision_controller_terraform_release
+        demo_controller_terraform_release
       }}_linux_amd64.zip
     args:
       chdir: /usr/local/bin

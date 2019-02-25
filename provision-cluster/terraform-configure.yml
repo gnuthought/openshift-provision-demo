@@ -8,7 +8,7 @@
 
   - name: Include terraform role for bootstrap
     include_role:
-      name: "{{ openshift_provision_cloud_provider }}-terraform"
+      name: "{{ demo_cloud_provider }}-terraform"
       allow_duplicates: true
     vars:
       terraform_action: apply
@@ -19,7 +19,7 @@
       - masters
       - router
       - public-load-balancer
-      terraform_dir: "{{ playbook_dir }}/terraform/{{ openshift_provision_cluster_name }}"
+      terraform_dir: "{{ playbook_dir }}/terraform/{{ demo_cluster_name }}"
 
   - name: Wait for all instances to be running
     command: ../hosts.py --wait 300

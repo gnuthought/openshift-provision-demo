@@ -1,2 +1,3 @@
-openshift_provision_sandbox_cluster_resources:
+---
+demo_cluster_resources_for_sandbox:
 - ClusterRole/sandbox-cluster-admin.yml

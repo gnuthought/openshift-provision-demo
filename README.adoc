@@ -33,7 +33,7 @@ terraform 0.11+
 
 To access the controller you will need an SSH key pair with a public key at
 `~/.ssh/id_rsa.pub` or configure your public key using
-`openshift_provision_controller_ansible_ssh_pubkey` in
+`demo_controller_ansible_ssh_pubkey` in
 `config/default/vars/controller.yml`.
 
 You will need to also need an account cloud provider account with sufficient
@@ -79,8 +79,15 @@ IP to access your controller:
 GCP_ANSIBLE_INVENTORY_USE_NAT_IP=true
 ```
 
-There is a sample environement file at `gcp-demo.env.example` which can for
-reference when setting your environment.
+There is a sample environement file at `demo.env.example` which can for
+reference when setting your environment. Just copy this over to `demo.env`
+and edit.
+
+You may also wish to set `DEMO_CLUSTER_NAME` in your `demo.env` file such as:
+
+```
+export DEMO_CLUSTER_NAME=gcp-demo-sbx-okd3
+```
 
 == Controller Setup
 
@@ -102,13 +109,13 @@ When this command exits it will print the ssh command to contact the cluster.
 The cluster firewall will be configured to allow SSH access from your source
 IP address as seen by http://ipv4bot.whatismyipaddress.com/. If you know your
 source IP range does not change, you can configure
-`openshift_provision_management_source_ip_range`. Whenever your source range
+`demo_management_source_ip_range`. Whenever your source range
 changes, just rerun the `configure-controller.sh` script.
 
 Note that the default SSH port for the controller configured for tcp 443 using
-`openshift_provision_controller_ansible_port` in
-`config/default/vars/controller.yml`. This has proved useful for accessing the
-demo cluster from networks with restrictive firewalls.
+`demo_controller_ansible_port` in `config/default/vars/controller.yml`. This
+has proved useful for accessing the demo cluster from networks with restrictive
+firewalls.
 
 To continue with the demo, SSH into the controller and start a `tmux` or
 `screen` session. This will allow you to disconnect and reconnect to long

@@ -1,5 +1,5 @@
 ---
-openshift_provision_project_openshift_provision:
+demo_project_openshift_provision:
   admin_create: true
   resources:
   - openshift-provision/ConfigMap/cluster.yml.j2

@@ -2,7 +2,7 @@
 - name: Uninstall Packages
   become: true
   yum:
-    name: "{{ openshift_provision_controller_remove_packages }}"
+    name: "{{ demo_controller_remove_packages }}"
     state: absent
 
 # The yum module should be preferable, but was found to frequently hang
@@ -10,10 +10,10 @@
   become: true
   command: >-
     yum install -y
-    {% if openshift_provision_controller_packages_enablerepo %}
-    --enablerepo={{ openshift_provision_controller_packages_enablerepo | join(',') }}
+    {% if demo_controller_packages_enablerepo %}
+    --enablerepo={{ demo_controller_packages_enablerepo | join(',') }}
     {% endif %}
-    {{ openshift_provision_controller_packages | join(' ') }}
+    {{ demo_controller_packages | join(' ') }}
   #'
   args:
     warn: false
@@ -26,10 +26,10 @@
   become: true
   command: >-
     yum install -y
-    {% if openshift_provision_controller_cloud_packages_enablerepo %}
-    --enablerepo={{ openshift_provision_controller_cloud_packages_enablerepo | join(',') }}
+    {% if demo_controller_cloud_packages_enablerepo %}
+    --enablerepo={{ demo_controller_cloud_packages_enablerepo | join(',') }}
     {% endif %}
-    {{ openshift_provision_controller_cloud_packages | join(' ') }}
+    {{ demo_controller_cloud_packages | join(' ') }}
   #'
   args:
     warn: false
@@ -42,4 +42,4 @@
   become: true
   command: >-
     pip install --upgrade {{ item }}
-  with_items: "{{ openshift_provision_controller_cloud_python_packages }}"
+  with_items: "{{ demo_controller_cloud_python_packages }}"

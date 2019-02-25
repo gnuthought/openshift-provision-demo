@@ -2,7 +2,7 @@
 - name: Get master.crt subject
   command: >-
     openssl x509 -subject -noout
-    -in {{ openshift_provision_cluster_tls_dir }}/master.crt
+    -in {{ demo_cluster_tls_dir }}/master.crt
   changed_when: false
   failed_when: false
   register: get_master_crt_subject
@@ -10,8 +10,8 @@
 - name: Check if master.crt is self-signed
   command: >-
     diff -q
-    {{ openshift_provision_cluster_tls_dir }}/master.crt
-    {{ openshift_provision_cluster_tls_dir }}/master-ca.crt
+    {{ demo_cluster_tls_dir }}/master.crt
+    {{ demo_cluster_tls_dir }}/master-ca.crt
   changed_when: false
   failed_when: false
   register: check_master_crt_self_signed
@@ -21,9 +21,9 @@
     path: "{{ item }}"
     state: absent
   with_items:
-  - "{{ openshift_provision_cluster_tls_dir }}/master.key"
-  - "{{ openshift_provision_cluster_tls_dir }}/master.crt"
-  - "{{ openshift_provision_cluster_tls_dir }}/master-ca.crt"
+  - "{{ demo_cluster_tls_dir }}/master.key"
+  - "{{ demo_cluster_tls_dir }}/master.crt"
+  - "{{ demo_cluster_tls_dir }}/master-ca.crt"
   vars:
     master_subject: >-
       {{ get_master_crt_subject.stdout
@@ -39,25 +39,25 @@
     openssl req -new -nodes -x509
     -newkey rsa:2048
     -days 365
-    -keyout {{ openshift_provision_cluster_tls_dir }}/master.key
-    -out {{ openshift_provision_cluster_tls_dir }}/master.crt
+    -keyout {{ demo_cluster_tls_dir }}/master.key
+    -out {{ demo_cluster_tls_dir }}/master.crt
     -subj '/CN={{ openshift_master_cluster_public_hostname }}'
   args:
-    creates: "{{ openshift_provision_cluster_tls_dir }}/master.crt"
+    creates: "{{ demo_cluster_tls_dir }}/master.crt"
   register: create_master_certificate
 
 - when: create_master_certificate.changed
   name: Copy master self signed sert to master-ca.crt
   copy:
     remote_src: true
-    src: "{{ openshift_provision_cluster_tls_dir }}/master.crt"
-    dest: "{{ openshift_provision_cluster_tls_dir }}/master-ca.crt"
+    src: "{{ demo_cluster_tls_dir }}/master.crt"
+    dest: "{{ demo_cluster_tls_dir }}/master-ca.crt"
 
 - name: Copy master ca cert to /etc/pki/ca-trust/source/anchors
   become: true
   copy:
     remote_src: true
-    src: "{{ openshift_provision_cluster_tls_dir }}/master-ca.crt"
-    dest: /etc/pki/ca-trust/source/anchors/{{ openshift_provision_cluster_name }}-master-ca.crt
+    src: "{{ demo_cluster_tls_dir }}/master-ca.crt"
+    dest: /etc/pki/ca-trust/source/anchors/{{ demo_cluster_name }}-master-ca.crt
   ignore_errors: true
   notify: update-ca-trust

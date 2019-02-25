@@ -1,25 +1,27 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
-USAGE="Usage: $0 <OPENSHIFT_PROVISION_CLUSTER_NAME>"
+[[ -e demo.env ]] && . demo.env
 
-export OPENSHIFT_PROVISION_CLUSTER_NAME=${1:-$OPENSHIFT_PROVISION_CLUSTER_NAME}
+USAGE="Usage: $0 <DEMO_CLUSTER_NAME>"
+
+export DEMO_CLUSTER_NAME=${1:-$DEMO_CLUSTER_NAME}
 
 errexit () {
   echo -e "$1\n$USAGE" >&2
   exit 1
 }
 
-[[ -z "$OPENSHIFT_PROVISION_CLUSTER_NAME" ]] && errexit "No OPENSHIFT_PROVISION_CLUSTER_NAME provided."
+[[ -z "$DEMO_CLUSTER_NAME" ]] && errexit "No DEMO_CLUSTER_NAME provided."
 
 cd provision-controller
-./ansible-playbook.sh configure.yml $OPENSHIFT_PROVISION_CLUSTER_NAME
+./ansible-playbook.sh configure.yml
 cd ..
 
 HOSTS_JSON=$(./hosts.py --list)
-CONTROLLER_HOSTNAME=$(echo $HOSTS_JSON | jq -r '.all.vars.openshift_provision_controller_public_hostname')
-CONTROLLER_PORT=$(echo $HOSTS_JSON | jq -r '.all.vars.openshift_provision_controller_ansible_port')
-CONTROLLER_USER=$(echo $HOSTS_JSON | jq -r '.all.vars.openshift_provision_controller_ansible_user')
+CONTROLLER_HOSTNAME=$(echo $HOSTS_JSON | jq -r '.all.vars.demo_controller_public_hostname')
+CONTROLLER_PORT=$(echo $HOSTS_JSON | jq -r '.all.vars.demo_controller_ansible_port')
+CONTROLLER_USER=$(echo $HOSTS_JSON | jq -r '.all.vars.demo_controller_ansible_user')
 
 cat <<EOF
 

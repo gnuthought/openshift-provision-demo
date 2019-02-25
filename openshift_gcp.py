@@ -36,11 +36,11 @@ class OpenShiftGCP:
             self.set_openshift_gcp_project()
         if self.ocpinv().init_mode:
             return
-        if self.ocpinv().cluster_var('openshift_provision_use_cloud_dns'):
+        if self.ocpinv().cluster_var('demo_use_cloud_dns'):
             self.set_cluster_domain_dns_servers()
         if not self.ocpinv().cluster_var('openshift_master_cluster_hostname'):
             self.set_master_cluster_hostname_with_loadbalancer_ip()
-        if self.ocpinv().cluster_var('openshift_provision_wildcard_dns'):
+        if self.ocpinv().cluster_var('demo_wildcard_dns'):
             self.set_wildcard_dns_vars()
 
     def set_openshift_gcp_project(self):
@@ -71,15 +71,15 @@ class OpenShiftGCP:
 
     def set_cluster_domain_dns_servers(self):
         """
-        Set openshift_provision_cluster_domain_dns_servers based on dynamically
+        Set demo_cluster_domain_dns_servers based on dynamically
         determined name server list.
         """
         cluster_zone = self.dnsAPI.managedZones().get(
-            managedZone = self.ocpinv().cluster_var('openshift_provision_gcp_dns_zone_name'),
+            managedZone = self.ocpinv().cluster_var('demo_gcp_dns_zone_name'),
             project = self.ocpinv().cluster_var('openshift_gcp_project')
         ).execute()
         self.ocpinv().set_dynamic_cluster_var(
-            'openshift_provision_cluster_domain_dns_servers',
+            'demo_cluster_domain_dns_servers',
             cluster_zone['nameServers']
         )
 
@@ -98,7 +98,7 @@ class OpenShiftGCP:
             return
 
     def set_wildcard_dns_vars(self):
-        wildcard_dns = self.ocpinv().cluster_var('openshift_provision_wildcard_dns')
+        wildcard_dns = self.ocpinv().cluster_var('demo_wildcard_dns')
         master_ip, router_ip = self.get_master_and_router_ip()
         if master_ip:
             self.ocpinv().set_dynamic_cluster_var(
@@ -119,14 +119,14 @@ class OpenShiftGCP:
         controller_ip, controller_public_ip = self.get_controller_ips()
         if controller_ip:
             self.ocpinv().set_dynamic_cluster_var(
-                'openshift_provision_controller_hostname',
+                'demo_controller_hostname',
                 "controller.{}.{}".format(
                     controller_ip,
                     wildcard_dns
                 )
             )
             self.ocpinv().set_dynamic_cluster_var(
-                'openshift_provision_controller_public_hostname',
+                'demo_controller_public_hostname',
                 "controller.{}.{}".format(
                     controller_public_ip,
                     wildcard_dns
@@ -135,7 +135,7 @@ class OpenShiftGCP:
 
     def get_master_and_router_ip(self):
         gcp_prefix = self.ocpinv().cluster_var('openshift_gcp_prefix')
-        if self.ocpinv().cluster_var('openshift_provision_shared_public_load_balancer'):
+        if self.ocpinv().cluster_var('demo_shared_public_load_balancer'):
             ip = self.get_globaladdress_ip(gcp_prefix + 'public')
             return ip, ip
         else:
@@ -188,13 +188,13 @@ class OpenShiftGCP:
         for the region.
         """
 
-        config_zones = self.ocpinv().cluster_var('openshift_provision_gcp_zones')
+        config_zones = self.ocpinv().cluster_var('demo_gcp_zones')
         if config_zones:
             return config_zones
 
         if not self.ocpinv().cluster_var('openshift_gcp_multizone'):
             gcp_zone = self.ocpinv().cluster_var('openshift_gcp_zone')
-            self.ocpinv().cluster_config['openshift_provision_gcp_zones'] = [gcp_zone]
+            self.ocpinv().cluster_config['demo_gcp_zones'] = [gcp_zone]
             return [gcp_zone]
 
         region = self.computeAPI.regions().get(
@@ -204,7 +204,7 @@ class OpenShiftGCP:
         gcp_zones = [
             zone_uri.rsplit('/',1)[-1] for zone_uri in region['zones']
         ]
-        self.ocpinv().cluster_config['openshift_provision_gcp_zones'] = gcp_zones
+        self.ocpinv().cluster_config['demo_gcp_zones'] = gcp_zones
         return gcp_zones
 
     def get_instance_in_zone(self, hostname, zone):
@@ -283,7 +283,7 @@ class OpenShiftGCP:
 
         node_group_name = self.instance_openshift_node_group_name(instance)
         node_group_labels = self.ocpinv().cluster_config \
-            .get('openshift_provision_node_groups', {}) \
+            .get('demo_openshift_node_groups', {}) \
             .get(node_group_name, {}) \
             .get('labels', {'node-role.kubernetes.io/'+node_group_name: 'true' })
         node_labels.update(node_group_labels)
@@ -331,7 +331,7 @@ class OpenShiftGCP:
         if instance.get('labels',{}).get('openshift-cluster-controller', 'false') != 'true':
             hostvars['openshift_node_group_name'] = \
                 'node-config-' + self.instance_openshift_node_group_name(instance)
-            hostvars['openshift_provision_node_labels'] = \
+            hostvars['demo_node_labels'] = \
                 self.instance_openshift_node_labels(instance)
             self.instance_add_host_storage_devices(instance, hostvars)
 
@@ -351,7 +351,7 @@ class OpenShiftGCP:
             return True
         for role in os.environ['OPENSHIFT_ROLE_FILTER'].split(','):
             kuberole = 'node-role.kubernetes.io/' + role
-            if kuberole in hostvars.get('openshift_provision_node_labels', {}):
+            if kuberole in hostvars.get('demo_node_labels', {}):
                 return True
         return False
 
@@ -448,7 +448,7 @@ class OpenShiftGCP:
             project = self.ocpinv().cluster_var('openshift_gcp_project'),
             body = {
                 "name": image_name,
-                "family": self.ocpinv().cluster_var('openshift_provision_gcp_node_image_family'),
+                "family": self.ocpinv().cluster_var('demo_gcp_node_image_family'),
                 "labels": {
                     "openshift-cluster": self.ocpinv().cluster_name
                 },
@@ -492,7 +492,7 @@ class OpenShiftGCP:
         req = self.computeAPI.images().list(
             project = self.ocpinv().cluster_var('openshift_gcp_project'),
             filter = '(family="{}")'.format(
-                self.ocpinv().cluster_var('openshift_provision_gcp_node_image_family')
+                self.ocpinv().cluster_var('demo_gcp_node_image_family')
             )
         )
         while req:
@@ -521,7 +521,7 @@ class OpenShiftGCP:
             'iam.googleapis.com',
             'serviceusage.googleapis.com'
         ]
-        if self.ocpinv().cluster_var('openshift_provision_use_cloud_dns'):
+        if self.ocpinv().cluster_var('demo_use_cloud_dns'):
             service_ids.append('dns.googleapis.com')
 
         self.serviceusageAPI \
@@ -563,7 +563,7 @@ class OpenShiftGCP:
                 raise e
 
     def scaleup(self):
-        node_groups = self.ocpinv().cluster_config.get('openshift_provision_node_groups', {})
+        node_groups = self.ocpinv().cluster_config.get('demo_openshift_node_groups', {})
         for node_group_name, node_group in node_groups.items():
             if node_group.get('static_node_group', False):
                 continue

@@ -8,7 +8,7 @@ resource "google_dns_managed_zone" "{{ cluster_dns_zone_name }}" {
   description = "{{ cluster_name }} managed by terraform"
 }
 
-{% if not openshift_provision_wildcard_dns %}
+{% if not demo_wildcard_dns %}
 resource "google_dns_record_set" "{{ openshift_gcp_prefix }}master-public" {
   name = "{{ openshift_master_cluster_public_hostname }}."
   type = "A"

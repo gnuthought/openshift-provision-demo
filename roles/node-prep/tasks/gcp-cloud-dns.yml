@@ -4,11 +4,11 @@
     path: /etc/dnsmasq.d/cluster-domain.conf
     create: true
     block: |-
-      {% for dnssrv in openshift_provision_cluster_domain_dns_servers %}
-      server=/{{ openshift_provision_dns_cluster_domain }}/{{ lookup('dig', dnssrv) }}
+      {% for dnssrv in demo_cluster_domain_dns_servers %}
+      server=/{{ demo_dns_cluster_domain }}/{{ lookup('dig', dnssrv) }}
       {% endfor %}
     marker: "# {mark} ANSIBLE MANAGED BLOCK - cloud-dns-gcp"
-  when: openshift_provision_cluster_domain_dns_servers is defined
+  when: demo_cluster_domain_dns_servers is defined
   notify:
   - restart dnsmasq
 

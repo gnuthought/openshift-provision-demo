@@ -27,10 +27,10 @@ spec:
         - --logtostderr
         - --namespace=kube-cluster-autoscaler
         - --write-status-configmap=true
-{% for node_group_name, node_group in openshift_provision_node_groups.items() %}
+{% for node_group_name, node_group in demo_openshift_node_groups.items() %}
 {%   if 'minimum_instance_count' in node_group and 'maximum_instance_count' in node_group %}
-{%     if openshift_provision_cloud_provider == 'gcp' %}
-{%       set gcp_zones = node_group.gcp_zones | default(openshift_provision_gcp_zones) %}
+{%     if demo_cloud_provider == 'gcp' %}
+{%       set gcp_zones = node_group.gcp_zones | default(demo_gcp_zones) %}
 {%       set outer_loop_last = loop.last %}
 {%       for gcp_zone in gcp_zones %}
 {%         set instance_group_name = openshift_gcp_prefix ~ node_group_name ~ gcp_zone[-2:] %}
@@ -44,8 +44,8 @@ spec:
         env:
         - name: LOG_OUTPUT
           value: /dev/stdout
-        image: {{ openshift_provision_cluster_autoscaler_image }}
-        imagePullPolicy: {{ openshift_provision_cluster_autoscaler_image_pull_policy }}
+        image: {{ demo_cluster_autoscaler_image }}
+        imagePullPolicy: {{ demo_cluster_autoscaler_image_pull_policy }}
         name: kube-cluster-autoscaler
         resources: {}
         terminationMessagePath: /dev/termination-log

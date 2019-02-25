@@ -1,5 +1,5 @@
 ---
-openshift_provision_project_kube_cluster_autoscaler:
+demo_project_kube_cluster_autoscaler:
   admin_create: true
   annotations:
     # Run autoscaler pods on masters
@@ -7,4 +7,4 @@ openshift_provision_project_kube_cluster_autoscaler:
   resources:
   - kube-cluster-autoscaler/Deployment/kube-cluster-autoscaler.yml.j2
 
-openshift_provision_cluster_autoscaler_image_pull_policy: Always
+demo_cluster_autoscaler_image_pull_policy: Always

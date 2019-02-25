@@ -13,7 +13,7 @@ openshift_master_htpasswd_users:
   # alice:password
   alice: "$apr1$qgCoSsC5$v5fSYIiuAUEFaZbJbYgaW0"
 
-openshift_provision_sandbox_cluster_role_bindings:
+demo_cluster_role_bindings_for_sandbox:
   sandbox-cluster-admin:
     users:
     - admin

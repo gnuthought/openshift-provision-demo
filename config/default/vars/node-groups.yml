@@ -4,4 +4,4 @@ openshift_master_bootstrap_auto_approve: true
 
 # Convert from reasonable node group variable to expected variable format
 openshift_node_groups: >-
-  {{ openshift_provision_node_groups | provision_to_openshift_node_groups }}
+  {{ demo_openshift_node_groups | demo_to_openshift_node_groups }}

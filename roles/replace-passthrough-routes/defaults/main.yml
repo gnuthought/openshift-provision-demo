@@ -1,2 +1,2 @@
 ---
-openshift_provision_replace_passthrough_routes: false
+demo_replace_passthrough_routes: false

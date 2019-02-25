@@ -11,4 +11,4 @@
   include_tasks: rootfs-quota.yml
 
 - name: Configure for cloud provider
-  include_tasks: cloud-provider-{{ openshift_provision_cloud_provider }}.yml
+  include_tasks: cloud-provider-{{ demo_cloud_provider }}.yml

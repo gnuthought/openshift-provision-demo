@@ -7,7 +7,7 @@
     body:
       grant_type: password
       username: root
-      password: "{{ openshift_provision_gitlab_root_password }}"
+      password: "{{ demo_gitlab_root_password }}"
   register: get_oauth_token
 
 - name: Create demo project
@@ -32,7 +32,7 @@
 - name: Add remote for local gitlab for openshift-provision-demo
   command: >-
     git remote add gitlab
-    http://root:{{ openshift_provision_gitlab_root_password }}@localhost/root/openshift-provision-demo.git
+    http://root:{{ demo_gitlab_root_password }}@localhost/root/openshift-provision-demo.git
   args:
     chdir: ~/openshift-provision-demo
   register: add_gitlab_remote
@@ -56,6 +56,7 @@
       Authorization: Bearer {{ get_oauth_token.json.access_token }}
   register: get_webhooks
 
+# FIXME - Add webhook after initial install
 - name: Add webhook for openshift-provision-demo
   uri:
     url: http://localhost/api/v4/projects/root%2Fopenshift-provision-demo/hooks
@@ -74,7 +75,7 @@
      {{ 'https://manager-openshift-provision.'
       ~ openshift_master_default_subdomain
       ~ '/provision/cluster/'
-      ~ openshift_provision_cluster_webhook_key
+      ~ demo_cluster_webhook_key
      }}
   when: >-
     0 == get_webhooks.json | json_query("[?url=='" ~ webhook_url ~ "']") | length

@@ -1,10 +1,10 @@
 ---
-- name: Check for GPG key {{ openshift_provision_gpg_key_email }}
-  command: gpg2 --list-keys {{ openshift_provision_gpg_key_email }}
+- name: Check for GPG key {{ demo_gpg_key_email }}
+  command: gpg2 --list-keys {{ demo_gpg_key_email }}
   changed_when: false
   failed_when: false
   register: get_gpg_key
 
-- name: Create GPG key {{ openshift_provision_gpg_key_email }}
+- name: Create GPG key {{ demo_gpg_key_email }}
   include_tasks: create-gpg-key.yml
   when: get_gpg_key.rc != 0

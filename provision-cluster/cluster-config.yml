@@ -6,11 +6,11 @@
     import_tasks: ../load-dynamic-config.yml
 
 - import_playbook: >-
-   {{ openshift_ansible_path }}/playbooks/init/main.yml
+   {{ demo_openshift_ansible_path }}/playbooks/init/main.yml
   vars:
     l_networkman_check_hosts: "oo_nodes_to_config"
 
 - import_playbook: >-
-   {{ openshift_ansible_path }}/playbooks/common/private/components.yml
+   {{ demo_openshift_ansible_path }}/playbooks/common/private/components.yml
 
 - import_playbook: replace-passthrough-routes.yml
