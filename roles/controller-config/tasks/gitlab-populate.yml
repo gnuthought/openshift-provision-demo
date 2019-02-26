@@ -16,6 +16,9 @@
   - name: openshift-provision-demo
     description: OpenShift Provision Demo
     origin_url: https://github.com/gnuthought/openshift-provision-demo.git
+  - name: openshift-provision-manager
+    description: OpenShift Provision Manager
+    origin_url: https://github.com/gnuthought/openshift-provision-manager.git
   - name: openshift-provision-example-0
     description: OpenShift Provision Example 0
     origin_url: https://github.com/gnuthought/openshift-provision-example-0.git
