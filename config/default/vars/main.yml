@@ -14,7 +14,7 @@ openshift_provision:
   # Resource search path corresponds to openshift_provision_config_hierarchy
   resource_path: >-
     {{ openshift_provision_config_hierarchy
-     | map('regex_replace','^(.*)$', openshift_provision_project_dir ~ '/\1/resources')
+     | map('regex_replace','^(.*)/vars$', openshift_provision_project_dir ~ '/\1/resources')
      | list
     }}
 
@@ -39,16 +39,16 @@ demo_ansible_ssh_pubkey: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
 # configuration.
 #
 demo_default_config_hierarchy_no_sandbox:
-- config/cluster/{{ demo_cluster_name }}
-- config/openshift_deployment_type/{{ openshift_deployment_type }}
-- config/openshift_release/{{ openshift_release }}
-- config/cloud_provider/{{ demo_cloud_provider }}
-- config/cloud_region/{{ demo_cloud_region }}
-- config/environment_level/{{ demo_environment_level }}
-- config/default
+- config/cluster/{{ demo_cluster_name }}/vars
+- config/openshift_deployment_type/{{ openshift_deployment_type }}/vars
+- config/openshift_release/{{ openshift_release }}/vars
+- config/cloud_provider/{{ demo_cloud_provider }}/vars
+- config/cloud_region/{{ demo_cloud_region }}/vars
+- config/environment_level/{{ demo_environment_level }}/vars
+- config/default/vars
 demo_default_config_hierarchy: >-
   {{ [demo_default_config_hierarchy_no_sandbox[0]]
-   + ( ['config/sandbox'] if demo_sandbox else [] )
+   + ( ['config/sandbox/vars'] if demo_sandbox else [] )
    + demo_default_config_hierarchy_no_sandbox[1:]
   }}
 openshift_provision_config_hierarchy: '{{ demo_default_config_hierarchy }}'
