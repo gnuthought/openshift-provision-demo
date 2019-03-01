@@ -63,11 +63,10 @@ class OpenShiftInventory:
             )
 
     def load_cluster_vars(self, path):
-        vardir = path + '/vars'
-        for varfile in os.listdir(self.openshift_provision_project_dir + '/' + vardir):
+        for varfile in os.listdir(self.openshift_provision_project_dir + '/' + path):
             if not re.match(r'\w.*\.(ya?ml|json)$', varfile):
                 continue
-            varpath = vardir + '/' + varfile
+            varpath = path + '/' + varfile
             self.cluster_config.update(
                 self.load_vars_file(varpath) or {}
             )

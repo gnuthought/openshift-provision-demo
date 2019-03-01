@@ -1,0 +1,8 @@
+---
+- name: Install openshift-provision with ansible-galaxy
+  command: >-
+    ansible-galaxy install
+    https://github.com/gnuthought/ansible-role-openshift-provision/archive/master.tar.gz#/openshift-provision
+  register: ansible_galaxy
+  changed_when: >-
+    'already installed' not in ansible_galaxy.stdout

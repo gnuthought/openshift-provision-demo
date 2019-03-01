@@ -41,6 +41,9 @@
 - name: Git clone openshift-ansible
   include_tasks: openshift-ansible-git.yml
 
+- name: Install openshift-provision ansible role
+  include_tasks: openshift-provision-install.yml
+
 - name: Include cloud provider specific configuration
   include_tasks: cloud-provider-{{ demo_cloud_provider }}.yml
 
