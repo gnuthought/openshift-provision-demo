@@ -15,6 +15,7 @@ demo_wildcard_dns: nip.io
 openshift_master_cluster_public_hostname: master.{{ demo_dns_cluster_domain }}
 openshift_master_default_subdomain: app.{{ demo_dns_cluster_domain }}
 demo_controller_public_hostname: controller.{{ demo_dns_cluster_domain }}
+demo_controller_hostname: controller.{{ demo_dns_cluster_domain }}
 
 # Use of cloud DNS requires extra access rights and the demo cluster can
 # function without this.
