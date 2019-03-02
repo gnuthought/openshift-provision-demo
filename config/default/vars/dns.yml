@@ -11,10 +11,9 @@ demo_dns_subdomain: "{{ demo_cluster_name }}"
 # openshift_master_cluster_public_hostname and openshift_master_default_subdomain
 demo_wildcard_dns: nip.io
 
-# If not using wildcard_dns then values must be set for
-# openshift_master_cluster_public_hostname and openshift_master_default_subdomain
-#openshift_master_cluster_public_hostname: master.{{ demo_dns_cluster_domain }}
-#openshift_master_default_subdomain: app.{{ demo_dns_cluster_domain }}
+# If using wildcard_dns then values will be overridden by dynamic inventory.
+openshift_master_cluster_public_hostname: master.{{ demo_dns_cluster_domain }}
+openshift_master_default_subdomain: app.{{ demo_dns_cluster_domain }}
 
 # Use of cloud DNS requires extra access rights and the demo cluster can
 # function without this.
