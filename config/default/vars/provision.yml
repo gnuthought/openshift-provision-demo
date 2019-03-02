@@ -6,7 +6,7 @@ demo_default_cluster_role_bindings:
   cluster-admin:
     users:
     - system:admin
-    - system:serviceaccount:openshift-provision:manager
+    - system:serviceaccount:openshift-provision:cluster
     groups:
     - system:cluster-admins
     - system:masters
