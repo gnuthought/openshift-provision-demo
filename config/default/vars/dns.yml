@@ -3,15 +3,12 @@ demo_dns_cluster_domain: "{{ demo_dns_subdomain }}.{{ demo_dns_parent_domain }}"
 demo_dns_parent_domain: openshift.gnuthought.com
 demo_dns_subdomain: "{{ demo_cluster_name }}"
 
-# If openshift_master_cluster_hostname then it must be resolvable, if not set
-# then the load balancer IP will automatically be set for this value.
-#openshift_master_cluster_hostname: master-internal.{{ demo_dns_cluster_domain }}
-
 # Use a wildcard DNS service such as xip.io or nip.io for
 # openshift_master_cluster_public_hostname and openshift_master_default_subdomain
 demo_wildcard_dns: nip.io
 
 # If using wildcard_dns then values will be overridden by dynamic inventory.
+openshift_master_cluster_hostname: master-internal.{{ demo_dns_cluster_domain }}
 openshift_master_cluster_public_hostname: master.{{ demo_dns_cluster_domain }}
 openshift_master_default_subdomain: app.{{ demo_dns_cluster_domain }}
 demo_controller_public_hostname: controller.{{ demo_dns_cluster_domain }}

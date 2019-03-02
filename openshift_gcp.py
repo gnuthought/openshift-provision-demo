@@ -102,6 +102,13 @@ class OpenShiftGCP:
         master_ip, router_ip = self.get_master_and_router_ip()
         if master_ip:
             self.ocpinv().set_dynamic_cluster_var(
+                'openshift_master_cluster_hostname',
+                "master-internal.{}.{}".format(
+                    master_ip,
+                    wildcard_dns
+                )
+            )
+            self.ocpinv().set_dynamic_cluster_var(
                 'openshift_master_cluster_public_hostname',
                 "master.{}.{}".format(
                     master_ip,
