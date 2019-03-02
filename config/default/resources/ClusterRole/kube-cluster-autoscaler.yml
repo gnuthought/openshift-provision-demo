@@ -7,19 +7,68 @@ metadata:
     openshift.io/description: Kubernetes cluster autoscaler role
   name: kube-cluster-autoscaler
 rules:
-# FIXME - This cluster role can be restricted... right now it is equivalent to
-# cluster-admin
 - apiGroups:
-  - '*'
+  - ""
+  resources:
+  - persistentvolumeclaims
+  - persistentvolumes
+  - pods
+  - replicationcontrollers
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+  attributeRestrictions: null
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - get
+  - list
+  - watch
+  - patch
+  - create
+  attributeRestrictions: null
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - get
+  - list
+  - watch
+  - patch
+  - update
+  attributeRestrictions: null
+- apiGroups:
+  - extensions
+  - apps
+  resources:
+  - daemonsets
+  - replicasets
+  - statefulsets
+  verbs:
+  - get
+  - list
+  - watch
+  attributeRestrictions: null
+- apiGroups:
+  - policy
+  resources:
+  - poddisruptionbudgets
+  verbs:
+  - get
+  - list
+  - watch
+  attributeRestrictions: null
+- apiGroups:
+  - storage.k8s.io
   attributeRestrictions: null
   resources:
-  - '*'
+  - storageclasses
   verbs:
-  - '*'
-- apiGroups: null
-  attributeRestrictions: null
-  nonResourceURLs:
-  - '*'
-  resources: []
-  verbs:
-  - '*'
+  - get
+  - list
+  - watch

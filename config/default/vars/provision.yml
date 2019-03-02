@@ -13,7 +13,7 @@ demo_default_cluster_role_bindings:
     remove_unlisted: true
   kube-cluster-autoscaler:
     users:
-    - system:serviceaccount:kube-cluster-autoscaler:default
+    - system:serviceaccount:kube-cluster-autoscaler:cluster-autoscaler
     remove_unlisted: true
   self-provisioner:
     users:

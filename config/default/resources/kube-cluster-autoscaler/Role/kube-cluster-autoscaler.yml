@@ -1,0 +1,52 @@
+---
+apiVersion: v1
+kind: Role
+metadata:
+  name: kube-cluster-autoscaler
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  resourceNames:
+  - cluster-autoscaler
+  - cluster-autoscaler-status
+  verbs:
+  - create
+  - get
+  - patch
+  - update
+  attributeRestrictions: null
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - create
+  attributeRestrictions: null
+- apiGroups:
+  - ""
+  attributeRestrictions: null
+  resources:
+  - endpoints
+  verbs:
+  - create
+- apiGroups:
+  - ""
+  attributeRestrictions: null
+  resourceNames:
+  - cluster-autoscaler
+  resources:
+  - endpoints
+  verbs:
+  - delete
+  - get
+  - patch
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  attributeRestrictions: null
