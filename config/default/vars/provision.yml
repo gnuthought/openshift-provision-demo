@@ -23,17 +23,17 @@ demo_default_cluster_role_bindings:
     remove_unlisted: false
 
 demo_default_process_templates:
-- file: http://{{ openshift_provision_cluster_vars.controller_hostname }}/root/openshift-provision-manager/raw/master/install-template-admin.yaml
+- file: http://{{ demo_controller_hostname }}/root/openshift-provision-manager/raw/master/install-template-admin.yaml
 
-- file: http://{{ openshift_provision_cluster_vars.controller_hostname }}/root/openshift-provision-example-0/raw/master/install-template-admin.yaml
+- file: http://{{ demo_controller_hostname }}/root/openshift-provision-example-0/raw/master/install-template-admin.yaml
 
-- file: http://{{ openshift_provision_cluster_vars.controller_hostname }}/root/openshift-provision-example-1/raw/master/install-template-admin.yaml
+- file: http://{{ demo_controller_hostname }}/root/openshift-provision-example-1/raw/master/install-template-admin.yaml
   parameters:
-    GIT_URL: http://{{ openshift_provision_cluster_vars.controller_hostname }}/root/openshift-provision-example-1.git
+    GIT_URL: http://{{ demo_controller_hostname }}/root/openshift-provision-example-1.git
 
-- file: http://{{ openshift_provision_cluster_vars.controller_hostname }}/root/openshift-provision-example-2/raw/master/install-template-admin.yaml
+- file: http://{{ demo_controller_hostname }}/root/openshift-provision-example-2/raw/master/install-template-admin.yaml
   parameters:
-    GIT_URL: http://{{ openshift_provision_cluster_vars.controller_hostname }}/root/openshift-provision-example-2.git
+    GIT_URL: http://{{ demo_controller_hostname }}/root/openshift-provision-example-2.git
 
 demo_default_projects:
   default: "{{ demo_project_default }}"

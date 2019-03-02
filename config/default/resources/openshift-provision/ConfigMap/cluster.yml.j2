@@ -13,4 +13,6 @@ data:
   git_url: >-
     http://{{ openshift_provision_cluster_vars.controller_hostname }}/root/openshift-provision-demo.git
   service_account: cluster
+  vars: >-
+    {{ demo_dynamic_vars | to_json }}
   webhook_secret: cluster-webhook
