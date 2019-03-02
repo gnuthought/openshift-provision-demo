@@ -42,3 +42,53 @@
     when: >-
       get_cluster_vars.rc != 0 or
       current_vars.data != cluster_vars.data
+
+  - name: Create openshift-provision namespace
+    command: oc adm new-project openshift-provision
+    register: create_openshift_provision_namespace
+    changed_when: >-
+      create_openshift_provision_namespace.rc == 0
+    failed_when: >-
+      create_openshift_provision_namespace.rc != 0 and
+      'already exists' not in create_openshift_provision_namespace.stderr
+
+  - name: Get openshift-provision cluster configmap
+    command: oc get configmap -n openshift-provision cluster -o json
+    register: get_cluster_configmap
+    changed_when: false
+    failed_when: >-
+      get_cluster_configmap.rc != 0 and
+      '(NotFound)' not in get_cluster_configmap.stderr
+
+  - name: Set openshift-provision cluster configmap
+    command: >-
+      oc {{ action }} -n openshift-provision -f -
+    args:
+      stdin: "{{ cluster_configmap | to_json }}"
+    vars:
+      action: "{{ 'replace' if get_cluster_configmap.rc == 0 else 'create' }}"
+      current_configmap: >-
+        {{ (
+          get_cluster_configmap.stdout if get_cluster_configmap.rc == 0 else '{}'
+        ) | from_json }}
+      cluster_configmap:
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: cluster
+          labels:
+            openshift-provision.gnuthought.com/config: "true"
+        data:
+          check_mode: "true"
+          config_path: |-
+            config/cluster/{{ demo_cluster_name }}/vars/main.yml
+            config/default/vars/main.yml
+          git_url: >-
+            http://{{ demo_controller_hostname }}/root/openshift-provision-demo.git
+          service_account: cluster
+          vars: >-
+            {{ demo_dynamic_vars | to_json }}
+          webhook_secret: cluster-webhook
+    when: >-
+      get_cluster_configmap.rc != 0 or
+      current_configmap.data != cluster_configmap.data

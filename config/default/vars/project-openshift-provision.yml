@@ -2,7 +2,6 @@
 demo_project_openshift_provision:
   admin_create: true
   resources:
-  - openshift-provision/ConfigMap/cluster.yml.j2
   - openshift-provision/Secret/cluster-webhook.yml.j2
   service_accounts:
   - cluster
