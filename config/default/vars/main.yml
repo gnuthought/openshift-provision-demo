@@ -103,28 +103,27 @@ demo_cluster_role_bindings: >-
   }}
 
 #
-# Assemble openshift_provision_cluster_vars. This is used to bootstrap values
-# into the cluster-vars configmap in the kube-public namespace which is then
-# dynamically loaded by openshift-provision when these settings are not
-# immediately available through the dynamic inventory.
+# Assemble demo_cluster_vars. This is used to set values into the cluster-vars
+# cluster-vars configmap in the kube-public namespace which is then dynamically
+# loaded by openshift-provision.
 #
-demo_openshift_provision_cluster_vars_for_openshift_release: {}
-demo_openshift_provision_cluster_vars_for_openshift_deployment_type: {}
-demo_openshift_provision_cluster_vars_for_cloud_provider: {}
-demo_openshift_provision_cluster_vars_for_cloud_region: {}
-demo_openshift_provision_cluster_vars_for_environment_level: {}
-demo_openshift_provision_cluster_vars_for_sandbox: {}
-demo_openshift_provision_cluster_vars_for_cluster: {}
+demo_cluster_vars_for_openshift_release: {}
+demo_cluster_vars_for_openshift_deployment_type: {}
+demo_cluster_vars_for_cloud_provider: {}
+demo_cluster_vars_for_cloud_region: {}
+demo_cluster_vars_for_environment_level: {}
+demo_cluster_vars_for_sandbox: {}
+demo_cluster_vars_for_cluster: {}
 
-openshift_provision_cluster_vars: >-
-  {{ demo_default_openshift_provision_cluster_vars
-   | combine(demo_openshift_provision_cluster_vars_for_openshift_release)
-   | combine(demo_openshift_provision_cluster_vars_for_openshift_deployment_type)
-   | combine(demo_openshift_provision_cluster_vars_for_cloud_provider)
-   | combine(demo_openshift_provision_cluster_vars_for_cloud_region)
-   | combine(demo_openshift_provision_cluster_vars_for_environment_level)
-   | combine(demo_openshift_provision_cluster_vars_for_sandbox)
-   | combine(demo_openshift_provision_cluster_vars_for_cluster)
+demo_cluster_vars: >-
+  {{ demo_default_cluster_vars
+   | combine(demo_cluster_vars_for_openshift_release)
+   | combine(demo_cluster_vars_for_openshift_deployment_type)
+   | combine(demo_cluster_vars_for_cloud_provider)
+   | combine(demo_cluster_vars_for_cloud_region)
+   | combine(demo_cluster_vars_for_environment_level)
+   | combine(demo_cluster_vars_for_sandbox)
+   | combine(demo_cluster_vars_for_cluster)
   }}
 
 #

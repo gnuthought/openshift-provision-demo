@@ -83,19 +83,23 @@ class OpenShiftGCP:
             cluster_zone['nameServers']
         )
 
-    def set_master_cluster_hostname_with_loadbalancer_ip(self):
+    def get_master_internal_loadbalancer_ip(self):
         gcp_prefix = self.ocpinv().cluster_var('openshift_gcp_prefix')
         resp = self.computeAPI.forwardingRules().list(
             filter = '(name="{}master")'.format(gcp_prefix),
             project = self.ocpinv().cluster_var('openshift_gcp_project'),
             region = self.ocpinv().cluster_var('openshift_gcp_region')
         ).execute()
-        for forwarding_rule in resp.get('items', []):
-            self.ocpinv().set_dynamic_cluster_var(
-                'openshift_master_cluster_hostname',
-                forwarding_rule['IPAddress']
-            )
-            return
+        if resp.get('items', []):
+            return resp['items'][0]['IPAddress']
+        else:
+            return ''
+
+    def set_master_cluster_hostname_with_loadbalancer_ip(self):
+        self.ocpinv().set_dynamic_cluster_var(
+            'openshift_master_cluster_hostname',
+            self.get_master_internal_loadbalancer_ip()
+        )
 
     def set_wildcard_dns_vars(self):
         wildcard_dns = self.ocpinv().cluster_var('demo_wildcard_dns')
@@ -104,7 +108,7 @@ class OpenShiftGCP:
             self.ocpinv().set_dynamic_cluster_var(
                 'openshift_master_cluster_hostname',
                 "master-internal.{}.{}".format(
-                    master_ip,
+                    self.get_master_internal_loadbalancer_ip(),
                     wildcard_dns
                 )
             )

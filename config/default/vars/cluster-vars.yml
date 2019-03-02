@@ -1,5 +1,5 @@
 ---
-demo_default_openshift_provision_cluster_vars:
+demo_default_cluster_vars:
   cloud_provider: "{{ demo_cloud_provider }}"
   cloud_region: "{{ demo_cloud_region }}"
   cluster_name: "{{ demo_cluster_name }}"

@@ -38,7 +38,7 @@
         kind: ConfigMap
         metadata:
           name: cluster-vars
-        data: "{{ openshift_provision_cluster_vars }}"
+        data: "{{ demo_cluster_vars }}"
     when: >-
       get_cluster_vars.rc != 0 or
       current_vars.data != cluster_vars.data

@@ -42,7 +42,7 @@ class OpenShiftInventory:
         )
         for item in conf_hierarchy[::-1]:
             self.load_cluster_vars(item)
-
+        self.cluster_config['openshift_provision_cluster_vars'] = self.cluster_config['demo_cluster_vars']
         self.cluster_config['demo_dynamic_vars'] = {}
         self.cloud_provider_class = __import__(
             'openshift_' + self.cluster_config['demo_cloud_provider']
