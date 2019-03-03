@@ -62,6 +62,6 @@ ANSIBLE_VARS=(
   '-e' "@$OPENSHIFT_PROVISION_PROJECT_DIR/$CLUSTER_MAIN_VARS"
 )
 
-export ANSIBLE_ROLES_PATH="$OPENSHIFT_PROVISION_PROJECT_DIR/roles:~/.ansible/roles"
+export ANSIBLE_ROLES_PATH="$OPENSHIFT_PROVISION_PROJECT_DIR/roles:~/.ansible/roles:/etc/ansible/roles"
 
 ansible-playbook "${ANSIBLE_VARS[@]}" $PLAYBOOK
