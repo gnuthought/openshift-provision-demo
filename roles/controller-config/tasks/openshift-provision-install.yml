@@ -1,7 +1,9 @@
 ---
 - name: Install openshift-provision with ansible-galaxy
+  become: true
   command: >-
     ansible-galaxy install
+    --roles-path=/etc/ansible/roles
     https://github.com/gnuthought/ansible-role-openshift-provision/archive/master.tar.gz#/openshift-provision
   register: ansible_galaxy
   changed_when: >-
