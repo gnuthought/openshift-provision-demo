@@ -34,7 +34,7 @@ class OpenShiftInventory:
         for path in openshift_provision_config_path[::-1]:
             conf_bootstrap.update(self.load_vars_file(path))
 
-        conf_hierarchy = yaml.load(
+        conf_hierarchy = yaml.safe_load(
             self.value_expand(
                 conf_bootstrap['openshift_provision_config_hierarchy'],
                 jinja_vars = conf_bootstrap
@@ -54,7 +54,7 @@ class OpenShiftInventory:
 
     def load_vars_file(self, path):
         try:
-            return yaml.load(
+            return yaml.safe_load(
                 open(self.openshift_provision_project_dir + '/' + path, 'r')
             )
         except Exception as e:
